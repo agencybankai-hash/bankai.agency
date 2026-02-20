@@ -55,7 +55,7 @@ function useReveal(delay = 0) {
           }, delay);
         }
       },
-      { threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
+      { threshold: 0.02, rootMargin: "0px 0px 40px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -105,7 +105,7 @@ function AnimCounter({ text }) {
         }
         obs.disconnect();
       }
-    }, { threshold: 0.5 });
+    }, { threshold: 0.15 });
     obs.observe(el);
     return () => obs.disconnect();
   }, [text]);
@@ -151,7 +151,7 @@ const sectionLabel = {
 };
 const sectionTitle = {
   fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 800,
-  lineHeight: 1.1, letterSpacing: "-0.03em", color: V.bright, maxWidth: 750, marginBottom: 64,
+  lineHeight: 1.1, letterSpacing: "-0.03em", color: V.bright, maxWidth: 750, marginBottom: 40,
 };
 
 /* ═══════════════════════ GRID BACKGROUND ═══════════════════════ */
@@ -231,7 +231,7 @@ function Nav() {
 /* ═══════════════════════ HERO ═══════════════════════ */
 function Hero() {
   return (
-    <section style={{ padding: "200px 0 140px", position: "relative", overflow: "hidden" }}>
+    <section style={{ padding: "160px 0 100px", position: "relative", overflow: "hidden" }}>
       <AuroraBg />
       {/* decorative ring */}
       <div style={{
@@ -370,7 +370,7 @@ function Problem() {
     { icon: "💸", num: "03", title: "Дорогие сотрудники, медленные процессы", text: "Нанять operations director — $150K/год. Нанять аналитика — ещё $100K. А рутина по-прежнему отнимает половину рабочего дня." },
   ];
   return (
-    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
         <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Проблема</div></Reveal>
         <Reveal delay={80}><h2 style={sectionTitle}>Ваш бизнес растёт, но операционка тянет вас назад</h2></Reveal>
@@ -428,7 +428,7 @@ function Solution() {
     },
   ];
   return (
-    <section id="solution" style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section id="solution" style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       {/* subtle bg glow */}
       <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 800, height: 800, background: "radial-gradient(circle, rgba(110,231,183,0.025) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={container}>
@@ -489,7 +489,7 @@ function Results() {
     { val: "24/7", label: "система работает без выходных", color: V.accent2 },
   ];
   return (
-    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
         <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Результаты</div></Reveal>
         <Reveal delay={80}><h2 style={sectionTitle}>Что получает бизнес после внедрения</h2></Reveal>
@@ -520,7 +520,7 @@ function Process() {
     { num: "04", dur: "Постоянно", title: "Поддержка и развитие", text: "Мониторим, добавляем новых агентов, масштабируем систему с ростом бизнеса." },
   ];
   return (
-    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
         <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Процесс</div></Reveal>
         <Reveal delay={80}><h2 style={sectionTitle}>Как мы внедряем AI-ядро</h2></Reveal>
@@ -564,7 +564,7 @@ function Process() {
 /* ═══════════════════════ CASE STUDY ═══════════════════════ */
 function CaseStudy() {
   return (
-    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
         <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.orange, display: "inline-block" }} /> Кейс</div></Reveal>
         <Reveal delay={80}><h2 style={sectionTitle}>Результаты, которые говорят за нас</h2></Reveal>
@@ -646,7 +646,7 @@ function Pricing() {
     },
   ];
   return (
-    <section id="pricing" style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section id="pricing" style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       <div style={{ position: "absolute", bottom: -200, left: "50%", transform: "translateX(-50%)", width: 700, height: 700, background: "radial-gradient(circle, rgba(110,231,183,0.03) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={container}>
         <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Тарифы</div></Reveal>
@@ -708,7 +708,7 @@ function FAQ() {
     { q: "Какая гарантия?", a: "Если после аудита нет конкретного ROI и плана — вернём деньги. Скоуп и KPI фиксируем до начала." },
   ];
   return (
-    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+    <section style={{ padding: "100px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
         <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> FAQ</div></Reveal>
         <Reveal delay={80}><h2 style={sectionTitle}>Ответы на главные вопросы</h2></Reveal>
@@ -730,7 +730,7 @@ function FAQ() {
 /* ═══════════════════════ FINAL CTA ═══════════════════════ */
 function FinalCTA() {
   return (
-    <section id="contact" style={{ padding: "140px 0 180px", textAlign: "center", position: "relative", zIndex: 1 }}>
+    <section id="contact" style={{ padding: "100px 0 140px", textAlign: "center", position: "relative", zIndex: 1 }}>
       <div style={{
         position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: 1000, height: 600,
