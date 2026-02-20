@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* ───── design tokens ───── */
 const V = {
@@ -40,79 +40,46 @@ const globalCSS = `
 ::-webkit-scrollbar-thumb { background: rgba(110,231,183,0.2); border-radius: 3px; }
 `;
 
-/* ───── scroll reveal hook ───── */
-function useReveal(delay = 0) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          if (delay > 0) {
-            setTimeout(() => setVisible(true), delay);
-          } else {
-            setVisible(true);
-          }
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.01, rootMargin: "0px 0px 60px 0px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [delay]);
-  return {
-    ref,
-    style: {
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(30px)",
-      transition: "all .7s cubic-bezier(.16,1,.3,1)",
-    },
-  };
-}
-
+/* ───── simple reveal via CSS animation ───── */
 function Reveal({ children, style: extra, delay = 0, tag: Tag = "div", ...props }) {
-  const r = useReveal(delay);
-  return <Tag ref={r.ref} style={{ ...r.style, ...extra }} {...props}>{children}</Tag>;
+  return (
+    <Tag
+      style={{
+        animation: `fadeInUp .8s cubic-bezier(.16,1,.3,1) ${delay}ms both`,
+        ...extra,
+      }}
+      {...props}
+    >
+      {children}
+    </Tag>
+  );
 }
 
-/* ───── animated counter ───── */
+/* ───── animated counter (runs on mount) ───── */
 function AnimCounter({ text }) {
-  const ref = useRef(null);
   const [display, setDisplay] = useState(text);
+  const ran = useRef(false);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        const match = text.match(/[\d,.]+/);
-        if (match) {
-          const target = parseFloat(match[0].replace(/,/g, ""));
-          const prefix = text.slice(0, text.indexOf(match[0]));
-          const suffix = text.slice(text.indexOf(match[0]) + match[0].length);
-          const hasComma = match[0].includes(",");
-          let start = 0;
-          const dur = 1500;
-          const t0 = performance.now();
-          const tick = (now) => {
-            const p = Math.min((now - t0) / dur, 1);
-            const ease = 1 - Math.pow(1 - p, 4);
-            const val = start + (target - start) * ease;
-            const formatted = hasComma ? Math.round(val).toLocaleString("en-US") : match[0].includes(".") ? val.toFixed(1) : Math.round(val).toString();
-            setDisplay(prefix + formatted + suffix);
-            if (p < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        }
-        obs.disconnect();
-      }
-    }, { threshold: 0.15 });
-    obs.observe(el);
-    return () => obs.disconnect();
+    if (ran.current) return;
+    ran.current = true;
+    const match = text.match(/[\d,.]+/);
+    if (!match) return;
+    const target = parseFloat(match[0].replace(/,/g, ""));
+    const prefix = text.slice(0, text.indexOf(match[0]));
+    const suffix = text.slice(text.indexOf(match[0]) + match[0].length);
+    const dur = 1400;
+    const t0 = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 4);
+      const val = target * ease;
+      const formatted = match[0].includes(",") ? Math.round(val).toLocaleString("en-US") : match[0].includes(".") ? val.toFixed(1) : Math.round(val).toString();
+      setDisplay(prefix + formatted + suffix);
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }, [text]);
-  return <span ref={ref}>{display}</span>;
+  return <span>{display}</span>;
 }
 
 /* ───── card with glow border ───── */
