@@ -1,75 +1,227 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ───── design tokens ───── */
 const V = {
-  bg: "#0A0A0F",
-  card: "#12121A",
-  cardHover: "#1A1A25",
+  bg: "#06060B",
+  card: "#0E0E16",
+  cardHover: "#14141E",
   text: "#E8E6F0",
-  dim: "#8A879A",
+  dim: "#7A7790",
   bright: "#FFFFFF",
   accent: "#6EE7B7",
-  accentDim: "rgba(110,231,183,0.15)",
-  accentGlow: "rgba(110,231,183,0.3)",
+  accent2: "#34D399",
+  accentDim: "rgba(110,231,183,0.12)",
+  accentGlow: "rgba(110,231,183,0.35)",
+  red: "#EF4444",
+  redDim: "rgba(239,68,68,0.12)",
   orange: "#F59E0B",
-  orangeDim: "rgba(245,158,11,0.15)",
-  border: "rgba(255,255,255,0.06)",
-  borderHover: "rgba(255,255,255,0.12)",
-  radius: 16,
-  radiusSm: 10,
+  orangeDim: "rgba(245,158,11,0.12)",
+  border: "rgba(255,255,255,0.05)",
+  borderHover: "rgba(255,255,255,0.1)",
+  radius: 20,
+  radiusSm: 12,
   heading: "'Unbounded', cursive",
-  body: "var(--font-manrope), 'Manrope', sans-serif",
 };
 
+/* ───── global CSS keyframes ───── */
+const globalCSS = `
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+@keyframes pulseGlow { 0%,100%{opacity:.6} 50%{opacity:1} }
+@keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes borderGlow { 0%,100%{border-color:rgba(110,231,183,0.08)} 50%{border-color:rgba(110,231,183,0.2)} }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes pulse2 { 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.5);opacity:0} }
+* { scrollbar-width: thin; scrollbar-color: rgba(110,231,183,0.2) transparent; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(110,231,183,0.2); border-radius: 3px; }
+`;
+
 /* ───── scroll reveal hook ───── */
-function useReveal() {
+function useReveal(delay = 0) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { el.style.opacity = 1; el.style.transform = "translateY(0)"; } },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      ([e]) => {
+        if (e.isIntersecting) {
+          setTimeout(() => {
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+          }, delay);
+        }
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
-  return { ref, style: { opacity: 0, transform: "translateY(32px)", transition: "all .7s cubic-bezier(.16,1,.3,1)" } };
+  }, [delay]);
+  return {
+    ref,
+    style: {
+      opacity: 0,
+      transform: "translateY(40px)",
+      transition: `all .8s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+    },
+  };
 }
 
-function Reveal({ children, style: extra, ...props }) {
-  const r = useReveal();
-  return <div ref={r.ref} style={{ ...r.style, ...extra }} {...props}>{children}</div>;
+function Reveal({ children, style: extra, delay = 0, tag: Tag = "div", ...props }) {
+  const r = useReveal(delay);
+  return <Tag ref={r.ref} style={{ ...r.style, ...extra }} {...props}>{children}</Tag>;
+}
+
+/* ───── animated counter ───── */
+function AnimCounter({ text }) {
+  const ref = useRef(null);
+  const [display, setDisplay] = useState(text);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        const match = text.match(/[\d,.]+/);
+        if (match) {
+          const target = parseFloat(match[0].replace(/,/g, ""));
+          const prefix = text.slice(0, text.indexOf(match[0]));
+          const suffix = text.slice(text.indexOf(match[0]) + match[0].length);
+          const hasComma = match[0].includes(",");
+          let start = 0;
+          const dur = 1500;
+          const t0 = performance.now();
+          const tick = (now) => {
+            const p = Math.min((now - t0) / dur, 1);
+            const ease = 1 - Math.pow(1 - p, 4);
+            const val = start + (target - start) * ease;
+            const formatted = hasComma ? Math.round(val).toLocaleString("en-US") : match[0].includes(".") ? val.toFixed(1) : Math.round(val).toString();
+            setDisplay(prefix + formatted + suffix);
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+        obs.disconnect();
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [text]);
+  return <span ref={ref}>{display}</span>;
+}
+
+/* ───── card with glow border ───── */
+function GlowCard({ children, style, glowColor = V.accent, ...props }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: V.card,
+        border: `1px solid ${hover ? `${glowColor}33` : V.border}`,
+        borderRadius: V.radius,
+        transition: "all .4s cubic-bezier(.16,1,.3,1)",
+        position: "relative",
+        overflow: "hidden",
+        ...(hover ? { transform: "translateY(-4px)", boxShadow: `0 20px 60px -15px ${glowColor}15` } : {}),
+        ...style,
+      }}
+      {...props}
+    >
+      {/* top glow line */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: 1,
+        background: `linear-gradient(90deg, transparent, ${glowColor}${hover ? "60" : "15"}, transparent)`,
+        transition: "all .4s",
+      }} />
+      {children}
+    </div>
+  );
 }
 
 /* ───── shared styles ───── */
-const container = { maxWidth: 1200, margin: "0 auto", padding: "0 24px" };
+const container = { maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative" };
 const sectionLabel = {
-  fontFamily: V.heading, fontSize: "0.72rem", fontWeight: 600,
-  letterSpacing: "0.15em", textTransform: "uppercase", color: V.accent, marginBottom: 20,
+  fontFamily: V.heading, fontSize: "0.7rem", fontWeight: 700,
+  letterSpacing: "0.2em", textTransform: "uppercase", color: V.accent, marginBottom: 16,
+  display: "inline-flex", alignItems: "center", gap: 10,
 };
 const sectionTitle = {
-  fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 700,
-  lineHeight: 1.15, letterSpacing: "-0.02em", color: V.bright, maxWidth: 700, marginBottom: 56,
+  fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 800,
+  lineHeight: 1.1, letterSpacing: "-0.03em", color: V.bright, maxWidth: 750, marginBottom: 64,
 };
+
+/* ═══════════════════════ GRID BACKGROUND ═══════════════════════ */
+function GridBg() {
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none", opacity: 0.4,
+    }}>
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+            <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255,255,255,0.015)" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      </svg>
+    </div>
+  );
+}
+
+/* ═══════════════════════ AURORA BG ═══════════════════════ */
+function AuroraBg() {
+  return (
+    <div style={{ position: "absolute", top: -300, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 1400, height: 900, pointerEvents: "none", zIndex: 0 }}>
+      <div style={{
+        position: "absolute", top: 0, left: "10%", width: 500, height: 500,
+        background: "radial-gradient(ellipse, rgba(110,231,183,0.08) 0%, transparent 70%)",
+        filter: "blur(80px)", animation: "float 8s ease-in-out infinite",
+      }} />
+      <div style={{
+        position: "absolute", top: 100, right: "5%", width: 400, height: 400,
+        background: "radial-gradient(ellipse, rgba(52,211,153,0.05) 0%, transparent 70%)",
+        filter: "blur(60px)", animation: "float 10s ease-in-out infinite 2s",
+      }} />
+      <div style={{
+        position: "absolute", top: 200, left: "40%", width: 300, height: 300,
+        background: "radial-gradient(ellipse, rgba(110,231,183,0.04) 0%, transparent 70%)",
+        filter: "blur(50px)", animation: "float 12s ease-in-out infinite 4s",
+      }} />
+    </div>
+  );
+}
 
 /* ═══════════════════════ NAV ═══════════════════════ */
 function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
+  }, []);
   return (
     <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "20px 0",
-      background: "rgba(10,10,15,0.8)", backdropFilter: "blur(20px)",
-      borderBottom: `1px solid ${V.border}`,
+      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+      padding: scrolled ? "14px 0" : "22px 0",
+      background: scrolled ? "rgba(6,6,11,0.9)" : "transparent",
+      backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+      borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
+      transition: "all .4s cubic-bezier(.16,1,.3,1)",
     }}>
       <div style={{ ...container, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: V.heading, fontWeight: 700, fontSize: "1.15rem", color: V.bright, letterSpacing: "-0.02em" }}>
+        <div style={{ fontFamily: V.heading, fontWeight: 800, fontSize: "1.2rem", color: V.bright, letterSpacing: "-0.03em" }}>
           AI<span style={{ color: V.accent }}>.</span>ЯДРО
         </div>
         <a href="#pricing" style={{
-          background: V.accent, color: V.bg, padding: "10px 24px", borderRadius: 100,
+          background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`,
+          color: V.bg, padding: "10px 26px", borderRadius: 100,
           fontWeight: 700, fontSize: "0.85rem", textDecoration: "none",
           transition: "all .3s", letterSpacing: "-0.01em",
+          boxShadow: `0 0 20px ${V.accentGlow}`,
         }}>Получить аудит →</a>
       </div>
     </nav>
@@ -79,109 +231,163 @@ function Nav() {
 /* ═══════════════════════ HERO ═══════════════════════ */
 function Hero() {
   return (
-    <section style={{ padding: "180px 0 120px", position: "relative" }}>
-      {/* radial glow */}
+    <section style={{ padding: "200px 0 140px", position: "relative", overflow: "hidden" }}>
+      <AuroraBg />
+      {/* decorative ring */}
       <div style={{
-        position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)",
-        width: 800, height: 800,
-        background: "radial-gradient(circle, rgba(110,231,183,0.06) 0%, transparent 70%)",
-        pointerEvents: "none",
-      }} />
-      <div style={container}>
-        {/* badge */}
+        position: "absolute", top: "50%", right: "-10%", width: 500, height: 500,
+        border: `1px solid ${V.border}`, borderRadius: "50%",
+        transform: "translateY(-50%)", opacity: 0.3,
+        animation: "spinSlow 120s linear infinite",
+      }}>
         <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          padding: "8px 18px", background: V.accentDim,
-          border: "1px solid rgba(110,231,183,0.2)", borderRadius: 100,
-          fontSize: "0.82rem", fontWeight: 600, color: V.accent, marginBottom: 32,
-        }}>
-          <span style={{ width: 6, height: 6, background: V.accent, borderRadius: "50%", display: "inline-block" }} />
-          Внедрение AI-систем для бизнеса
-        </div>
+          position: "absolute", top: -4, left: "50%", width: 8, height: 8,
+          background: V.accent, borderRadius: "50%",
+          boxShadow: `0 0 20px ${V.accentGlow}`,
+        }} />
+      </div>
+      <div style={{ ...container, zIndex: 1, position: "relative" }}>
+        {/* badge */}
+        <Reveal>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "8px 20px", background: "rgba(110,231,183,0.06)",
+            border: "1px solid rgba(110,231,183,0.15)", borderRadius: 100,
+            fontSize: "0.8rem", fontWeight: 600, color: V.accent, marginBottom: 40,
+            backdropFilter: "blur(10px)",
+          }}>
+            <span style={{
+              width: 7, height: 7, background: V.accent, borderRadius: "50%",
+              display: "inline-block", position: "relative",
+            }}>
+              <span style={{
+                position: "absolute", inset: -3, borderRadius: "50%",
+                border: `2px solid ${V.accent}`, animation: "pulse2 2s ease-out infinite",
+              }} />
+            </span>
+            Внедрение AI-систем для бизнеса
+          </div>
+        </Reveal>
 
         {/* heading */}
-        <h1 style={{
-          fontFamily: V.heading, fontSize: "clamp(2.5rem, 5.5vw, 4.2rem)",
-          fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em",
-          color: V.bright, maxWidth: 900, marginBottom: 28,
-        }}>
-          Операционная система{" "}
-          <span style={{
-            background: "linear-gradient(135deg, #6EE7B7, #34D399)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-          }}>вашего бизнеса</span>{" "}
-          на базе ИИ
-        </h1>
+        <Reveal delay={100}>
+          <h1 style={{
+            fontFamily: V.heading, fontSize: "clamp(2.8rem, 6vw, 4.8rem)",
+            fontWeight: 900, lineHeight: 1.05, letterSpacing: "-0.04em",
+            color: V.bright, maxWidth: 950, marginBottom: 32,
+          }}>
+            Операционная система{" "}
+            <span style={{
+              background: `linear-gradient(135deg, ${V.accent}, ${V.accent2}, #A7F3D0)`,
+              backgroundSize: "200% 200%", animation: "gradientShift 4s ease infinite",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            }}>вашего бизнеса</span>{" "}
+            на базе ИИ
+          </h1>
+        </Reveal>
 
-        <p style={{ fontSize: "1.2rem", color: V.dim, maxWidth: 620, lineHeight: 1.7, marginBottom: 48 }}>
-          Внедряем AI-агентов, которые берут на себя рутину, аналитику и часть решений.
-          Вы получаете управляемый бизнес без раздутого штата.
-        </p>
+        <Reveal delay={200}>
+          <p style={{ fontSize: "1.25rem", color: V.dim, maxWidth: 640, lineHeight: 1.7, marginBottom: 52, fontWeight: 400 }}>
+            Внедряем AI-агентов, которые берут на себя рутину, аналитику и часть решений.
+            Вы получаете управляемый бизнес без раздутого штата.
+          </p>
+        </Reveal>
 
         {/* buttons */}
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <a href="#pricing" style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            background: V.accent, color: V.bg, padding: "16px 36px", borderRadius: 100,
-            fontWeight: 700, fontSize: "1rem", textDecoration: "none", transition: "all .3s",
-          }}>Заказать аудит — $2 500 →</a>
-          <a href="#solution" style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            background: "transparent", color: V.text, padding: "16px 36px", borderRadius: 100,
-            fontWeight: 600, fontSize: "1rem", textDecoration: "none",
-            border: `1px solid ${V.borderHover}`, transition: "all .3s",
-          }}>Как это работает</a>
-        </div>
+        <Reveal delay={300}>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <a href="#pricing" style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`,
+              color: V.bg, padding: "18px 40px", borderRadius: 100,
+              fontWeight: 700, fontSize: "1.05rem", textDecoration: "none", transition: "all .3s",
+              boxShadow: `0 0 40px ${V.accentGlow}, 0 8px 32px rgba(0,0,0,0.3)`,
+            }}>Заказать аудит — $2 500 →</a>
+            <a href="#solution" style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              background: "rgba(255,255,255,0.03)", color: V.text, padding: "18px 40px", borderRadius: 100,
+              fontWeight: 600, fontSize: "1.05rem", textDecoration: "none",
+              border: `1px solid ${V.borderHover}`, transition: "all .3s",
+              backdropFilter: "blur(10px)",
+            }}>Как это работает</a>
+          </div>
+        </Reveal>
 
         {/* stats */}
-        <div style={{
-          display: "flex", gap: 48, marginTop: 72, paddingTop: 48,
-          borderTop: `1px solid ${V.border}`, flexWrap: "wrap",
-        }}>
-          {[
-            { val: "20–40", unit: "ч/нед", label: "экономия времени команды" },
-            { val: "3–6", unit: "мес", label: "окупаемость внедрения" },
-            { val: "2–3", unit: "FTE", label: "замена штатных единиц" },
-          ].map((s, i) => (
-            <div key={i}>
-              <div style={{ fontFamily: V.heading, fontSize: "2rem", fontWeight: 700, color: V.bright }}>
-                {s.val} <span style={{ color: V.accent }}>{s.unit}</span>
+        <Reveal delay={400}>
+          <div style={{
+            display: "flex", gap: 56, marginTop: 80, paddingTop: 48,
+            borderTop: `1px solid ${V.border}`, flexWrap: "wrap",
+          }}>
+            {[
+              { val: "20–40", unit: "ч/нед", label: "экономия времени команды" },
+              { val: "3–6", unit: "мес", label: "окупаемость внедрения" },
+              { val: "2–3", unit: "FTE", label: "замена штатных единиц" },
+            ].map((s, i) => (
+              <div key={i} style={{ position: "relative" }}>
+                <div style={{ fontFamily: V.heading, fontSize: "2.2rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.03em" }}>
+                  {s.val} <span style={{ color: V.accent, fontSize: "1.2rem" }}>{s.unit}</span>
+                </div>
+                <div style={{ fontSize: "0.85rem", color: V.dim, marginTop: 6, fontWeight: 500 }}>{s.label}</div>
               </div>
-              <div style={{ fontSize: "0.85rem", color: V.dim, marginTop: 4 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
+  );
+}
+
+/* ═══════════════════════ MARQUEE DIVIDER ═══════════════════════ */
+function Marquee() {
+  const items = ["AI-АВТОМАТИЗАЦИЯ", "ОПЕРАЦИОННОЕ УПРАВЛЕНИЕ", "MACHINE LEARNING", "AI-АГЕНТЫ", "БИЗНЕС-АНАЛИТИКА", "CRM-ИНТЕГРАЦИЯ", "ПРОГНОЗИРОВАНИЕ"];
+  return (
+    <div style={{ overflow: "hidden", borderTop: `1px solid ${V.border}`, borderBottom: `1px solid ${V.border}`, padding: "18px 0", position: "relative", zIndex: 1 }}>
+      <div style={{
+        display: "flex", gap: 48, animation: "shimmer 20s linear infinite",
+        whiteSpace: "nowrap", width: "max-content",
+      }}>
+        {[...items, ...items, ...items].map((t, i) => (
+          <span key={i} style={{
+            fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700,
+            letterSpacing: "0.15em", textTransform: "uppercase",
+            color: i % 2 === 0 ? V.dim : V.accent, opacity: 0.5,
+          }}>{t}</span>
+        ))}
+      </div>
+      <style>{`
+        @keyframes shimmer { 0%{transform:translateX(0)} 100%{transform:translateX(-33.33%)} }
+      `}</style>
+    </div>
   );
 }
 
 /* ═══════════════════════ PROBLEM ═══════════════════════ */
 function Problem() {
   const cards = [
-    { icon: "⏱", title: "Всё завязано на вас", text: "Вы вручную контролируете каждый процесс. Без вашего участия ничего не движется. Масштабирование невозможно, пока вы — узкое горлышко." },
-    { icon: "📊", title: "Нет прозрачности", text: "Данные разбросаны между CRM, таблицами и головами сотрудников. Вы принимаете решения на ощущениях, а не на цифрах." },
-    { icon: "💸", title: "Дорогие сотрудники, медленные процессы", text: "Нанять operations director — $150K/год. Нанять аналитика — ещё $100K. А рутина по-прежнему отнимает половину рабочего дня." },
+    { icon: "⏱", num: "01", title: "Всё завязано на вас", text: "Вы вручную контролируете каждый процесс. Без вашего участия ничего не движется. Масштабирование невозможно, пока вы — узкое горлышко." },
+    { icon: "📊", num: "02", title: "Нет прозрачности", text: "Данные разбросаны между CRM, таблицами и головами сотрудников. Вы принимаете решения на ощущениях, а не на цифрах." },
+    { icon: "💸", num: "03", title: "Дорогие сотрудники, медленные процессы", text: "Нанять operations director — $150K/год. Нанять аналитика — ещё $100K. А рутина по-прежнему отнимает половину рабочего дня." },
   ];
   return (
-    <section style={{ padding: "120px 0" }}>
+    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Проблема</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Ваш бизнес растёт, но операционка тянет вас назад</h2></Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Проблема</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Ваш бизнес растёт, но операционка тянет вас назад</h2></Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {cards.map((c, i) => (
-            <Reveal key={i}>
-              <div style={{
-                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                padding: 36, transition: "all .4s", position: "relative", overflow: "hidden", height: "100%",
-              }}>
-                <div style={{
-                  width: 48, height: 48, background: "rgba(239,68,68,0.1)", borderRadius: 12,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", marginBottom: 20,
-                }}>{c.icon}</div>
-                <h3 style={{ fontFamily: V.heading, fontSize: "1.05rem", fontWeight: 600, color: V.bright, marginBottom: 12 }}>{c.title}</h3>
-                <p style={{ fontSize: "0.92rem", color: V.dim, lineHeight: 1.7 }}>{c.text}</p>
-              </div>
+            <Reveal key={i} delay={i * 100}>
+              <GlowCard glowColor={V.red} style={{ padding: "40px 36px", height: "100%" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+                  <div style={{
+                    width: 52, height: 52, background: V.redDim, borderRadius: 14,
+                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem",
+                  }}>{c.icon}</div>
+                  <span style={{ fontFamily: V.heading, fontSize: "2.5rem", fontWeight: 900, color: "rgba(239,68,68,0.06)", lineHeight: 1 }}>{c.num}</span>
+                </div>
+                <h3 style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 700, color: V.bright, marginBottom: 14, letterSpacing: "-0.02em" }}>{c.title}</h3>
+                <p style={{ fontSize: "0.9rem", color: V.dim, lineHeight: 1.75 }}>{c.text}</p>
+              </GlowCard>
             </Reveal>
           ))}
         </div>
@@ -194,75 +400,78 @@ function Problem() {
 function Solution() {
   const layers = [
     {
-      num: "Слой 01 — Операционный", title: "AI делает рутину за команду",
-      desc: "Агенты, которые работают 24/7 и не ошибаются. Они обрабатывают входящие, квалифицируют лиды, создают задачи и генерируют отчёты без вашего участия.",
+      num: "01", label: "Операционный", title: "AI делает рутину за команду",
+      desc: "Агенты, которые работают 24/7 и не ошибаются. Они обрабатывают входящие, квалифицируют лиды, создают задачи и генерируют отчёты.",
       features: [
-        { bold: "Автообработка заявок", text: " — лид приходит, AI квалифицирует и маршрутизирует менеджеру за секунды" },
-        { bold: "Транскрибация → задачи", text: " — каждый звонок и встреча превращаются в чёткий action-plan" },
-        { bold: "Авто-отчёты", text: " — еженедельные отчёты по KPI генерируются сами и приходят вам в мессенджер" },
+        { bold: "Автообработка заявок", text: " — AI квалифицирует и маршрутизирует лиды за секунды" },
+        { bold: "Транскрибация → задачи", text: " — звонки и встречи превращаются в action-plan" },
+        { bold: "Авто-отчёты", text: " — KPI-отчёты генерируются и приходят в мессенджер" },
       ],
     },
     {
-      num: "Слой 02 — Тактический", title: "AI анализирует и рекомендует",
-      desc: "Система непрерывно следит за метриками, рекламными кампаниями и конкурентами. Вы получаете не данные, а готовые рекомендации к действию.",
+      num: "02", label: "Тактический", title: "AI анализирует и рекомендует",
+      desc: "Система следит за метриками, рекламой и конкурентами. Вы получаете готовые рекомендации к действию.",
       features: [
-        { bold: "KPI-алерты", text: " — мгновенные уведомления при отклонении от нормы с объяснением причин" },
-        { bold: "Анализ рекламы", text: " — AI смотрит ваши кампании и говорит что масштабировать, а что остановить" },
-        { bold: "Конкурентная разведка", text: " — автоматический мониторинг конкурентов и их стратегий" },
+        { bold: "KPI-алерты", text: " — уведомления при отклонении от нормы с объяснением" },
+        { bold: "Анализ рекламы", text: " — AI говорит что масштабировать, а что остановить" },
+        { bold: "Конкурентная разведка", text: " — мониторинг конкурентов и их стратегий" },
       ],
     },
     {
-      num: "Слой 03 — Стратегический", title: "AI как ваш цифровой советник",
-      desc: "Полная картина бизнеса в одном дашборде. Прогнозы, сценарии, рекомендации — всё, что нужно для взвешенных решений.",
+      num: "03", label: "Стратегический", title: "AI как ваш цифровой советник",
+      desc: "Полная картина бизнеса в одном дашборде. Прогнозы, сценарии, рекомендации для решений.",
       features: [
-        { bold: "Живой дашборд", text: " — все ключевые метрики бизнеса в реальном времени" },
-        { bold: "Прогнозирование", text: " — AI строит модели на основе ваших исторических данных" },
-        { bold: "Сценарное моделирование", text: " — «что если» анализ перед каждым крупным решением" },
+        { bold: "Живой дашборд", text: " — ключевые метрики в реальном времени" },
+        { bold: "Прогнозирование", text: " — модели на основе исторических данных" },
+        { bold: "Сценарное моделирование", text: " — «что если» анализ перед решением" },
       ],
     },
   ];
   return (
-    <section id="solution" style={{ padding: "120px 0", position: "relative" }}>
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-        background: "linear-gradient(180deg, transparent, rgba(110,231,183,0.02), transparent)",
-        pointerEvents: "none",
-      }} />
+    <section id="solution" style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+      {/* subtle bg glow */}
+      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 800, height: 800, background: "radial-gradient(circle, rgba(110,231,183,0.025) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Решение</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Три слоя AI-ядра, которые закрывают операционку</h2></Reveal>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Решение</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Три слоя AI-ядра, которые закрывают операционку</h2></Reveal>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {layers.map((l, i) => (
-            <Reveal key={i}>
-              <div style={{
-                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                padding: "44px 48px", display: "grid", gridTemplateColumns: "1fr 1.4fr",
-                gap: 48, alignItems: "center", transition: "all .4s", position: "relative", overflow: "hidden",
+            <Reveal key={i} delay={i * 120}>
+              <GlowCard style={{
+                padding: "48px 52px", display: "grid", gridTemplateColumns: "1fr 1.5fr",
+                gap: 52, alignItems: "center",
               }}>
                 <div>
-                  <div style={{ fontFamily: V.heading, fontSize: "0.7rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>{l.num}</div>
-                  <h3 style={{ fontFamily: V.heading, fontSize: "1.4rem", fontWeight: 700, color: V.bright, marginBottom: 14, letterSpacing: "-0.02em" }}>{l.title}</h3>
-                  <p style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.7 }}>{l.desc}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                    <span style={{
+                      fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800,
+                      color: V.bg, background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`,
+                      padding: "4px 12px", borderRadius: 100, letterSpacing: "0.08em",
+                    }}>СЛОЙ {l.num}</span>
+                    <span style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 600, color: V.dim, letterSpacing: "0.08em", textTransform: "uppercase" }}>{l.label}</span>
+                  </div>
+                  <h3 style={{ fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 800, color: V.bright, marginBottom: 16, letterSpacing: "-0.03em", lineHeight: 1.2 }}>{l.title}</h3>
+                  <p style={{ fontSize: "0.93rem", color: V.dim, lineHeight: 1.75 }}>{l.desc}</p>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {l.features.map((f, j) => (
                     <div key={j} style={{
                       display: "flex", alignItems: "flex-start", gap: 14,
-                      padding: "16px 20px", background: "rgba(255,255,255,0.02)",
+                      padding: "18px 22px", background: "rgba(255,255,255,0.02)",
                       borderRadius: V.radiusSm, border: `1px solid ${V.border}`, transition: "all .3s",
                     }}>
                       <div style={{
-                        width: 32, height: 32, minWidth: 32, background: V.accentDim,
+                        width: 28, height: 28, minWidth: 28, background: V.accentDim,
                         borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center",
-                        color: V.accent, fontSize: "0.85rem", fontWeight: 700,
+                        color: V.accent, fontSize: "0.75rem", fontWeight: 800,
                       }}>→</div>
-                      <div style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.5 }}>
-                        <strong style={{ color: V.bright, fontWeight: 600 }}>{f.bold}</strong>{f.text}
+                      <div style={{ fontSize: "0.87rem", color: V.text, lineHeight: 1.55 }}>
+                        <strong style={{ color: V.bright, fontWeight: 700 }}>{f.bold}</strong>{f.text}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </GlowCard>
             </Reveal>
           ))}
         </div>
@@ -274,26 +483,26 @@ function Solution() {
 /* ═══════════════════════ RESULTS ═══════════════════════ */
 function Results() {
   const items = [
-    { val: "–40%", label: "времени на рутинные операции" },
-    { val: "×3", label: "скорость обработки заявок" },
-    { val: "–$150K", label: "экономия на штате в год" },
-    { val: "24/7", label: "система работает без выходных" },
+    { val: "–40%", label: "времени на рутинные операции", color: V.accent },
+    { val: "×3", label: "скорость обработки заявок", color: V.accent2 },
+    { val: "–$150K", label: "экономия на штате в год", color: V.accent },
+    { val: "24/7", label: "система работает без выходных", color: V.accent2 },
   ];
   return (
-    <section style={{ padding: "120px 0" }}>
+    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Результаты</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Что получает бизнес после внедрения</h2></Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Результаты</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Что получает бизнес после внедрения</h2></Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
           {items.map((r, i) => (
-            <Reveal key={i}>
-              <div style={{
-                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                padding: "36px 32px", textAlign: "center", transition: "all .4s", height: "100%",
-              }}>
-                <div style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 800, color: V.accent, lineHeight: 1, marginBottom: 12 }}>{r.val}</div>
+            <Reveal key={i} delay={i * 80}>
+              <GlowCard style={{ padding: "44px 28px", textAlign: "center", height: "100%" }}>
+                <div style={{
+                  fontFamily: V.heading, fontSize: "2.8rem", fontWeight: 900, color: r.color,
+                  lineHeight: 1, marginBottom: 16, letterSpacing: "-0.03em",
+                }}><AnimCounter text={r.val} /></div>
                 <div style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.5 }}>{r.label}</div>
-              </div>
+              </GlowCard>
             </Reveal>
           ))}
         </div>
@@ -305,36 +514,47 @@ function Results() {
 /* ═══════════════════════ PROCESS ═══════════════════════ */
 function Process() {
   const steps = [
-    { num: "01", dur: "1–2 недели", title: "Аудит и стратегия", text: "Изучаем процессы, находим узкие места, проектируем архитектуру AI-системы. Вы получаете детальный план с ROI-прогнозом." },
-    { num: "02", dur: "3–4 недели", title: "Разработка и настройка", text: "Создаём и обучаем AI-агентов под ваши задачи. Интегрируем с CRM, мессенджерами, рекламными кабинетами." },
-    { num: "03", dur: "1–2 недели", title: "Запуск и калибровка", text: "Запускаем систему в работу, тестируем на реальных данных, калибруем точность и скорость агентов." },
-    { num: "04", dur: "Постоянно", title: "Поддержка и развитие", text: "Мониторим работу, добавляем новых агентов, масштабируем систему вместе с ростом вашего бизнеса." },
+    { num: "01", dur: "1–2 недели", title: "Аудит и стратегия", text: "Изучаем процессы, находим узкие места, проектируем архитектуру AI-системы с ROI-прогнозом." },
+    { num: "02", dur: "3–4 недели", title: "Разработка и настройка", text: "Создаём AI-агентов под ваши задачи. Интегрируем с CRM, мессенджерами, рекламными кабинетами." },
+    { num: "03", dur: "1–2 недели", title: "Запуск и калибровка", text: "Запускаем систему в работу, тестируем на реальных данных, калибруем точность агентов." },
+    { num: "04", dur: "Постоянно", title: "Поддержка и развитие", text: "Мониторим, добавляем новых агентов, масштабируем систему с ростом бизнеса." },
   ];
   return (
-    <section style={{ padding: "120px 0" }}>
+    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Процесс</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Как мы внедряем AI-ядро</h2></Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
-          {steps.map((s, i) => (
-            <Reveal key={i}>
-              <div style={{
-                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                padding: 36, position: "relative", transition: "all .4s", height: "100%",
-              }}>
-                <div style={{
-                  fontFamily: V.heading, fontSize: "3rem", fontWeight: 900,
-                  color: "rgba(110,231,183,0.08)", position: "absolute", top: 20, right: 24, lineHeight: 1,
-                }}>{s.num}</div>
-                <div style={{
-                  display: "inline-block", fontSize: "0.75rem", fontWeight: 600, color: V.accent,
-                  background: V.accentDim, padding: "4px 12px", borderRadius: 100, marginBottom: 14,
-                }}>{s.dur}</div>
-                <h3 style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 600, color: V.bright, marginBottom: 10 }}>{s.title}</h3>
-                <p style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.7 }}>{s.text}</p>
-              </div>
-            </Reveal>
-          ))}
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Процесс</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Как мы внедряем AI-ядро</h2></Reveal>
+        {/* horizontal timeline */}
+        <div style={{ position: "relative" }}>
+          {/* connector line */}
+          <div style={{ position: "absolute", top: 30, left: "6%", right: "6%", height: 2, background: `linear-gradient(90deg, ${V.accent}40, ${V.accent}20)`, zIndex: 0 }} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, position: "relative", zIndex: 1 }}>
+            {steps.map((s, i) => (
+              <Reveal key={i} delay={i * 120}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                  {/* timeline dot */}
+                  <div style={{
+                    width: 60, height: 60, borderRadius: "50%",
+                    background: V.card, border: `2px solid ${V.accent}40`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.accent,
+                    marginBottom: 24, position: "relative",
+                    boxShadow: `0 0 30px ${V.accentGlow}`,
+                  }}>
+                    {s.num}
+                  </div>
+                  <GlowCard style={{ padding: "32px 24px", width: "100%", textAlign: "center" }}>
+                    <div style={{
+                      display: "inline-block", fontSize: "0.72rem", fontWeight: 700, color: V.accent,
+                      background: V.accentDim, padding: "4px 14px", borderRadius: 100, marginBottom: 16,
+                    }}>{s.dur}</div>
+                    <h3 style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 700, color: V.bright, marginBottom: 12, letterSpacing: "-0.02em" }}>{s.title}</h3>
+                    <p style={{ fontSize: "0.85rem", color: V.dim, lineHeight: 1.7 }}>{s.text}</p>
+                  </GlowCard>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -344,28 +564,27 @@ function Process() {
 /* ═══════════════════════ CASE STUDY ═══════════════════════ */
 function CaseStudy() {
   return (
-    <section style={{ padding: "120px 0" }}>
+    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Кейс</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Результаты, которые говорят за нас</h2></Reveal>
-        <Reveal>
-          <div style={{
-            background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-            padding: 56, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center",
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.orange, display: "inline-block" }} /> Кейс</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Результаты, которые говорят за нас</h2></Reveal>
+        <Reveal delay={160}>
+          <GlowCard glowColor={V.orange} style={{
+            padding: "60px 56px", display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 60, alignItems: "center",
           }}>
             <div>
               <div style={{
-                fontSize: "0.75rem", fontWeight: 700, color: V.orange, background: V.orangeDim,
-                display: "inline-block", padding: "4px 14px", borderRadius: 100, marginBottom: 20,
-                letterSpacing: "0.05em", textTransform: "uppercase",
+                fontSize: "0.72rem", fontWeight: 800, color: V.orange, background: V.orangeDim,
+                display: "inline-block", padding: "5px 16px", borderRadius: 100, marginBottom: 24,
+                letterSpacing: "0.08em", textTransform: "uppercase",
               }}>Мувинговая компания • США</div>
-              <h3 style={{ fontFamily: V.heading, fontSize: "1.6rem", fontWeight: 700, color: V.bright, marginBottom: 16, letterSpacing: "-0.02em" }}>
+              <h3 style={{ fontFamily: V.heading, fontSize: "1.7rem", fontWeight: 800, color: V.bright, marginBottom: 18, letterSpacing: "-0.03em", lineHeight: 1.2 }}>
                 От ручного хаоса к системе, генерирующей $14.6M
               </h3>
-              <p style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.7, marginBottom: 32 }}>
-                Комплексное внедрение: сайт, перформанс-маркетинг, CRM, автоматизация обработки заявок и аналитики. Из локального бизнеса — в компанию с 10,000+ заказов.
+              <p style={{ fontSize: "0.93rem", color: V.dim, lineHeight: 1.75, marginBottom: 36 }}>
+                Комплексное внедрение: сайт, перформанс-маркетинг, CRM, автоматизация обработки заявок и аналитики.
               </p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[
                   { val: "$14.6M", label: "выручка" },
                   { val: "10,235", label: "заказов" },
@@ -373,28 +592,34 @@ function CaseStudy() {
                   { val: "40→26", label: "позиция в SEO" },
                 ].map((m, i) => (
                   <div key={i} style={{
-                    padding: 20, background: "rgba(255,255,255,0.02)",
+                    padding: "18px 20px", background: "rgba(255,255,255,0.02)",
                     borderRadius: V.radiusSm, border: `1px solid ${V.border}`,
                   }}>
-                    <div style={{ fontFamily: V.heading, fontSize: "1.6rem", fontWeight: 700, color: V.accent }}>{m.val}</div>
-                    <div style={{ fontSize: "0.8rem", color: V.dim, marginTop: 4 }}>{m.label}</div>
+                    <div style={{ fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 800, color: V.accent, letterSpacing: "-0.02em" }}>
+                      <AnimCounter text={m.val} />
+                    </div>
+                    <div style={{ fontSize: "0.78rem", color: V.dim, marginTop: 4 }}>{m.label}</div>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{ position: "relative", paddingLeft: 28 }}>
+            <div style={{ position: "relative", paddingLeft: 32 }}>
               <div style={{
                 position: "absolute", left: 0, top: 0, bottom: 0, width: 3,
-                background: V.accent, borderRadius: 2,
+                background: `linear-gradient(180deg, ${V.accent}, ${V.accent2})`, borderRadius: 2,
               }} />
-              <p style={{ fontSize: "1.15rem", color: V.text, lineHeight: 1.7, fontStyle: "italic", marginBottom: 20 }}>
-                «Мы передали рутину системе и наконец сфокусировались на росте. Раньше я тратил 4 часа в день на проверку заявок — сейчас это делает AI, а я смотрю дашборд раз в день.»
+              <div style={{
+                fontFamily: V.heading, fontSize: "4rem", lineHeight: 1, color: "rgba(110,231,183,0.06)",
+                position: "absolute", top: -10, right: 0, fontWeight: 900,
+              }}>"</div>
+              <p style={{ fontSize: "1.15rem", color: V.text, lineHeight: 1.75, fontStyle: "italic", marginBottom: 24, marginTop: 8 }}>
+                Мы передали рутину системе и наконец сфокусировались на росте. Раньше я тратил 4 часа в день на проверку заявок — сейчас это делает AI, а я смотрю дашборд раз в день.
               </p>
               <div style={{ fontSize: "0.88rem", color: V.dim }}>
-                <strong style={{ color: V.bright }}>Основатель компании</strong><br />SOS Moving, New York
+                <strong style={{ color: V.bright, fontWeight: 700 }}>Основатель компании</strong><br />SOS Moving, New York
               </div>
             </div>
-          </div>
+          </GlowCard>
         </Reveal>
       </div>
     </section>
@@ -415,65 +640,55 @@ function Pricing() {
       cta: "Обсудить проект →", featured: true,
     },
     {
-      badge: null, title: "Полная система + поддержка", price: "$25–50K", note: "+ $2–5K/мес поддержка",
-      features: ["Все три слоя: операционный, тактический, стратегический", "Кастомные дашборды и прогнозы", "Постоянная калибровка и оптимизация", "Приоритетная поддержка", "Масштабирование по мере роста"],
+      badge: null, title: "Полная система", price: "$25–50K", note: "+ $2–5K/мес поддержка",
+      features: ["Все три слоя системы", "Кастомные дашборды и прогнозы", "Постоянная калибровка и оптимизация", "Приоритетная поддержка", "Масштабирование по мере роста"],
       cta: "Обсудить проект →", featured: false,
     },
   ];
   return (
-    <section id="pricing" style={{ padding: "120px 0", position: "relative" }}>
-      <div style={{
-        position: "absolute", bottom: -200, left: "50%", transform: "translateX(-50%)",
-        width: 600, height: 600,
-        background: "radial-gradient(circle, rgba(110,231,183,0.04) 0%, transparent 70%)",
-        pointerEvents: "none",
-      }} />
+    <section id="pricing" style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
+      <div style={{ position: "absolute", bottom: -200, left: "50%", transform: "translateX(-50%)", width: 700, height: 700, background: "radial-gradient(circle, rgba(110,231,183,0.03) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Тарифы</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Выберите точку входа</h2></Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> Тарифы</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Выберите точку входа</h2></Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {plans.map((p, i) => (
-            <Reveal key={i}>
-              <div style={{
-                background: p.featured
-                  ? `linear-gradient(180deg, rgba(110,231,183,0.04), ${V.card})`
-                  : V.card,
-                border: `1px solid ${p.featured ? "rgba(110,231,183,0.25)" : V.border}`,
-                borderRadius: V.radius, padding: 44, transition: "all .4s", position: "relative", height: "100%",
-                display: "flex", flexDirection: "column",
+            <Reveal key={i} delay={i * 100}>
+              <GlowCard style={{
+                padding: 44, height: "100%", display: "flex", flexDirection: "column",
+                ...(p.featured ? {
+                  background: `linear-gradient(180deg, rgba(110,231,183,0.04), ${V.card})`,
+                  border: `1px solid rgba(110,231,183,0.2)`,
+                  boxShadow: `0 0 60px rgba(110,231,183,0.08)`,
+                } : {}),
               }}>
-                {p.featured && (
-                  <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0, height: 2,
-                    background: "linear-gradient(90deg, transparent, #6EE7B7, transparent)",
-                  }} />
-                )}
                 {p.badge && (
                   <div style={{
-                    display: "inline-block", fontSize: "0.72rem", fontWeight: 700, color: V.bg,
-                    background: V.accent, padding: "4px 14px", borderRadius: 100, marginBottom: 20,
-                    letterSpacing: "0.05em", textTransform: "uppercase", alignSelf: "flex-start",
+                    display: "inline-block", fontSize: "0.68rem", fontWeight: 800, color: V.bg,
+                    background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`,
+                    padding: "5px 16px", borderRadius: 100, marginBottom: 20,
+                    letterSpacing: "0.06em", textTransform: "uppercase", alignSelf: "flex-start",
                   }}>{p.badge}</div>
                 )}
-                <h3 style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 700, color: V.bright, marginBottom: 10 }}>{p.title}</h3>
-                <div style={{ fontFamily: V.heading, fontSize: "2.2rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>{p.price}</div>
-                <div style={{ fontSize: "0.82rem", color: V.dim, marginBottom: 28 }}>{p.note}</div>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 14, marginBottom: 32, flex: 1 }}>
+                <h3 style={{ fontFamily: V.heading, fontSize: "1.15rem", fontWeight: 700, color: V.bright, marginBottom: 12 }}>{p.title}</h3>
+                <div style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 900, color: V.bright, marginBottom: 8, letterSpacing: "-0.03em" }}>{p.price}</div>
+                <div style={{ fontSize: "0.82rem", color: V.dim, marginBottom: 32 }}>{p.note}</div>
+                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 14, marginBottom: 36, flex: 1 }}>
                   {p.features.map((f, j) => (
-                    <li key={j} style={{ display: "flex", alignItems: "flex-start", gap: 12, fontSize: "0.9rem", color: V.text, lineHeight: 1.5 }}>
-                      <span style={{ color: V.accent, fontWeight: 700, minWidth: 18 }}>✓</span>
+                    <li key={j} style={{ display: "flex", alignItems: "flex-start", gap: 12, fontSize: "0.88rem", color: V.text, lineHeight: 1.5 }}>
+                      <span style={{ color: V.accent, fontWeight: 800, minWidth: 18, fontSize: "0.8rem" }}>✓</span>
                       {f}
                     </li>
                   ))}
                 </ul>
                 <a href="#contact" style={{
-                  display: "block", textAlign: "center", padding: "14px 28px", borderRadius: 100,
+                  display: "block", textAlign: "center", padding: "15px 28px", borderRadius: 100,
                   fontWeight: 700, fontSize: "0.92rem", textDecoration: "none", transition: "all .3s",
                   ...(p.featured
-                    ? { background: V.accent, color: V.bg }
+                    ? { background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`, color: V.bg, boxShadow: `0 0 30px ${V.accentGlow}` }
                     : { background: "transparent", border: `1px solid ${V.borderHover}`, color: V.text }),
                 }}>{p.cta}</a>
-              </div>
+              </GlowCard>
             </Reveal>
           ))}
         </div>
@@ -485,28 +700,25 @@ function Pricing() {
 /* ═══════════════════════ FAQ ═══════════════════════ */
 function FAQ() {
   const items = [
-    { q: "Какие системы вы интегрируете?", a: "HubSpot, Salesforce, Google Ads, Meta Ads, CallRail, Slack, Telegram, WhatsApp и любые системы с API. На этапе аудита мы определяем ваш стек и проектируем интеграции." },
-    { q: "Сколько времени занимает внедрение?", a: "Аудит — 1–2 недели. Внедрение операционного ядра — 6–8 недель. Полная система — 8–12 недель. Первые результаты вы увидите уже на 3-й неделе после начала работ." },
-    { q: "Что если AI ошибётся?", a: "Для критичных процессов мы используем human-in-the-loop: AI делает предложение, а человек подтверждает. Плюс мы калибруем систему на ваших реальных данных перед запуском." },
-    { q: "Можно ли начать с одного агента?", a: "Да. Аудит покажет, какой агент даст максимальный ROI для вашего бизнеса. Можно начать с него и масштабировать по мере роста." },
-    { q: "Нужен ли мне технический специалист в штате?", a: "Нет. Мы полностью берём на себя разработку, настройку и поддержку. Ваша команда работает с системой через привычные интерфейсы: мессенджеры, CRM, дашборды." },
-    { q: "Какая гарантия?", a: "Если после аудита вы не увидите конкретного ROI и плана — мы вернём деньги. На этапе внедрения мы фиксируем скоуп и KPI до начала работ." },
+    { q: "Какие системы вы интегрируете?", a: "HubSpot, Salesforce, Google Ads, Meta Ads, CallRail, Slack, Telegram, WhatsApp и любые системы с API." },
+    { q: "Сколько времени занимает внедрение?", a: "Аудит — 1–2 недели. Внедрение ядра — 6–8 недель. Полная система — 8–12 недель. Первые результаты на 3-й неделе." },
+    { q: "Что если AI ошибётся?", a: "Human-in-the-loop для критичных процессов: AI предлагает, человек подтверждает. Калибруем на реальных данных." },
+    { q: "Можно ли начать с одного агента?", a: "Да. Аудит покажет, какой агент даст максимальный ROI. Масштабируйте по мере роста." },
+    { q: "Нужен ли технический специалист?", a: "Нет. Мы берём всё на себя. Ваша команда работает через привычные интерфейсы." },
+    { q: "Какая гарантия?", a: "Если после аудита нет конкретного ROI и плана — вернём деньги. Скоуп и KPI фиксируем до начала." },
   ];
   return (
-    <section style={{ padding: "120px 0" }}>
+    <section style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
       <div style={container}>
-        <Reveal><div style={sectionLabel}>Частые вопросы</div></Reveal>
-        <Reveal><h2 style={sectionTitle}>Ответы на главные вопросы</h2></Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 20 }}>
+        <Reveal><div style={sectionLabel}><span style={{ width: 20, height: 1, background: V.accent, display: "inline-block" }} /> FAQ</div></Reveal>
+        <Reveal delay={80}><h2 style={sectionTitle}>Ответы на главные вопросы</h2></Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
           {items.map((f, i) => (
-            <Reveal key={i}>
-              <div style={{
-                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                padding: 32, transition: "all .3s", height: "100%",
-              }}>
-                <h3 style={{ fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 600, color: V.bright, marginBottom: 12 }}>{f.q}</h3>
-                <p style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.7 }}>{f.a}</p>
-              </div>
+            <Reveal key={i} delay={i * 60}>
+              <GlowCard style={{ padding: "32px 36px", height: "100%" }}>
+                <h3 style={{ fontFamily: V.heading, fontSize: "0.88rem", fontWeight: 700, color: V.bright, marginBottom: 12, letterSpacing: "-0.01em" }}>{f.q}</h3>
+                <p style={{ fontSize: "0.87rem", color: V.dim, lineHeight: 1.75 }}>{f.a}</p>
+              </GlowCard>
             </Reveal>
           ))}
         </div>
@@ -518,30 +730,44 @@ function FAQ() {
 /* ═══════════════════════ FINAL CTA ═══════════════════════ */
 function FinalCTA() {
   return (
-    <section id="contact" style={{ padding: "120px 0 160px", textAlign: "center", position: "relative" }}>
+    <section id="contact" style={{ padding: "140px 0 180px", textAlign: "center", position: "relative", zIndex: 1 }}>
       <div style={{
         position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)",
-        width: 900, height: 500,
+        width: 1000, height: 600,
         background: "radial-gradient(ellipse, rgba(110,231,183,0.06) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
       <div style={container}>
-        <h2 style={{
-          fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800,
-          color: V.bright, maxWidth: 700, margin: "0 auto 20px", letterSpacing: "-0.03em", lineHeight: 1.15,
-        }}>
-          Готовы перестать быть узким горлышком своего бизнеса?
-        </h2>
-        <p style={{ fontSize: "1.1rem", color: V.dim, maxWidth: 500, margin: "0 auto 40px", lineHeight: 1.7 }}>
-          Начните с аудита за $2,500 и получите конкретный план с цифрами ROI. Без обязательств.
-        </p>
-        <a href="https://calendly.com/" target="_blank" rel="noopener noreferrer" style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          background: V.accent, color: V.bg, padding: "18px 44px", borderRadius: 100,
-          fontWeight: 700, fontSize: "1.1rem", textDecoration: "none", transition: "all .3s",
-        }}>
-          Записаться на discovery-звонок →
-        </a>
+        <Reveal>
+          <h2 style={{
+            fontFamily: V.heading, fontSize: "clamp(2.2rem, 4.5vw, 3.4rem)", fontWeight: 900,
+            color: V.bright, maxWidth: 750, margin: "0 auto 24px", letterSpacing: "-0.04em", lineHeight: 1.1,
+          }}>
+            Готовы перестать быть{" "}
+            <span style={{
+              background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`,
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            }}>узким горлышком</span>{" "}
+            своего бизнеса?
+          </h2>
+        </Reveal>
+        <Reveal delay={100}>
+          <p style={{ fontSize: "1.15rem", color: V.dim, maxWidth: 520, margin: "0 auto 48px", lineHeight: 1.7 }}>
+            Начните с аудита за $2,500 и получите конкретный план с цифрами ROI. Без обязательств.
+          </p>
+        </Reveal>
+        <Reveal delay={200}>
+          <a href="https://calendly.com/" target="_blank" rel="noopener noreferrer" style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            background: `linear-gradient(135deg, ${V.accent}, ${V.accent2})`,
+            color: V.bg, padding: "20px 52px", borderRadius: 100,
+            fontWeight: 800, fontSize: "1.15rem", textDecoration: "none", transition: "all .3s",
+            boxShadow: `0 0 50px ${V.accentGlow}, 0 12px 40px rgba(0,0,0,0.4)`,
+            letterSpacing: "-0.01em",
+          }}>
+            Записаться на discovery-звонок →
+          </a>
+        </Reveal>
       </div>
     </section>
   );
@@ -550,12 +776,12 @@ function FinalCTA() {
 /* ═══════════════════════ FOOTER ═══════════════════════ */
 function Footer() {
   return (
-    <footer style={{ borderTop: `1px solid ${V.border}`, padding: "40px 0" }}>
+    <footer style={{ borderTop: `1px solid ${V.border}`, padding: "44px 0", position: "relative", zIndex: 1 }}>
       <div style={{ ...container, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: V.heading, fontWeight: 700, fontSize: "1.15rem", color: V.bright }}>
+        <div style={{ fontFamily: V.heading, fontWeight: 800, fontSize: "1.2rem", color: V.bright }}>
           AI<span style={{ color: V.accent }}>.</span>ЯДРО
         </div>
-        <p style={{ fontSize: "0.82rem", color: V.dim }}>© 2026 Bankai.Agency. Все права защищены.</p>
+        <p style={{ fontSize: "0.8rem", color: V.dim }}>© 2026 Bankai.Agency. Все права защищены.</p>
       </div>
     </footer>
   );
@@ -565,16 +791,11 @@ function Footer() {
 export default function Home() {
   return (
     <>
-      <style>{`
-        @media (max-width: 900px) {
-          /* solution layer cards → single column */
-        }
-        @media (max-width: 600px) {
-          /* results grid → single column handled by auto-fit */
-        }
-      `}</style>
+      <style>{globalCSS}</style>
+      <GridBg />
       <Nav />
       <Hero />
+      <Marquee />
       <Problem />
       <Solution />
       <Results />

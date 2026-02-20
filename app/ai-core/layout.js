@@ -22,7 +22,7 @@ export default function AiCoreLayout({ children }) {
       />
       <style>{`
         body {
-          background: #0A0A0F !important;
+          background: #06060B !important;
           color: #E8E6F0 !important;
           font-family: 'Manrope', sans-serif !important;
         }
