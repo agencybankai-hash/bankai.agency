@@ -307,8 +307,16 @@ function Img({ label, ratio = "16/9" }) {
   );
 }
 
-// ─── FUNNEL ───
+// ─── FUNNEL (CHIPSA STYLE — dramatic cards) ───
 function Funnel() {
+  const [vis, setVis] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVis(true); }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
   const stages = [
     { title: "Attract", desc: "Drive qualified traffic through every relevant channel.", items: ["Google Ads & LSA", "SEO & Content", "Meta Ads", "GBP Optimization"], impact: "+180%", impactLabel: "organic traffic growth", icon: "target" },
     { title: "Capture", desc: "Turn visitors into tracked, qualified leads.", items: ["High-converting pages", "Call tracking (CallRail)", "Multi-step forms", "Live chat & CTAs"], impact: "3\u00d7", impactLabel: "lead capture rate", icon: "web" },
@@ -318,52 +326,59 @@ function Funnel() {
   ];
 
   return (
-    <section style={{ padding: "120px 0" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 80 }}>
-          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: T.dark, letterSpacing: "-0.03em" }}>How we drive revenue</h2>
-          <p style={{ fontSize: 15, color: T.muted, maxWidth: 380, textAlign: "right", lineHeight: 1.6 }}>From first impression to closed deal &mdash; we build and optimize every touchpoint.</p>
+    <section ref={ref} style={{ padding: "160px 0 120px", position: "relative", overflow: "hidden" }}>
+      {/* Background watermark */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+        fontSize: "clamp(8rem, 20vw, 18rem)", fontWeight: 900, color: T.bg2,
+        letterSpacing: "-0.05em", pointerEvents: "none", whiteSpace: "nowrap",
+        textTransform: "uppercase",
+      }}>FUNNEL</div>
+
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", position: "relative" }}>
+        {/* Header — massive */}
+        <div style={{ marginBottom: 80 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 4, color: T.red, textTransform: "uppercase", display: "block", marginBottom: 24 }}>Our methodology</span>
+          <h2 style={{
+            fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 900, color: T.dark,
+            letterSpacing: "-0.04em", textTransform: "uppercase", lineHeight: 1,
+          }}>How we drive<br />revenue</h2>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 48, padding: "0 24px" }}>
-          {stages.map((_, i) => (
-            <div key={i} style={{ display: "contents" }}>
-              <div style={{
-                width: i === stages.length - 1 ? 14 : 10,
-                height: i === stages.length - 1 ? 14 : 10,
-                borderRadius: "50%",
-                background: i === stages.length - 1 ? T.red : T.dark,
-                flexShrink: 0,
-              }} />
-              {i < stages.length - 1 && (
-                <div style={{ flex: 1, height: 1, background: T.line, position: "relative" }}>
-                  <div style={{
-                    position: "absolute", right: -1, top: -3,
-                    width: 0, height: 0,
-                    borderTop: "3.5px solid transparent",
-                    borderBottom: "3.5px solid transparent",
-                    borderLeft: `6px solid ${T.light}`,
-                  }} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 32 }}>
+        {/* Cards grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
           {stages.map((s, i) => (
-            <div key={i}>
-              <div style={{ marginBottom: 16, opacity: 0.6 }}>{icons[s.icon](i === stages.length - 1 ? T.red : T.dark)}</div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: T.dark, marginBottom: 8 }}>{s.title}</h3>
-              <p style={{ fontSize: 13, color: T.muted, lineHeight: 1.6, marginBottom: 20 }}>{s.desc}</p>
-              <div style={{ borderTop: `1px solid ${T.line}`, paddingTop: 16, marginBottom: 20 }}>
+            <div key={i} style={{
+              background: i === 4 ? T.dark : T.bg,
+              borderRadius: 20, padding: "36px 28px",
+              border: i === 4 ? "none" : `1px solid ${T.line}`,
+              opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(40px)",
+              transition: `all 0.8s cubic-bezier(0.16,1,0.3,1) ${i * 0.1}s`,
+              display: "flex", flexDirection: "column",
+            }}>
+              {/* Number */}
+              <span style={{
+                fontSize: 48, fontWeight: 900, color: i === 4 ? "rgba(255,255,255,0.08)" : T.bg2,
+                lineHeight: 1, letterSpacing: "-0.04em", marginBottom: 20,
+              }}>0{i + 1}</span>
+
+              <div style={{ marginBottom: 12, opacity: 0.6 }}>{icons[s.icon](i === 4 ? "#fff" : T.dark)}</div>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: i === 4 ? "#fff" : T.dark, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>{s.title}</h3>
+              <p style={{ fontSize: 13, color: i === 4 ? "rgba(255,255,255,0.5)" : T.muted, lineHeight: 1.6, marginBottom: 24, flex: 1 }}>{s.desc}</p>
+
+              <div style={{ borderTop: `1px solid ${i === 4 ? "rgba(255,255,255,0.1)" : T.line}`, paddingTop: 16, marginBottom: 20 }}>
                 {s.items.map((item, j) => (
-                  <p key={j} style={{ fontSize: 12, color: T.mid, lineHeight: 1.7 }}>{item}</p>
+                  <p key={j} style={{ fontSize: 12, color: i === 4 ? "rgba(255,255,255,0.4)" : T.mid, lineHeight: 1.8 }}>{item}</p>
                 ))}
               </div>
-              <div style={{ borderTop: `1px solid ${T.line}`, paddingTop: 16 }}>
-                <span style={{ fontSize: "clamp(1.2rem, 2vw, 1.6rem)", fontWeight: 800, color: i === stages.length - 1 ? T.red : T.dark, letterSpacing: "-0.02em" }}>{s.impact}</span>
-                <p style={{ fontSize: 11, color: T.muted, marginTop: 4 }}>{s.impactLabel}</p>
+
+              {/* Impact number */}
+              <div style={{ borderTop: `1px solid ${i === 4 ? "rgba(255,255,255,0.1)" : T.line}`, paddingTop: 16 }}>
+                <span style={{
+                  fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)", fontWeight: 900,
+                  color: i === 4 ? T.red : T.dark, letterSpacing: "-0.02em",
+                }}>{s.impact}</span>
+                <p style={{ fontSize: 11, color: i === 4 ? "rgba(255,255,255,0.3)" : T.muted, marginTop: 4 }}>{s.impactLabel}</p>
               </div>
             </div>
           ))}
@@ -373,46 +388,38 @@ function Funnel() {
   );
 }
 
-// ─── CASE DIVIDER ───
+// ─── CASE DIVIDER (CHIPSA — bold, dramatic) ───
 function CaseDivider({ nextNum, nextName, nextTagline, color }) {
   return (
     <div style={{
-      background: T.dark,
-      padding: "80px 0",
-      position: "relative",
-      overflow: "hidden",
+      background: T.dark, padding: "100px 0",
+      position: "relative", overflow: "hidden",
     }}>
-      {/* Accent stripe */}
+      {/* Giant number bg */}
       <div style={{
-        position: "absolute", left: 0, top: 0, bottom: 0, width: 4,
-        background: color,
-      }} />
-      {/* Subtle large number */}
-      <div style={{
-        position: "absolute", right: 48, top: "50%", transform: "translateY(-50%)",
-        fontSize: "clamp(8rem, 20vw, 14rem)", fontWeight: 900, color: "rgba(255,255,255,0.03)",
+        position: "absolute", right: -20, top: "50%", transform: "translateY(-50%)",
+        fontSize: "clamp(12rem, 30vw, 22rem)", fontWeight: 900, color: "rgba(255,255,255,0.03)",
         lineHeight: 1, letterSpacing: "-0.05em", pointerEvents: "none",
       }}>{nextNum}</div>
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", position: "relative" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-          <span style={{
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            width: 48, height: 48, borderRadius: "50%", border: `2px solid ${color}`,
-            fontSize: 16, fontWeight: 700, color: color, flexShrink: 0,
-          }}>{nextNum}</span>
-          <div style={{ height: 1, flex: 1, background: `linear-gradient(to right, ${color}40, transparent)` }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 32 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 16, background: color,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 22, fontWeight: 900, color: "#fff",
+          }}>{nextNum}</div>
+          <div>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: color, textTransform: "uppercase", display: "block" }}>Next case</span>
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>{nextName}</span>
+          </div>
         </div>
-        <span style={{ fontSize: 12, fontWeight: 600, color: color, letterSpacing: 2, textTransform: "uppercase", display: "block", marginBottom: 12 }}>Next case study</span>
-        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", display: "block", marginBottom: 8 }}>{nextName}</span>
-        <h3 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", maxWidth: 700, lineHeight: 1.15 }}>
+        <h3 style={{
+          fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, color: "#fff",
+          letterSpacing: "-0.03em", maxWidth: 700, lineHeight: 1.1, textTransform: "uppercase",
+        }}>
           {nextTagline}
         </h3>
-        {/* scroll hint */}
-        <div style={{ marginTop: 32, display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 1, height: 24, background: `linear-gradient(to bottom, ${color}, transparent)` }} />
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", letterSpacing: 1 }}>SCROLL</span>
-        </div>
       </div>
     </div>
   );
@@ -477,22 +484,25 @@ function TechFlow({ items, color }) {
   );
 }
 
-// ─── CASE STUDY (enriched) ───
+// ─── CASE STUDY (CHIPSA STYLE — bold, dramatic) ───
 function Case({ color, num, name, tagline, intro, metrics, challenge, approach, phases, services, results, testimonial, images, bars, techFlow }) {
   return (
     <article style={{ padding: "120px 0" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            width: 36, height: 36, borderRadius: "50%", background: color + "14",
-            fontSize: 13, fontWeight: 700, color: color,
-          }}>{num}</span>
-          <span style={{ fontSize: 13, color: T.muted, fontWeight: 500 }}>Case Study</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: 14, background: color,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, fontWeight: 900, color: "#fff",
+        }}>{num}</div>
+        <div>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: color, textTransform: "uppercase", display: "block" }}>Case Study</span>
+          <span style={{ fontSize: 14, color: T.muted }}>{name}</span>
         </div>
-        <span style={{ fontSize: 13, color: T.muted }}>{name}</span>
       </div>
-      <h3 style={{ fontSize: "clamp(2.2rem, 5vw, 3.6rem)", fontWeight: 800, color: T.dark, letterSpacing: "-0.03em", lineHeight: 1.05, maxWidth: 800 }}>
+      <h3 style={{
+        fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 900, color: T.dark,
+        letterSpacing: "-0.04em", lineHeight: 1.05, maxWidth: 800, textTransform: "uppercase",
+      }}>
         {tagline}
       </h3>
       <p style={{ fontSize: 17, color: T.mid, lineHeight: 1.7, maxWidth: 640, marginTop: 28 }}>{intro}</p>
@@ -504,24 +514,23 @@ function Case({ color, num, name, tagline, intro, metrics, challenge, approach, 
         <Img label={images.hero} ratio="2.4/1" />
       </div>
 
-      {/* Metrics with radial charts */}
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${metrics.length}, 1fr)`, gap: 24, marginTop: 64 }}>
+      {/* Metrics — bold cards */}
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${metrics.length}, 1fr)`, gap: 16, marginTop: 64 }}>
         {metrics.map((m, i) => (
           <div key={i} style={{
-            padding: "32px 24px", borderRadius: 12,
-            background: i === 0 ? color + "08" : T.bg2,
-            border: `1px solid ${i === 0 ? color + "20" : T.lineLight}`,
+            padding: "36px 28px", borderRadius: 20,
+            background: i === 0 ? color : T.bg2,
             textAlign: "center",
-          }}>
-            {m.pct !== undefined && (
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-                <Radial pct={m.pct} size={64} stroke={4} color={color}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color }}>{icons[m.icon || "chart"](color)}</span>
-                </Radial>
-              </div>
-            )}
-            <div style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, color: i === 0 ? color : T.dark, letterSpacing: "-0.02em", lineHeight: 1 }}>{m.val}</div>
-            <div style={{ fontSize: 12, color: T.muted, marginTop: 8 }}>{m.lab}</div>
+            transition: "transform 0.3s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+          >
+            <div style={{
+              fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 900,
+              color: i === 0 ? "#fff" : T.dark, letterSpacing: "-0.03em", lineHeight: 1,
+            }}>{m.val}</div>
+            <div style={{ fontSize: 12, color: i === 0 ? "rgba(255,255,255,0.6)" : T.muted, marginTop: 10 }}>{m.lab}</div>
           </div>
         ))}
       </div>
@@ -808,9 +817,13 @@ function Work() {
   return (
     <section id="work" style={{ padding: "0 0 0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px" }}>
-        <div style={{ padding: "100px 0 0", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: T.dark, letterSpacing: "-0.03em" }}>Selected work</h2>
-          <p style={{ fontSize: 15, color: T.muted, maxWidth: 400, textAlign: "right", lineHeight: 1.6 }}>Complete marketing ecosystems. Every channel connected. Every dollar tracked.</p>
+        <div style={{ padding: "160px 0 0" }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 4, color: T.red, textTransform: "uppercase", display: "block", marginBottom: 24 }}>Portfolio</span>
+          <h2 style={{
+            fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 900, color: T.dark,
+            letterSpacing: "-0.04em", textTransform: "uppercase", lineHeight: 1, marginBottom: 16,
+          }}>Selected work</h2>
+          <p style={{ fontSize: 17, color: T.muted, maxWidth: 500, lineHeight: 1.7 }}>Complete marketing ecosystems. Every channel connected. Every dollar tracked.</p>
         </div>
 
         <Case {...cases[0]} />
@@ -833,32 +846,53 @@ function Work() {
   );
 }
 
-// ─── SERVICES ───
+// ─── SERVICES (CHIPSA STYLE — bold cards with hover) ───
 function Services() {
   const items = [
-    { title: "Performance Marketing", desc: "Google Ads, LSA, Meta Ads. Precision campaigns optimized for conversions, not clicks.", icon: "ads" },
-    { title: "SEO & Local SEO", desc: "Technical SEO, content strategy, GBP optimization. Dominate organic search in your market.", icon: "seo" },
-    { title: "Web Development", desc: "High-converting Webflow sites. Fast, responsive, built to turn visitors into leads.", icon: "web" },
-    { title: "CRM & Automation", desc: "HubSpot setup, lead scoring, email sequences. No lead falls through the cracks.", icon: "crm" },
-    { title: "Analytics & Tracking", desc: "GA4, CallRail, Looker Studio dashboards. Know where every dollar goes.", icon: "chart" },
-    { title: "UI/UX Design", desc: "Conversion-focused design in Figma. Branding, landing pages, marketing materials.", icon: "design" },
+    { title: "Performance Marketing", desc: "Google Ads, LSA, Meta Ads. Precision campaigns optimized for conversions, not clicks.", icon: "ads", num: "01" },
+    { title: "SEO & Local SEO", desc: "Technical SEO, content strategy, GBP optimization. Dominate organic search in your market.", icon: "seo", num: "02" },
+    { title: "Web Development", desc: "High-converting Webflow sites. Fast, responsive, built to turn visitors into leads.", icon: "web", num: "03" },
+    { title: "CRM & Automation", desc: "HubSpot setup, lead scoring, email sequences. No lead falls through the cracks.", icon: "crm", num: "04" },
+    { title: "Analytics & Tracking", desc: "GA4, CallRail, Looker Studio dashboards. Know where every dollar goes.", icon: "chart", num: "05" },
+    { title: "UI/UX Design", desc: "Conversion-focused design in Figma. Branding, landing pages, marketing materials.", icon: "design", num: "06" },
   ];
   return (
-    <section id="services" style={{ padding: "120px 0", background: T.bg2 }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 72 }}>
-          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: T.dark, letterSpacing: "-0.03em" }}>What we do</h2>
-          <p style={{ fontSize: 15, color: T.muted, maxWidth: 380, textAlign: "right", lineHeight: 1.6 }}>Full-stack marketing. Every channel connected and optimized for revenue.</p>
+    <section id="services" style={{ padding: "160px 0", background: T.dark, position: "relative", overflow: "hidden" }}>
+      {/* Watermark */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+        fontSize: "clamp(8rem, 18vw, 16rem)", fontWeight: 900, color: "rgba(255,255,255,0.02)",
+        letterSpacing: "-0.05em", pointerEvents: "none", whiteSpace: "nowrap", textTransform: "uppercase",
+      }}>SERVICES</div>
+
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", position: "relative" }}>
+        <div style={{ marginBottom: 80 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 4, color: T.red, textTransform: "uppercase", display: "block", marginBottom: 24 }}>Capabilities</span>
+          <h2 style={{
+            fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 900, color: "#fff",
+            letterSpacing: "-0.04em", textTransform: "uppercase", lineHeight: 1,
+          }}>What we do</h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1, background: T.line, borderRadius: 16, overflow: "hidden" }}>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
           {items.map((s, i) => (
-            <div key={i} style={{ padding: "44px 40px", background: T.bg, transition: "background 0.3s", cursor: "default" }}
-              onMouseEnter={e => e.currentTarget.style.background = T.bg2}
-              onMouseLeave={e => e.currentTarget.style.background = T.bg}
+            <div key={i} style={{
+              padding: "44px 36px", borderRadius: 20,
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+              transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)", cursor: "default",
+              position: "relative", overflow: "hidden",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              <div style={{ marginBottom: 16, opacity: 0.7 }}>{icons[s.icon](T.dark)}</div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: T.dark, marginBottom: 12 }}>{s.title}</h3>
-              <p style={{ fontSize: 14, color: T.muted, lineHeight: 1.65 }}>{s.desc}</p>
+              {/* Faint number */}
+              <span style={{
+                position: "absolute", top: 16, right: 20, fontSize: 52, fontWeight: 900,
+                color: "rgba(255,255,255,0.04)", lineHeight: 1,
+              }}>{s.num}</span>
+              <div style={{ marginBottom: 20 }}>{icons[s.icon]("rgba(255,255,255,0.5)")}</div>
+              <h3 style={{ fontSize: 19, fontWeight: 800, color: "#fff", marginBottom: 12, textTransform: "uppercase", letterSpacing: 0.5 }}>{s.title}</h3>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, position: "relative" }}>{s.desc}</p>
             </div>
           ))}
         </div>
@@ -867,8 +901,16 @@ function Services() {
   );
 }
 
-// ─── PROCESS ───
+// ─── PROCESS (CHIPSA STYLE — horizontal cards with giant numbers) ───
 function Process() {
+  const [vis, setVis] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVis(true); }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
   const steps = [
     { n: "01", t: "Discovery", d: "We analyze your business, competitors, and current marketing. Every channel. Every number.", detail: ["Business & competitor audit", "Marketing channel analysis", "Tracking infrastructure review", "Opportunity mapping"], icon: "seo" },
     { n: "02", t: "Strategy", d: "Custom roadmap. CRM configuration. Tracking setup. Campaign architecture.", detail: ["Custom channel strategy", "CRM & pipeline design", "Tracking & attribution setup", "Campaign architecture"], icon: "target" },
@@ -876,40 +918,50 @@ function Process() {
     { n: "04", t: "Scale", d: "New channels. Higher budgets. Deeper automation. Compounding results.", detail: ["Channel expansion", "Budget scaling", "Advanced automation", "Compounding growth"], icon: "arrowUp" },
   ];
   return (
-    <section style={{ padding: "120px 0" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 72 }}>
-          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: T.dark, letterSpacing: "-0.03em" }}>How we work</h2>
-          <p style={{ fontSize: 15, color: T.muted, maxWidth: 380, textAlign: "right", lineHeight: 1.6 }}>A proven 4-phase system. Each phase builds on the last.</p>
+    <section ref={ref} style={{ padding: "160px 0 120px", position: "relative", overflow: "hidden" }}>
+      {/* Watermark */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+        fontSize: "clamp(8rem, 20vw, 18rem)", fontWeight: 900, color: T.bg2,
+        letterSpacing: "-0.05em", pointerEvents: "none", whiteSpace: "nowrap", textTransform: "uppercase",
+      }}>PROCESS</div>
+
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", position: "relative" }}>
+        <div style={{ marginBottom: 80 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 4, color: T.red, textTransform: "uppercase", display: "block", marginBottom: 24 }}>How it works</span>
+          <h2 style={{
+            fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 900, color: T.dark,
+            letterSpacing: "-0.04em", textTransform: "uppercase", lineHeight: 1,
+          }}>Our process</h2>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 48, padding: "0 24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
           {steps.map((s, i) => (
-            <div key={i} style={{ display: "contents" }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: "50%",
-                border: `1.5px solid ${i === 0 ? T.red : T.line}`,
-                background: i === 0 ? T.redSoft : "transparent",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: i === 0 ? T.red : T.muted }}>{s.n}</span>
-              </div>
-              {i < steps.length - 1 && (
-                <div style={{ flex: 1, height: 1, background: `linear-gradient(to right, ${i === 0 ? T.red : T.line}, ${T.line})` }} />
-              )}
-            </div>
-          ))}
-        </div>
+            <div key={i} style={{
+              background: T.bg, borderRadius: 20, padding: "40px 32px",
+              border: `1px solid ${T.line}`, position: "relative", overflow: "hidden",
+              opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(40px)",
+              transition: `all 0.8s cubic-bezier(0.16,1,0.3,1) ${i * 0.12}s`,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = i === 0 ? T.red : T.dark; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = vis ? "translateY(0)" : "translateY(40px)"; e.currentTarget.style.borderColor = T.line; }}
+            >
+              {/* Giant faint number */}
+              <span style={{
+                position: "absolute", top: -10, right: -5,
+                fontSize: 100, fontWeight: 900, color: T.bg2,
+                lineHeight: 1, letterSpacing: "-0.04em", pointerEvents: "none",
+              }}>{s.n}</span>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, borderTop: `1px solid ${T.line}`, paddingTop: 40 }}>
-          {steps.map((s, i) => (
-            <div key={i}>
-              <div style={{ marginBottom: 14, opacity: 0.6 }}>{icons[s.icon](i === 0 ? T.red : T.dark)}</div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: T.dark, marginBottom: 10 }}>{s.t}</h3>
-              <p style={{ fontSize: 14, color: T.muted, lineHeight: 1.65, marginBottom: 20 }}>{s.d}</p>
-              <div style={{ borderTop: `1px solid ${T.lineLight}`, paddingTop: 16 }}>
+              <div style={{ marginBottom: 20, opacity: 0.6, position: "relative" }}>{icons[s.icon](i === 0 ? T.red : T.dark)}</div>
+              <h3 style={{
+                fontSize: 20, fontWeight: 800, color: T.dark, marginBottom: 12,
+                textTransform: "uppercase", letterSpacing: 0.5, position: "relative",
+              }}>{s.t}</h3>
+              <p style={{ fontSize: 14, color: T.muted, lineHeight: 1.7, marginBottom: 24, position: "relative" }}>{s.d}</p>
+              <div style={{ borderTop: `1px solid ${T.lineLight}`, paddingTop: 16, position: "relative" }}>
                 {s.detail.map((d, j) => (
-                  <p key={j} style={{ fontSize: 12, color: T.mid, lineHeight: 1.7 }}>{d}</p>
+                  <p key={j} style={{ fontSize: 12, color: T.mid, lineHeight: 1.8 }}>{d}</p>
                 ))}
               </div>
             </div>
