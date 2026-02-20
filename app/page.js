@@ -90,11 +90,16 @@ function Logo({ white }) {
 // ─── NAV ───
 function Nav() {
   const [s, setS] = useState(false);
+  const [atTop, setAtTop] = useState(true);
   useEffect(() => {
-    const h = () => setS(window.scrollY > 80);
+    const h = () => {
+      setS(window.scrollY > 80);
+      setAtTop(window.scrollY < window.innerHeight - 100);
+    };
     window.addEventListener("scroll", h);
     return () => window.removeEventListener("scroll", h);
   }, []);
+  const light = atTop && !s; // white text when over dark hero
   return (
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
@@ -105,23 +110,23 @@ function Nav() {
       transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)",
     }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Logo />
+        <Logo white={light} />
         <div style={{ display: "flex", gap: 40, alignItems: "center" }}>
           {["Work", "Services", "Contact"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} style={{
-              color: T.muted, textDecoration: "none", fontSize: 13, fontWeight: 500,
+              color: light ? "rgba(255,255,255,0.6)" : T.muted, textDecoration: "none", fontSize: 13, fontWeight: 500,
               letterSpacing: 0.5, transition: "color 0.3s",
             }}
-            onMouseEnter={e => e.target.style.color = T.dark}
-            onMouseLeave={e => e.target.style.color = T.muted}
+            onMouseEnter={e => e.target.style.color = light ? "#fff" : T.dark}
+            onMouseLeave={e => e.target.style.color = light ? "rgba(255,255,255,0.6)" : T.muted}
             >{l}</a>
           ))}
           <a href="#contact" style={{
-            color: T.dark, padding: "10px 28px", borderRadius: 100, textDecoration: "none",
-            fontSize: 13, fontWeight: 600, border: `1.5px solid ${T.dark}`, transition: "all 0.3s",
+            color: light ? "#fff" : T.dark, padding: "10px 28px", borderRadius: 100, textDecoration: "none",
+            fontSize: 13, fontWeight: 600, border: `1.5px solid ${light ? "rgba(255,255,255,0.4)" : T.dark}`, transition: "all 0.3s",
           }}
-          onMouseEnter={e => { e.target.style.background = T.dark; e.target.style.color = "#fff"; }}
-          onMouseLeave={e => { e.target.style.background = "transparent"; e.target.style.color = T.dark; }}
+          onMouseEnter={e => { e.target.style.background = light ? "#fff" : T.dark; e.target.style.color = light ? T.dark : "#fff"; }}
+          onMouseLeave={e => { e.target.style.background = "transparent"; e.target.style.color = light ? "#fff" : T.dark; }}
           >Get in touch</a>
         </div>
       </div>
@@ -129,106 +134,145 @@ function Nav() {
   );
 }
 
-// ─── HERO (WOW) ───
+// ─── HERO (CLEAN + GROWTH CHART) ───
 function Hero() {
   const [on, setOn] = useState(false);
-  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
-  const heroRef = useRef(null);
-
   useEffect(() => { setTimeout(() => setOn(true), 200); }, []);
-
-  const handleMouse = (e) => {
-    if (!heroRef.current) return;
-    const r = heroRef.current.getBoundingClientRect();
-    setMouse({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
-  };
 
   const f = (d) => ({
     opacity: on ? 1 : 0,
-    transform: on ? "translateY(0)" : "translateY(40px)",
-    transition: `all 1.2s cubic-bezier(0.16,1,0.3,1) ${d}s`,
+    transform: on ? "translateY(0)" : "translateY(30px)",
+    transition: `all 1s cubic-bezier(0.16,1,0.3,1) ${d}s`,
   });
 
-  // CSS keyframes via style tag
   const keyframes = `
-    @keyframes heroGrid { 0% { opacity: 0.03; } 50% { opacity: 0.06; } 100% { opacity: 0.03; } }
-    @keyframes heroPulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
-    @keyframes heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     @keyframes heroLine { 0% { width: 0; } 100% { width: 120px; } }
-    @keyframes heroOrb { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-40px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.9); } 100% { transform: translate(0,0) scale(1); } }
+    @keyframes heroPulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
     @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    @keyframes drawChart { from { stroke-dashoffset: 800; } to { stroke-dashoffset: 0; } }
+    @keyframes drawBars { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dataPoint { 0%,100% { r: 3; opacity: 0.7; } 50% { r: 5; opacity: 1; } }
+    @keyframes scanLine { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
   `;
 
-  const gridSize = 60;
+  // Growth chart SVG path — revenue curve going up and to the right
+  const chartPath = "M0,180 C40,175 80,165 120,155 C160,140 200,130 240,105 C280,85 320,70 360,50 C400,38 440,22 480,8";
+  // Bar chart heights (representing monthly growth)
+  const bars = [40, 55, 48, 65, 60, 78, 72, 90, 85, 105, 98, 130];
 
   return (
-    <section
-      ref={heroRef}
-      onMouseMove={handleMouse}
-      style={{
-        minHeight: "100vh", display: "flex", flexDirection: "column",
-        justifyContent: "flex-end", padding: "0 0 0",
-        background: T.dark, position: "relative", overflow: "hidden", cursor: "default",
-      }}
-    >
+    <section style={{
+      minHeight: "100vh", display: "flex", flexDirection: "column",
+      justifyContent: "flex-end",
+      background: T.dark, position: "relative", overflow: "hidden", cursor: "default",
+    }}>
       <style>{keyframes}</style>
 
-      {/* Animated grid */}
+      {/* Subtle red glow — single, understated */}
       <div style={{
-        position: "absolute", inset: 0, opacity: 0.04,
-        backgroundImage: `linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-        backgroundSize: `${gridSize}px ${gridSize}px`,
-        animation: "heroGrid 4s ease-in-out infinite",
-      }} />
-
-      {/* Floating red orb (follows mouse subtly) */}
-      <div style={{
-        position: "absolute",
-        left: `${20 + mouse.x * 15}%`,
-        top: `${15 + mouse.y * 15}%`,
+        position: "absolute", right: "5%", top: "20%",
         width: 500, height: 500, borderRadius: "50%",
-        background: `radial-gradient(circle, ${T.red}25 0%, transparent 70%)`,
-        filter: "blur(80px)",
-        animation: "heroOrb 12s ease-in-out infinite",
-        pointerEvents: "none",
-        transition: "left 1.5s ease-out, top 1.5s ease-out",
+        background: `radial-gradient(circle, ${T.red}18 0%, transparent 70%)`,
+        filter: "blur(100px)", pointerEvents: "none",
       }} />
 
-      {/* Secondary blue orb */}
+      {/* ── ANIMATED GROWTH CHART (right side) ── */}
       <div style={{
-        position: "absolute", right: "10%", bottom: "20%",
-        width: 350, height: 350, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
-        filter: "blur(60px)",
-        animation: "heroOrb 16s ease-in-out infinite reverse",
-        pointerEvents: "none",
-      }} />
+        position: "absolute", right: 0, bottom: 80, width: "55%", height: "60%",
+        pointerEvents: "none", opacity: on ? 1 : 0,
+        transition: "opacity 1.5s ease 0.5s",
+      }}>
+        <svg width="100%" height="100%" viewBox="0 0 520 200" preserveAspectRatio="none" style={{ overflow: "visible" }}>
+          {/* Horizontal grid lines */}
+          {[0, 1, 2, 3, 4].map(i => (
+            <line key={i} x1="0" y1={i * 45} x2="520" y2={i * 45}
+              stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+          ))}
+          {/* Vertical grid lines */}
+          {[0, 1, 2, 3, 4, 5].map(i => (
+            <line key={i} x1={i * 100 + 20} y1="0" x2={i * 100 + 20} y2="200"
+              stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+          ))}
 
-      {/* Floating particles */}
-      {[...Array(6)].map((_, i) => (
-        <div key={i} style={{
-          position: "absolute",
-          left: `${12 + i * 15}%`,
-          top: `${20 + (i % 3) * 25}%`,
-          width: i % 2 === 0 ? 4 : 3,
-          height: i % 2 === 0 ? 4 : 3,
-          borderRadius: "50%",
-          background: i === 0 || i === 3 ? T.red : "rgba(255,255,255,0.3)",
-          animation: `heroFloat ${3 + i * 0.7}s ease-in-out infinite`,
-          animationDelay: `${i * 0.4}s`,
-          boxShadow: i === 0 || i === 3 ? `0 0 12px ${T.red}60` : "none",
+          {/* Bar chart (background, subtle) */}
+          {bars.map((h, i) => (
+            <rect key={i}
+              x={20 + i * 40} y={180 - h} width="24" height={h}
+              fill={i >= 10 ? `${T.red}25` : "rgba(255,255,255,0.04)"}
+              rx="2"
+              style={{
+                transformOrigin: `${32 + i * 40}px 180px`,
+                animation: on ? `drawBars 0.8s cubic-bezier(0.16,1,0.3,1) ${0.8 + i * 0.08}s both` : "none",
+              }}
+            />
+          ))}
+
+          {/* Growth line with gradient */}
+          <defs>
+            <linearGradient id="chartGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
+              <stop offset="60%" stopColor={T.red} />
+              <stop offset="100%" stopColor="#FF8A65" />
+            </linearGradient>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={`${T.red}20`} />
+              <stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+          </defs>
+
+          {/* Area fill under curve */}
+          <path d={`${chartPath} L480,180 L0,180 Z`}
+            fill="url(#areaGrad)"
+            style={{ opacity: on ? 1 : 0, transition: "opacity 1.5s ease 1.5s" }}
+          />
+
+          {/* Main growth line */}
+          <path d={chartPath}
+            fill="none" stroke="url(#chartGrad)" strokeWidth="2.5" strokeLinecap="round"
+            strokeDasharray="800" strokeDashoffset="800"
+            style={{ animation: on ? "drawChart 2.5s cubic-bezier(0.16,1,0.3,1) 0.8s forwards" : "none" }}
+          />
+
+          {/* Data points on the line */}
+          {[[0, 180], [120, 155], [240, 105], [360, 50], [480, 8]].map(([cx, cy], i) => (
+            <circle key={i} cx={cx} cy={cy} r="3"
+              fill={i === 4 ? T.red : "rgba(255,255,255,0.5)"}
+              stroke={i === 4 ? T.red : "rgba(255,255,255,0.2)"}
+              strokeWidth="1"
+              style={{
+                opacity: 0,
+                animation: on ? `fadeInUp 0.5s ease ${1.5 + i * 0.3}s forwards` : "none",
+              }}
+            />
+          ))}
+
+          {/* End point glow */}
+          <circle cx="480" cy="8" r="8" fill={`${T.red}30`}
+            style={{ opacity: 0, animation: on ? `fadeInUp 0.5s ease 3s forwards` : "none" }}
+          />
+
+          {/* Animated value labels */}
+          {[
+            { x: 240, y: 92, text: "+180%", delay: 2.1 },
+            { x: 420, y: -5, text: "$14.6M", delay: 2.8 },
+          ].map((l, i) => (
+            <text key={i} x={l.x} y={l.y}
+              fill={i === 1 ? T.red : "rgba(255,255,255,0.4)"}
+              fontSize="11" fontWeight="700" fontFamily="inherit" letterSpacing="0.5"
+              style={{ opacity: 0, animation: on ? `fadeInUp 0.6s ease ${l.delay}s forwards` : "none" }}
+            >{l.text}</text>
+          ))}
+        </svg>
+
+        {/* Scan line effect */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, width: "30%", height: "100%",
+          background: `linear-gradient(90deg, transparent, ${T.red}06, transparent)`,
+          animation: on ? "scanLine 4s ease-in-out 2s infinite" : "none",
           pointerEvents: "none",
         }} />
-      ))}
-
-      {/* Giant BANKAI watermark */}
-      <div style={{
-        position: "absolute", top: "50%", left: "50%",
-        transform: `translate(-50%, -50%) translate(${(mouse.x - 0.5) * -30}px, ${(mouse.y - 0.5) * -20}px)`,
-        fontSize: "clamp(10rem, 22vw, 18rem)", fontWeight: 900, letterSpacing: "0.05em",
-        color: "rgba(255,255,255,0.02)", pointerEvents: "none", whiteSpace: "nowrap",
-        transition: "transform 1.5s ease-out",
-      }}>BANKAI</div>
+      </div>
 
       {/* Main content */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", width: "100%", position: "relative", zIndex: 2, paddingBottom: 100 }}>
@@ -250,7 +294,7 @@ function Hero() {
 
         <h1 style={{
           fontSize: "clamp(3.8rem, 8vw, 7rem)", fontWeight: 900, lineHeight: 0.95,
-          letterSpacing: "-0.04em", maxWidth: 950,
+          letterSpacing: "-0.04em", maxWidth: 700,
         }}>
           <span style={{ display: "block", color: "#fff", ...f(0.15) }}>Only for those who</span>
           <span style={{ display: "block", color: "rgba(255,255,255,0.15)", ...f(0.3) }}>refuse to blend in.</span>
@@ -963,42 +1007,70 @@ function Process() {
   );
 }
 
-// ─── CTA + FOOTER (WOW) ───
+// ─── CTA + FOOTER (CLEAN + GROWTH) ───
 function CallToAction() {
   const [hovered, setHovered] = useState(false);
+  const [vis, setVis] = useState(false);
+  const ctaRef = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVis(true); }, { threshold: 0.2 });
+    if (ctaRef.current) obs.observe(ctaRef.current);
+    return () => obs.disconnect();
+  }, []);
+
   const footerKeyframes = `
-    @keyframes footerOrb { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(50px,-30px) scale(1.15); } 66% { transform: translate(-30px,40px) scale(0.85); } 100% { transform: translate(0,0) scale(1); } }
     @keyframes footerPulseRing { 0%,100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.5); opacity: 0; } }
     @keyframes footerMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    @keyframes footerReveal { 0% { clip-path: inset(100% 0 0 0); } 100% { clip-path: inset(0 0 0 0); } }
+    @keyframes ctaDrawLine { from { stroke-dashoffset: 1200; } to { stroke-dashoffset: 0; } }
+    @keyframes ctaFadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes ctaBarGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes ctaGlow { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
   `;
 
   const marqueeText = "LET\u2019S BUILD SOMETHING \u00d7 LET\u2019S BUILD SOMETHING \u00d7 LET\u2019S BUILD SOMETHING \u00d7 LET\u2019S BUILD SOMETHING \u00d7 ";
 
   return (
     <>
-      <section id="contact" style={{
+      <section ref={ctaRef} id="contact" style={{
         padding: "0", background: T.dark, position: "relative", overflow: "hidden",
       }}>
         <style>{footerKeyframes}</style>
 
-        {/* Grid background */}
+        {/* ── Background animated chart (subtle, full-width) ── */}
         <div style={{
-          position: "absolute", inset: 0, opacity: 0.03,
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-        }} />
-
-        {/* Giant red orb */}
-        <div style={{
-          position: "absolute", left: "50%", top: "30%",
-          transform: "translate(-50%,-50%)",
-          width: 600, height: 600, borderRadius: "50%",
-          background: `radial-gradient(circle, ${T.red}20 0%, transparent 70%)`,
-          filter: "blur(100px)",
-          animation: "footerOrb 15s ease-in-out infinite",
-          pointerEvents: "none",
-        }} />
+          position: "absolute", inset: 0, pointerEvents: "none",
+          opacity: vis ? 1 : 0, transition: "opacity 1s ease",
+        }}>
+          <svg width="100%" height="100%" viewBox="0 0 1200 500" preserveAspectRatio="none" style={{ position: "absolute", inset: 0 }}>
+            {/* Subtle vertical bars */}
+            {[...Array(24)].map((_, i) => (
+              <rect key={i}
+                x={i * 50} y={500 - (20 + Math.sin(i * 0.6) * 40 + i * 8)}
+                width="20" height={20 + Math.sin(i * 0.6) * 40 + i * 8}
+                fill={i >= 20 ? `${T.red}10` : "rgba(255,255,255,0.015)"}
+                rx="2"
+                style={{
+                  transformOrigin: `${i * 50 + 10}px 500px`,
+                  animation: vis ? `ctaBarGrow 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s both` : "none",
+                }}
+              />
+            ))}
+            {/* Rising trend line */}
+            <path
+              d="M0,420 C100,400 200,380 300,350 C400,310 500,280 600,240 C700,195 800,160 900,110 C1000,70 1100,35 1200,10"
+              fill="none" stroke={`${T.red}30`} strokeWidth="2" strokeLinecap="round"
+              strokeDasharray="1200" strokeDashoffset="1200"
+              style={{ animation: vis ? "ctaDrawLine 3s cubic-bezier(0.16,1,0.3,1) 0.5s forwards" : "none" }}
+            />
+            {/* Area fill */}
+            <path
+              d="M0,420 C100,400 200,380 300,350 C400,310 500,280 600,240 C700,195 800,160 900,110 C1000,70 1100,35 1200,10 L1200,500 L0,500 Z"
+              fill={`${T.red}06`}
+              style={{ opacity: vis ? 1 : 0, transition: "opacity 2s ease 1.5s" }}
+            />
+          </svg>
+        </div>
 
         {/* Marquee banner */}
         <div style={{
@@ -1012,7 +1084,7 @@ function CallToAction() {
             {[...Array(2)].map((_, r) => (
               <span key={r} style={{
                 fontSize: "clamp(1rem, 2vw, 1.4rem)", fontWeight: 800, letterSpacing: "0.15em",
-                color: "rgba(255,255,255,0.06)", textTransform: "uppercase", paddingRight: 0,
+                color: "rgba(255,255,255,0.06)", textTransform: "uppercase",
               }}>{marqueeText}</span>
             ))}
           </div>
@@ -1022,15 +1094,6 @@ function CallToAction() {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "120px 48px 100px", position: "relative", zIndex: 2 }}>
 
           <div style={{ textAlign: "center", position: "relative" }}>
-            {/* Pulsing ring behind button */}
-            <div style={{
-              position: "absolute", left: "50%", bottom: -20,
-              width: 200, height: 200, borderRadius: "50%",
-              border: `2px solid ${T.red}30`,
-              transform: "translateX(-50%)",
-              animation: "footerPulseRing 3s ease-in-out infinite",
-              pointerEvents: "none",
-            }} />
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginBottom: 40 }}>
               <div style={{ height: 1, width: 60, background: `linear-gradient(to right, transparent, ${T.red}60)` }} />
@@ -1090,13 +1153,13 @@ function CallToAction() {
           </div>
         </div>
 
-        {/* Giant BANKAI watermark */}
+        {/* BANKAI watermark — clean stroke */}
         <div style={{
           fontSize: "clamp(6rem, 18vw, 16rem)", fontWeight: 900, letterSpacing: "0.08em",
           color: "transparent", textAlign: "center",
           WebkitTextStroke: "1px rgba(255,255,255,0.04)",
           lineHeight: 0.85, padding: "40px 0 0", pointerEvents: "none",
-          position: "relative", overflow: "hidden",
+          position: "relative",
         }}>BANKAI</div>
 
         {/* Footer links */}
@@ -1110,7 +1173,7 @@ function CallToAction() {
               {["Work", "Services", "Contact", "LinkedIn"].map(l => (
                 <a key={l} href={l === "LinkedIn" ? "#" : `#${l.toLowerCase()}`} style={{
                   color: "rgba(255,255,255,0.25)", textDecoration: "none", fontSize: 13,
-                  transition: "all 0.3s", position: "relative",
+                  transition: "all 0.3s",
                 }}
                 onMouseEnter={e => { e.target.style.color = "#fff"; }}
                 onMouseLeave={e => { e.target.style.color = "rgba(255,255,255,0.25)"; }}
