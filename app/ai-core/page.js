@@ -43,19 +43,22 @@ const globalCSS = `
 /* ───── scroll reveal hook ───── */
 function useReveal(delay = 0) {
   const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
-          setTimeout(() => {
-            el.style.opacity = "1";
-            el.style.transform = "translateY(0)";
-          }, delay);
+          if (delay > 0) {
+            setTimeout(() => setVisible(true), delay);
+          } else {
+            setVisible(true);
+          }
+          obs.disconnect();
         }
       },
-      { threshold: 0.02, rootMargin: "0px 0px 40px 0px" }
+      { threshold: 0.01, rootMargin: "0px 0px 60px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -63,9 +66,9 @@ function useReveal(delay = 0) {
   return {
     ref,
     style: {
-      opacity: 0,
-      transform: "translateY(40px)",
-      transition: `all .8s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(30px)",
+      transition: "all .7s cubic-bezier(.16,1,.3,1)",
     },
   };
 }
