@@ -129,33 +129,187 @@ function Nav() {
   );
 }
 
-// ─── HERO ───
+// ─── HERO (WOW) ───
 function Hero() {
   const [on, setOn] = useState(false);
-  useEffect(() => { setTimeout(() => setOn(true), 100); }, []);
-  const f = (d) => ({ opacity: on ? 1 : 0, transform: on ? "translateY(0)" : "translateY(30px)", transition: `all 0.9s cubic-bezier(0.16,1,0.3,1) ${d}s` });
+  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
+  const heroRef = useRef(null);
+
+  useEffect(() => { setTimeout(() => setOn(true), 200); }, []);
+
+  const handleMouse = (e) => {
+    if (!heroRef.current) return;
+    const r = heroRef.current.getBoundingClientRect();
+    setMouse({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
+  };
+
+  const f = (d) => ({
+    opacity: on ? 1 : 0,
+    transform: on ? "translateY(0)" : "translateY(40px)",
+    transition: `all 1.2s cubic-bezier(0.16,1,0.3,1) ${d}s`,
+  });
+
+  // CSS keyframes via style tag
+  const keyframes = `
+    @keyframes heroGrid { 0% { opacity: 0.03; } 50% { opacity: 0.06; } 100% { opacity: 0.03; } }
+    @keyframes heroPulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
+    @keyframes heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes heroLine { 0% { width: 0; } 100% { width: 120px; } }
+    @keyframes heroOrb { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-40px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.9); } 100% { transform: translate(0,0) scale(1); } }
+    @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  `;
+
+  const gridSize = 60;
+
   return (
-    <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end", padding: "0 0 120px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", width: "100%" }}>
+    <section
+      ref={heroRef}
+      onMouseMove={handleMouse}
+      style={{
+        minHeight: "100vh", display: "flex", flexDirection: "column",
+        justifyContent: "flex-end", padding: "0 0 0",
+        background: T.dark, position: "relative", overflow: "hidden", cursor: "default",
+      }}
+    >
+      <style>{keyframes}</style>
+
+      {/* Animated grid */}
+      <div style={{
+        position: "absolute", inset: 0, opacity: 0.04,
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)`,
+        backgroundSize: `${gridSize}px ${gridSize}px`,
+        animation: "heroGrid 4s ease-in-out infinite",
+      }} />
+
+      {/* Floating red orb (follows mouse subtly) */}
+      <div style={{
+        position: "absolute",
+        left: `${20 + mouse.x * 15}%`,
+        top: `${15 + mouse.y * 15}%`,
+        width: 500, height: 500, borderRadius: "50%",
+        background: `radial-gradient(circle, ${T.red}25 0%, transparent 70%)`,
+        filter: "blur(80px)",
+        animation: "heroOrb 12s ease-in-out infinite",
+        pointerEvents: "none",
+        transition: "left 1.5s ease-out, top 1.5s ease-out",
+      }} />
+
+      {/* Secondary blue orb */}
+      <div style={{
+        position: "absolute", right: "10%", bottom: "20%",
+        width: 350, height: 350, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
+        filter: "blur(60px)",
+        animation: "heroOrb 16s ease-in-out infinite reverse",
+        pointerEvents: "none",
+      }} />
+
+      {/* Floating particles */}
+      {[...Array(6)].map((_, i) => (
+        <div key={i} style={{
+          position: "absolute",
+          left: `${12 + i * 15}%`,
+          top: `${20 + (i % 3) * 25}%`,
+          width: i % 2 === 0 ? 4 : 3,
+          height: i % 2 === 0 ? 4 : 3,
+          borderRadius: "50%",
+          background: i === 0 || i === 3 ? T.red : "rgba(255,255,255,0.3)",
+          animation: `heroFloat ${3 + i * 0.7}s ease-in-out infinite`,
+          animationDelay: `${i * 0.4}s`,
+          boxShadow: i === 0 || i === 3 ? `0 0 12px ${T.red}60` : "none",
+          pointerEvents: "none",
+        }} />
+      ))}
+
+      {/* Giant BANKAI watermark */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%",
+        transform: `translate(-50%, -50%) translate(${(mouse.x - 0.5) * -30}px, ${(mouse.y - 0.5) * -20}px)`,
+        fontSize: "clamp(10rem, 22vw, 18rem)", fontWeight: 900, letterSpacing: "0.05em",
+        color: "rgba(255,255,255,0.02)", pointerEvents: "none", whiteSpace: "nowrap",
+        transition: "transform 1.5s ease-out",
+      }}>BANKAI</div>
+
+      {/* Main content */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", width: "100%", position: "relative", zIndex: 2, paddingBottom: 100 }}>
+
+        {/* Top accent */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 48, ...f(0) }}>
+          <div style={{
+            width: 10, height: 10, borderRadius: "50%", background: T.red,
+            animation: on ? "heroPulse 2s ease-in-out infinite" : "none",
+            boxShadow: `0 0 20px ${T.red}80`,
+          }} />
+          <div style={{
+            height: 1, background: `linear-gradient(to right, ${T.red}, transparent)`,
+            animation: on ? "heroLine 1.5s cubic-bezier(0.16,1,0.3,1) 0.5s forwards" : "none",
+            width: 0,
+          }} />
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 3, color: "rgba(255,255,255,0.3)", textTransform: "uppercase" }}>Revenue-driven marketing</span>
+        </div>
+
         <h1 style={{
-          fontSize: "clamp(3.5rem, 7.5vw, 6.5rem)", fontWeight: 800, lineHeight: 1.0,
-          letterSpacing: "-0.04em", maxWidth: 900, ...f(0.15),
+          fontSize: "clamp(3.8rem, 8vw, 7rem)", fontWeight: 900, lineHeight: 0.95,
+          letterSpacing: "-0.04em", maxWidth: 950,
         }}>
-          <span style={{ color: T.dark }}>Only for those who </span>
-          <span style={{ color: T.light }}>refuse to blend in. </span>
-          <span style={{ color: T.red }}>Play to win.</span>
+          <span style={{ display: "block", color: "#fff", ...f(0.15) }}>Only for those who</span>
+          <span style={{ display: "block", color: "rgba(255,255,255,0.15)", ...f(0.3) }}>refuse to blend in.</span>
+          <span style={{ display: "block", ...f(0.45) }}>
+            <span style={{
+              background: `linear-gradient(135deg, ${T.red}, #FF8A65)`,
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>Play to win.</span>
+          </span>
         </h1>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 64, ...f(0.4) }}>
-          <p style={{ fontSize: 17, color: T.mid, maxWidth: 440, lineHeight: 1.7 }}>
-            Revenue-driven marketing for businesses that refuse to settle. We build systems that generate leads, close deals, and scale.
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 64, ...f(0.6) }}>
+          <p style={{ fontSize: 17, color: "rgba(255,255,255,0.4)", maxWidth: 440, lineHeight: 1.7 }}>
+            We build systems that generate leads, close deals, and scale. Full-stack marketing for businesses that refuse to settle.
           </p>
-          <a href="#contact" style={{
-            background: T.dark, color: "#fff", padding: "16px 40px", borderRadius: 100,
-            textDecoration: "none", fontSize: 14, fontWeight: 600, transition: "all 0.3s", flexShrink: 0,
-          }}
-          onMouseEnter={e => { e.target.style.background = T.red; }}
-          onMouseLeave={e => { e.target.style.background = T.dark; }}
-          >Start a project</a>
+          <div style={{ display: "flex", gap: 16, alignItems: "center", flexShrink: 0 }}>
+            <a href="#contact" style={{
+              background: T.red, color: "#fff", padding: "18px 44px", borderRadius: 100,
+              textDecoration: "none", fontSize: 15, fontWeight: 600, transition: "all 0.4s",
+              boxShadow: `0 0 40px ${T.red}40`,
+            }}
+            onMouseEnter={e => { e.target.style.boxShadow = `0 0 60px ${T.red}80`; e.target.style.transform = "scale(1.05)"; }}
+            onMouseLeave={e => { e.target.style.boxShadow = `0 0 40px ${T.red}40`; e.target.style.transform = "scale(1)"; }}
+            >Start a project</a>
+            <a href="#work" style={{
+              color: "rgba(255,255,255,0.35)", textDecoration: "none", fontSize: 14,
+              display: "flex", alignItems: "center", gap: 8, transition: "color 0.3s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = "#fff"}
+            onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.35)"}
+            >
+              View work
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom ticker marquee */}
+      <div style={{
+        position: "relative", zIndex: 2,
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        overflow: "hidden", ...f(0.8),
+      }}>
+        <div style={{
+          display: "flex", whiteSpace: "nowrap", padding: "20px 0",
+          animation: "tickerScroll 30s linear infinite",
+        }}>
+          {[...Array(2)].map((_, r) => (
+            <div key={r} style={{ display: "flex", alignItems: "center", gap: 48, paddingRight: 48 }}>
+              {["$14.6M Revenue", "10,235 Jobs Booked", "36.5\u00d7 ROAS", "42% Lower CPL", "180% Organic Growth", "60% Automated", "$14.6M Revenue", "10,235 Jobs Booked", "36.5\u00d7 ROAS", "42% Lower CPL", "180% Organic Growth", "60% Automated"].map((t, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: i % 3 === 0 ? T.red : "rgba(255,255,255,0.15)" }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, color: i % 3 === 0 ? T.red : "rgba(255,255,255,0.25)", textTransform: "uppercase" }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -809,57 +963,179 @@ function Process() {
   );
 }
 
-// ─── CTA ───
+// ─── CTA + FOOTER (WOW) ───
 function CallToAction() {
+  const [hovered, setHovered] = useState(false);
+  const footerKeyframes = `
+    @keyframes footerOrb { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(50px,-30px) scale(1.15); } 66% { transform: translate(-30px,40px) scale(0.85); } 100% { transform: translate(0,0) scale(1); } }
+    @keyframes footerPulseRing { 0%,100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.5); opacity: 0; } }
+    @keyframes footerMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    @keyframes footerReveal { 0% { clip-path: inset(100% 0 0 0); } 100% { clip-path: inset(0 0 0 0); } }
+  `;
+
+  const marqueeText = "LET\u2019S BUILD SOMETHING \u00d7 LET\u2019S BUILD SOMETHING \u00d7 LET\u2019S BUILD SOMETHING \u00d7 LET\u2019S BUILD SOMETHING \u00d7 ";
+
   return (
-    <section id="contact" style={{ padding: "140px 0", background: T.dark }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", textAlign: "center" }}>
-        <h2 style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.05 }}>
-          Ready to stop guessing<br /><span style={{ color: T.red }}>and start growing?</span>
-        </h2>
-        <p style={{ fontSize: 17, color: "rgba(255,255,255,0.4)", maxWidth: 440, margin: "28px auto 0", lineHeight: 1.7 }}>
-          Book a free strategy call. We&apos;ll audit your marketing and show you where the opportunities are.
-        </p>
-        <div style={{ display: "flex", gap: 20, justifyContent: "center", marginTop: 48 }}>
-          <a href="#" style={{
-            background: T.red, color: "#fff", padding: "16px 44px", borderRadius: 100,
-            textDecoration: "none", fontSize: 15, fontWeight: 600, transition: "all 0.3s",
-          }}
-          onMouseEnter={e => { e.target.style.background = "#fff"; e.target.style.color = T.dark; }}
-          onMouseLeave={e => { e.target.style.background = T.red; e.target.style.color = "#fff"; }}
-          >Book a call</a>
-          <a href="mailto:hello@bankai.agency" style={{
-            color: "rgba(255,255,255,0.35)", padding: "16px 0",
-            textDecoration: "none", fontSize: 15, transition: "color 0.3s",
-          }}
-          onMouseEnter={e => e.target.style.color = "#fff"}
-          onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.35)"}
-          >hello@bankai.agency &rarr;</a>
+    <>
+      <section id="contact" style={{
+        padding: "0", background: T.dark, position: "relative", overflow: "hidden",
+      }}>
+        <style>{footerKeyframes}</style>
+
+        {/* Grid background */}
+        <div style={{
+          position: "absolute", inset: 0, opacity: 0.03,
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)`,
+          backgroundSize: "80px 80px",
+        }} />
+
+        {/* Giant red orb */}
+        <div style={{
+          position: "absolute", left: "50%", top: "30%",
+          transform: "translate(-50%,-50%)",
+          width: 600, height: 600, borderRadius: "50%",
+          background: `radial-gradient(circle, ${T.red}20 0%, transparent 70%)`,
+          filter: "blur(100px)",
+          animation: "footerOrb 15s ease-in-out infinite",
+          pointerEvents: "none",
+        }} />
+
+        {/* Marquee banner */}
+        <div style={{
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          overflow: "hidden", padding: "28px 0",
+        }}>
+          <div style={{
+            display: "flex", whiteSpace: "nowrap",
+            animation: "footerMarquee 20s linear infinite",
+          }}>
+            {[...Array(2)].map((_, r) => (
+              <span key={r} style={{
+                fontSize: "clamp(1rem, 2vw, 1.4rem)", fontWeight: 800, letterSpacing: "0.15em",
+                color: "rgba(255,255,255,0.06)", textTransform: "uppercase", paddingRight: 0,
+              }}>{marqueeText}</span>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+
+        {/* Main CTA */}
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "120px 48px 100px", position: "relative", zIndex: 2 }}>
+
+          <div style={{ textAlign: "center", position: "relative" }}>
+            {/* Pulsing ring behind button */}
+            <div style={{
+              position: "absolute", left: "50%", bottom: -20,
+              width: 200, height: 200, borderRadius: "50%",
+              border: `2px solid ${T.red}30`,
+              transform: "translateX(-50%)",
+              animation: "footerPulseRing 3s ease-in-out infinite",
+              pointerEvents: "none",
+            }} />
+
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginBottom: 40 }}>
+              <div style={{ height: 1, width: 60, background: `linear-gradient(to right, transparent, ${T.red}60)` }} />
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 4, color: T.red, textTransform: "uppercase" }}>Get started</span>
+              <div style={{ height: 1, width: 60, background: `linear-gradient(to left, transparent, ${T.red}60)` }} />
+            </div>
+
+            <h2 style={{
+              fontSize: "clamp(3rem, 7vw, 6rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95,
+              marginBottom: 32,
+            }}>
+              <span style={{ color: "#fff", display: "block" }}>Stop guessing.</span>
+              <span style={{
+                display: "block",
+                background: `linear-gradient(135deg, ${T.red}, #FF8A65)`,
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              }}>Start growing.</span>
+            </h2>
+
+            <p style={{ fontSize: 18, color: "rgba(255,255,255,0.35)", maxWidth: 500, margin: "0 auto 56px", lineHeight: 1.7 }}>
+              Book a free strategy call. We&apos;ll audit your marketing and show you exactly where the revenue opportunities are.
+            </p>
+
+            <div style={{ display: "flex", gap: 24, justifyContent: "center", alignItems: "center" }}>
+              <a
+                href="#"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                style={{
+                  position: "relative",
+                  background: T.red, color: "#fff",
+                  padding: "20px 56px", borderRadius: 100,
+                  textDecoration: "none", fontSize: 16, fontWeight: 700,
+                  transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)",
+                  boxShadow: hovered ? `0 0 80px ${T.red}80, 0 20px 60px ${T.red}40` : `0 0 40px ${T.red}30`,
+                  transform: hovered ? "scale(1.08)" : "scale(1)",
+                  letterSpacing: 0.5,
+                }}
+              >
+                Book a call
+                <span style={{
+                  position: "absolute", inset: -3, borderRadius: 100,
+                  border: `1px solid ${T.red}40`,
+                  animation: hovered ? "footerPulseRing 1.5s ease-in-out infinite" : "none",
+                  pointerEvents: "none",
+                }} />
+              </a>
+              <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 13 }}>or</span>
+              <a href="mailto:hello@bankai.agency" style={{
+                color: "rgba(255,255,255,0.35)", textDecoration: "none", fontSize: 15,
+                transition: "all 0.3s", borderBottom: "1px solid transparent",
+              }}
+              onMouseEnter={e => { e.target.style.color = "#fff"; e.target.style.borderBottomColor = T.red; }}
+              onMouseLeave={e => { e.target.style.color = "rgba(255,255,255,0.35)"; e.target.style.borderBottomColor = "transparent"; }}
+              >hello@bankai.agency</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Giant BANKAI watermark */}
+        <div style={{
+          fontSize: "clamp(6rem, 18vw, 16rem)", fontWeight: 900, letterSpacing: "0.08em",
+          color: "transparent", textAlign: "center",
+          WebkitTextStroke: "1px rgba(255,255,255,0.04)",
+          lineHeight: 0.85, padding: "40px 0 0", pointerEvents: "none",
+          position: "relative", overflow: "hidden",
+        }}>BANKAI</div>
+
+        {/* Footer links */}
+        <div style={{
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          position: "relative", zIndex: 2,
+        }}>
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 48px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", alignItems: "center" }}>
+            <Logo white />
+            <div style={{ display: "flex", gap: 32, justifyContent: "center" }}>
+              {["Work", "Services", "Contact", "LinkedIn"].map(l => (
+                <a key={l} href={l === "LinkedIn" ? "#" : `#${l.toLowerCase()}`} style={{
+                  color: "rgba(255,255,255,0.25)", textDecoration: "none", fontSize: 13,
+                  transition: "all 0.3s", position: "relative",
+                }}
+                onMouseEnter={e => { e.target.style.color = "#fff"; }}
+                onMouseLeave={e => { e.target.style.color = "rgba(255,255,255,0.25)"; }}
+                >{l}</a>
+              ))}
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.12)" }}>&copy; 2026 Bankai Agency. All rights reserved.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom accent line */}
+        <div style={{
+          height: 3,
+          background: `linear-gradient(to right, transparent, ${T.red}, transparent)`,
+          opacity: 0.4,
+        }} />
+      </section>
+    </>
   );
 }
 
-// ─── FOOTER ───
-function Footer() {
-  return (
-    <footer style={{ background: T.dark, borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 0" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Logo white />
-        <div style={{ display: "flex", gap: 32 }}>
-          {["Work", "Services", "Contact", "LinkedIn"].map(l => (
-            <a key={l} href={l === "LinkedIn" ? "#" : `#${l.toLowerCase()}`} style={{ color: "rgba(255,255,255,0.3)", textDecoration: "none", fontSize: 13, transition: "color 0.2s" }}
-            onMouseEnter={e => e.target.style.color = "#fff"}
-            onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.3)"}
-            >{l}</a>
-          ))}
-        </div>
-        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.15)" }}>&copy; 2026 Bankai Agency</span>
-      </div>
-    </footer>
-  );
-}
+// Footer is now part of CallToAction
+function Footer() { return null; }
 
 // ─── MAIN ───
 export default function Home() {
