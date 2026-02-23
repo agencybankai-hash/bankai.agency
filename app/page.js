@@ -3,18 +3,18 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 /* ───── design tokens ───── */
 const V = {
-  bg: "#06060B",
-  card: "#0C0C14",
-  cardHover: "#12121C",
-  surface: "#0A0A12",
-  text: "#C8C5D4",
-  dim: "#6B6880",
-  muted: "#4A4760",
+  bg: "#08080A",
+  card: "#0F0F12",
+  cardHover: "#151518",
+  surface: "#0B0B0E",
+  text: "#C4C0CC",
+  dim: "#706D7E",
+  muted: "#4D4A5A",
   bright: "#FFFFFF",
-  accent: "#6EE7B7",
-  accent2: "#34D399",
-  accentDim: "rgba(110,231,183,0.08)",
-  accentGlow: "rgba(110,231,183,0.25)",
+  accent: "#E53935",
+  accent2: "#FF5252",
+  accentDim: "rgba(229,57,53,0.08)",
+  accentGlow: "rgba(229,57,53,0.25)",
   border: "rgba(255,255,255,0.06)",
   borderHover: "rgba(255,255,255,0.12)",
   divider: "rgba(255,255,255,0.04)",
@@ -34,11 +34,11 @@ const globalCSS = `
 @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 @keyframes drawLine { from{stroke-dashoffset:1000} to{stroke-dashoffset:0} }
 @keyframes countUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-* { scrollbar-width: thin; scrollbar-color: rgba(110,231,183,0.15) transparent; box-sizing: border-box; }
+* { scrollbar-width: thin; scrollbar-color: rgba(229,57,53,0.2) transparent; box-sizing: border-box; }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(110,231,183,0.15); border-radius: 3px; }
-::selection { background: rgba(110,231,183,0.2); color: #fff; }
+::-webkit-scrollbar-thumb { background: rgba(229,57,53,0.2); border-radius: 3px; }
+::selection { background: rgba(229,57,53,0.25); color: #fff; }
 html { scroll-behavior: smooth; }
 @media (max-width: 768px) {
   .grid-2 { grid-template-columns: 1fr !important; }
@@ -180,11 +180,11 @@ function GradientArc() {
       const mouseInfluence = (sm.x - 0.5) * 0.15;
 
       const layers = [
-        { radius: baseRadius * 1.1, width: 120, alpha: 0.1, hue: 160, speed: 0.7 },
-        { radius: baseRadius * 0.95, width: 90, alpha: 0.18, hue: 155, speed: 1 },
-        { radius: baseRadius * 0.82, width: 60, alpha: 0.25, hue: 150, speed: 1.3 },
-        { radius: baseRadius * 0.72, width: 35, alpha: 0.15, hue: 165, speed: 0.9 },
-        { radius: baseRadius * 0.6, width: 20, alpha: 0.1, hue: 170, speed: 1.5 },
+        { radius: baseRadius * 1.1, width: 120, alpha: 0.1, hue: 0, speed: 0.7 },
+        { radius: baseRadius * 0.95, width: 90, alpha: 0.18, hue: 5, speed: 1 },
+        { radius: baseRadius * 0.82, width: 60, alpha: 0.25, hue: 10, speed: 1.3 },
+        { radius: baseRadius * 0.72, width: 35, alpha: 0.15, hue: 355, speed: 0.9 },
+        { radius: baseRadius * 0.6, width: 20, alpha: 0.1, hue: 350, speed: 1.5 },
       ];
 
       for (const layer of layers) {
@@ -225,11 +225,11 @@ function GradientArc() {
         cx + Math.cos(coreStart) * coreR, cy + Math.sin(coreStart) * coreR,
         cx + Math.cos(coreEnd) * coreR, cy + Math.sin(coreEnd) * coreR
       );
-      coreGrad.addColorStop(0, "hsla(160, 80%, 70%, 0)");
-      coreGrad.addColorStop(0.15, "hsla(160, 80%, 75%, 0.12)");
-      coreGrad.addColorStop(0.5, "hsla(155, 90%, 80%, 0.3)");
-      coreGrad.addColorStop(0.85, "hsla(150, 80%, 70%, 0.12)");
-      coreGrad.addColorStop(1, "hsla(150, 80%, 65%, 0)");
+      coreGrad.addColorStop(0, "hsla(0, 85%, 60%, 0)");
+      coreGrad.addColorStop(0.15, "hsla(0, 85%, 65%, 0.12)");
+      coreGrad.addColorStop(0.5, "hsla(5, 90%, 70%, 0.3)");
+      coreGrad.addColorStop(0.85, "hsla(10, 85%, 60%, 0.12)");
+      coreGrad.addColorStop(1, "hsla(10, 85%, 55%, 0)");
 
       ctx.beginPath();
       ctx.arc(cx, cy, coreR, coreStart, coreEnd);
@@ -252,8 +252,8 @@ function GradientArc() {
         const pSize = 2 + Math.sin(t * 4 + i * 2) * 1;
 
         const pg = ctx.createRadialGradient(px, py, 0, px, py, pSize * 4);
-        pg.addColorStop(0, `hsla(158, 85%, 75%, ${pAlpha})`);
-        pg.addColorStop(1, `hsla(158, 85%, 75%, 0)`);
+        pg.addColorStop(0, `hsla(5, 85%, 65%, ${pAlpha})`);
+        pg.addColorStop(1, `hsla(5, 85%, 65%, 0)`);
         ctx.beginPath();
         ctx.arc(px, py, pSize * 4, 0, Math.PI * 2);
         ctx.fillStyle = pg;
@@ -376,7 +376,7 @@ function Hero() {
             Строим системы,
             <br />
             <span style={{
-              background: `linear-gradient(135deg, ${V.accent}, ${V.accent2}, #A7F3D0)`,
+              background: `linear-gradient(135deg, ${V.accent}, ${V.accent2}, #FF8A80)`,
               backgroundSize: "200% 200%", animation: "gradientShift 4s ease infinite",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             }}>которые приносят
