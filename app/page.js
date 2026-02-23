@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 /* ───── design tokens ─────
    Premium black/crimson: red is a whisper, not a scream.
@@ -25,13 +25,27 @@ const V = {
   body: "'Manrope', -apple-system, sans-serif",
 };
 
-/* ───── css ───── */
+/* ───── css keyframes ───── */
 const globalCSS = `
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap');
-@keyframes fadeInUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* scroll-triggered animations */
+@keyframes revealUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes revealDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes revealLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes revealRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes revealScale{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+@keyframes revealFade{from{opacity:0}to{opacity:1}}
+@keyframes lineGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes dividerGrow{from{width:0}to{width:100%}}
+@keyframes labelLine{from{width:0}to{width:24px}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* existing */
 @keyframes pulse2{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:0}}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
 *{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;box-sizing:border-box}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -54,28 +68,123 @@ html{scroll-behavior:smooth}
 }
 `;
 
-/* ───── reveal ───── */
-function Reveal({ children, style: extra, delay = 0, tag: Tag = "div", ...props }) {
-  return <Tag style={{ animation: `fadeInUp .85s cubic-bezier(.16,1,.3,1) ${delay}ms both`, ...extra }} {...props}>{children}</Tag>;
+/* ═══════════════════════ SCROLL ANIMATION SYSTEM ═══════════════════════ */
+
+/* useInView hook — fires once when element enters viewport */
+function useInView(opts = {}) {
+  const { threshold = 0.15, rootMargin = "0px 0px -60px 0px" } = opts;
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold, rootMargin }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold, rootMargin]);
+
+  return [ref, visible];
+}
+
+/* Reveal — scroll-triggered with multiple animation types */
+function Reveal({
+  children, style: extra, delay = 0,
+  type = "up", // up | down | left | right | scale | fade
+  duration = 0.8,
+  tag: Tag = "div",
+  ...props
+}) {
+  const [ref, visible] = useInView();
+  const animMap = {
+    up: "revealUp", down: "revealDown",
+    left: "revealLeft", right: "revealRight",
+    scale: "revealScale", fade: "revealFade",
+  };
+  return (
+    <Tag
+      ref={ref}
+      style={{
+        opacity: visible ? 1 : 0,
+        animation: visible
+          ? `${animMap[type] || "revealUp"} ${duration}s cubic-bezier(.16,1,.3,1) ${delay}ms both`
+          : "none",
+        ...extra,
+      }}
+      {...props}
+    >
+      {children}
+    </Tag>
+  );
 }
 
 /* ───── container ───── */
 const cx = { maxWidth: 1140, margin: "0 auto", padding: "0 32px", position: "relative" };
 
-/* ───── divider ───── */
+/* ───── animated divider ───── */
 function Divider() {
-  return <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 32px" }}><div style={{ height: 1, background: V.divider }} /></div>;
-}
-
-/* ───── section label ───── */
-function Label({ num, text }) {
+  const [ref, visible] = useInView({ threshold: 0.5 });
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-      <span style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700, color: V.muted }}>{num}</span>
-      <span style={{ width: 24, height: 1, background: V.accent, opacity: 0.4 }} />
-      <span style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: V.dim }}>{text}</span>
+    <div ref={ref} style={{ maxWidth: 1140, margin: "0 auto", padding: "0 32px" }}>
+      <div style={{
+        height: 1,
+        background: V.divider,
+        transform: visible ? "scaleX(1)" : "scaleX(0)",
+        transformOrigin: "left center",
+        transition: "transform 1.2s cubic-bezier(.16,1,.3,1)",
+      }} />
     </div>
   );
+}
+
+/* ───── animated section label ───── */
+function Label({ num, text }) {
+  const [ref, visible] = useInView();
+  return (
+    <div ref={ref} style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+      <span style={{
+        fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700, color: V.muted,
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(-10px)",
+        transition: "all 0.6s cubic-bezier(.16,1,.3,1)",
+      }}>{num}</span>
+      <span style={{
+        height: 1, background: V.accent, opacity: 0.4,
+        width: visible ? 24 : 0,
+        transition: "width 0.8s cubic-bezier(.16,1,.3,1) 0.15s",
+      }} />
+      <span style={{
+        fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+        letterSpacing: "0.18em", textTransform: "uppercase", color: V.dim,
+        opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(15px)",
+        transition: "all 0.7s cubic-bezier(.16,1,.3,1) 0.3s",
+      }}>{text}</span>
+    </div>
+  );
+}
+
+/* ───── counter animation ───── */
+function Counter({ value, suffix = "", duration = 1800 }) {
+  const [ref, visible] = useInView();
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    if (!visible) return;
+    const num = parseInt(value);
+    if (isNaN(num)) { setDisplay(value); return; }
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      setDisplay(Math.round(num * ease).toString());
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [visible, value, duration]);
+
+  return <span ref={ref}>{display}{suffix}</span>;
 }
 
 /* ───── data ───── */
@@ -203,7 +312,6 @@ function GradientArc() {
       const R = Math.min(w, h) * 0.78;
       const mi = (s.x - 0.5) * 0.12;
 
-      // Deep atmospheric layers — very low saturation, low alpha
       const layers = [
         { r: R * 1.15, w: 140, a: 0.06, sat: 50, light: 25, sp: 0.6 },
         { r: R * 0.98, w: 100, a: 0.10, sat: 55, light: 28, sp: 0.9 },
@@ -233,7 +341,6 @@ function GradientArc() {
       }
       ctx.filter = "none";
 
-      // Thin bright core
       const cr = R * 0.84 + Math.sin(T * 1.1) * 6 + (s.y - 0.5) * 16;
       const cs = -Math.PI * 0.78 + mi + Math.sin(T * 0.5) * 0.05;
       const ce = -Math.PI * 0.22 + mi + Math.cos(T * 0.7) * 0.05;
@@ -250,7 +357,6 @@ function GradientArc() {
       ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.strokeStyle = cg;
       ctx.filter = "blur(1px)"; ctx.stroke(); ctx.filter = "none";
 
-      // Sparse glow particles
       for (let i = 0; i < 12; i++) {
         const f = i / 12;
         const a = cs + (ce - cs) * f;
@@ -319,8 +425,8 @@ function Hero() {
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
       <GradientArc />
       <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 140, paddingBottom: 80 }}>
-        {/* Under construction — minimal, not screaming */}
-        <Reveal>
+        {/* Under construction pill */}
+        <Reveal type="fade" duration={1.2}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 10,
             padding: "8px 18px",
@@ -337,7 +443,7 @@ function Hero() {
           </div>
         </Reveal>
 
-        <Reveal delay={80}>
+        <Reveal delay={150} duration={1}>
           <h1 className="hero-heading" style={{
             fontFamily: V.heading, fontSize: "clamp(2.6rem, 5.5vw, 4.8rem)",
             fontWeight: 900, lineHeight: 1.04, letterSpacing: "-0.05em",
@@ -349,14 +455,14 @@ function Hero() {
           </h1>
         </Reveal>
 
-        <Reveal delay={160}>
+        <Reveal delay={300} type="fade" duration={1}>
           <p style={{ fontSize: "1.05rem", color: V.dim, maxWidth: 480, lineHeight: 1.7, marginBottom: 48 }}>
             AI-автоматизация и маркетинг полного цикла
             для бизнеса, который хочет расти быстрее.
           </p>
         </Reveal>
 
-        <Reveal delay={240}>
+        <Reveal delay={450} type="up">
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
             <a href="#services" style={{
               border: `1px solid ${V.borderHover}`, color: V.bright,
@@ -370,19 +476,21 @@ function Hero() {
           </div>
         </Reveal>
 
-        <Reveal delay={380}>
+        <Reveal delay={600} type="fade" duration={1.2}>
           <div className="stat-grid" style={{
             display: "grid", gridTemplateColumns: "repeat(3, auto)", gap: 56,
             marginTop: 80, paddingTop: 36, borderTop: `1px solid ${V.divider}`, maxWidth: 520,
           }}>
             {[
-              { v: "50+", l: "проектов" },
-              { v: "3x", l: "средний рост" },
-              { v: "24ч", l: "время ответа" },
-            ].map((s, i) => (
+              { v: "50", s: "+", l: "проектов" },
+              { v: "3", s: "x", l: "средний рост" },
+              { v: "24", s: "ч", l: "время ответа" },
+            ].map((stat, i) => (
               <div key={i}>
-                <div style={{ fontFamily: V.heading, fontSize: "1.6rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.04em", marginBottom: 2 }}>{s.v}</div>
-                <div style={{ fontSize: "0.72rem", color: V.muted }}>{s.l}</div>
+                <div style={{ fontFamily: V.heading, fontSize: "1.6rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.04em", marginBottom: 2 }}>
+                  <Counter value={stat.v} suffix={stat.s} />
+                </div>
+                <div style={{ fontSize: "0.72rem", color: V.muted }}>{stat.l}</div>
               </div>
             ))}
           </div>
@@ -394,6 +502,7 @@ function Hero() {
 
 /* ═══════════════════════ MARQUEE ═══════════════════════ */
 function Marquee() {
+  const [ref, visible] = useInView({ threshold: 0.3 });
   const words = ["AI-АВТОМАТИЗАЦИЯ", "GOOGLE ADS", "SEO", "CRM", "АНАЛИТИКА", "PERFORMANCE", "ЛИДОГЕНЕРАЦИЯ", "КОНТЕНТ", "BRANDING", "WEB DEV"];
   const row = words.map((w, i) => (
     <span key={i} style={{
@@ -404,7 +513,13 @@ function Marquee() {
     }}>{w}</span>
   ));
   return (
-    <div style={{ overflow: "hidden", padding: "22px 0", borderTop: `1px solid ${V.divider}`, borderBottom: `1px solid ${V.divider}`, position: "relative", zIndex: 1 }}>
+    <div ref={ref} style={{
+      overflow: "hidden", padding: "22px 0",
+      borderTop: `1px solid ${V.divider}`, borderBottom: `1px solid ${V.divider}`,
+      position: "relative", zIndex: 1,
+      opacity: visible ? 1 : 0,
+      transition: "opacity 1s cubic-bezier(.16,1,.3,1)",
+    }}>
       <div style={{ display: "flex", animation: "marquee 40s linear infinite", width: "max-content" }}>{row}{row}</div>
     </div>
   );
@@ -416,8 +531,8 @@ function MainServices() {
   return (
     <section id="services" style={{ padding: "120px 0 80px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <Reveal><Label num="01" text="Ключевые направления" /></Reveal>
-        <Reveal delay={60}>
+        <Reveal type="fade"><Label num="01" text="Ключевые направления" /></Reveal>
+        <Reveal delay={100}>
           <h2 className="section-heading" style={{
             fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900,
             lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
@@ -426,7 +541,7 @@ function MainServices() {
 
         <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {mainServices.map((s, i) => (
-            <Reveal key={i} delay={100 + i * 80}>
+            <Reveal key={i} delay={180 + i * 120} type={i === 0 ? "left" : "right"} duration={0.9}>
               <div
                 onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
                 style={{
@@ -438,7 +553,6 @@ function MainServices() {
                   height: "100%", display: "flex", flexDirection: "column",
                 }}
               >
-                {/* subtle top accent */}
                 {s.flagship && <div style={{
                   position: "absolute", top: 0, left: "15%", right: "15%", height: 1,
                   background: `linear-gradient(90deg, transparent, rgba(160,28,45,${hi === 0 ? 0.3 : 0.12}), transparent)`,
@@ -488,8 +602,8 @@ function ServicesGrid() {
   return (
     <section style={{ padding: "80px 0 120px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <Reveal><Label num="02" text="Все услуги" /></Reveal>
-        <Reveal delay={60}>
+        <Reveal type="fade"><Label num="02" text="Все услуги" /></Reveal>
+        <Reveal delay={80}>
           <h2 className="section-heading" style={{
             fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
             lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 600, marginBottom: 48,
@@ -498,7 +612,7 @@ function ServicesGrid() {
 
         <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
           {services.map((s, i) => (
-            <Reveal key={i} delay={80 + i * 35}>
+            <Reveal key={i} delay={100 + i * 60} type="scale" duration={0.7}>
               <div
                 onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
                 style={{
@@ -528,8 +642,8 @@ function Process() {
   return (
     <section id="process" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <Reveal><Label num="03" text="Процесс" /></Reveal>
-        <Reveal delay={60}>
+        <Reveal type="fade"><Label num="03" text="Процесс" /></Reveal>
+        <Reveal delay={80}>
           <h2 className="section-heading" style={{
             fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
             lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 600, marginBottom: 56,
@@ -538,7 +652,7 @@ function Process() {
 
         <div className="process-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
           {steps.map((s, i) => (
-            <Reveal key={i} delay={100 + i * 70}>
+            <Reveal key={i} delay={120 + i * 100} type="left" duration={0.85}>
               <div
                 onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
                 style={{
@@ -565,20 +679,47 @@ function Process() {
 
 /* ═══════════════════════ STATEMENT ═══════════════════════ */
 function Statement() {
+  const [ref, visible] = useInView({ threshold: 0.3 });
+  const dimText = "Мы не просто запускаем рекламу. ";
+  const brightText = "Мы строим системы, где AI, данные и маркетинг работают как единый механизм";
+  const endText = " — и приносят измеримый результат.";
+
   return (
     <section style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <Reveal>
-          <h2 style={{
-            fontFamily: V.heading, fontSize: "clamp(1.5rem, 3vw, 2.3rem)",
-            fontWeight: 800, lineHeight: 1.35, letterSpacing: "-0.03em",
-            color: V.dim, maxWidth: 850,
-          }}>
-            Мы не просто запускаем рекламу.{" "}
-            <span style={{ color: V.bright }}>Мы строим системы, где AI, данные и маркетинг работают как единый механизм</span>
-            {" "}— и приносят измеримый результат.
-          </h2>
-        </Reveal>
+        <h2 ref={ref} style={{
+          fontFamily: V.heading, fontSize: "clamp(1.5rem, 3vw, 2.3rem)",
+          fontWeight: 800, lineHeight: 1.35, letterSpacing: "-0.03em",
+          maxWidth: 850,
+        }}>
+          {dimText.split(" ").map((word, i) => (
+            <span key={`d${i}`} style={{
+              color: V.dim,
+              display: "inline-block", marginRight: "0.3em",
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(12px)",
+              transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${i * 50}ms`,
+            }}>{word}</span>
+          ))}
+          {brightText.split(" ").map((word, i) => (
+            <span key={`b${i}`} style={{
+              color: V.bright,
+              display: "inline-block", marginRight: "0.3em",
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(12px)",
+              transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + i) * 50}ms`,
+            }}>{word}</span>
+          ))}
+          {endText.split(" ").filter(Boolean).map((word, i) => (
+            <span key={`e${i}`} style={{
+              color: V.dim,
+              display: "inline-block", marginRight: "0.3em",
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(12px)",
+              transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + brightText.split(" ").length + i) * 50}ms`,
+            }}>{word}</span>
+          ))}
+        </h2>
       </div>
     </section>
   );
@@ -616,19 +757,19 @@ function Contact() {
       <div style={cx}>
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "start" }}>
           <div>
-            <Reveal><Label num="04" text="Контакты" /></Reveal>
-            <Reveal delay={60}>
+            <Reveal type="fade"><Label num="04" text="Контакты" /></Reveal>
+            <Reveal delay={80} type="left">
               <h2 className="section-heading" style={{
                 fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
                 lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, marginBottom: 20,
               }}>Обсудим ваш проект?</h2>
             </Reveal>
-            <Reveal delay={100}>
+            <Reveal delay={160} type="fade">
               <p style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.7, marginBottom: 44, maxWidth: 380 }}>
                 Оставьте заявку — мы свяжемся в течение 24 часов.
               </p>
             </Reveal>
-            <Reveal delay={140}>
+            <Reveal delay={240} type="left">
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {[
                   { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com" },
@@ -651,7 +792,7 @@ function Contact() {
             </Reveal>
           </div>
 
-          <Reveal delay={120}>
+          <Reveal delay={150} type="right" duration={0.9}>
             <div style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius, padding: "36px 32px" }}>
               {sent ? (
                 <div style={{ textAlign: "center", padding: "44px 0" }}>
@@ -695,12 +836,14 @@ function Contact() {
 /* ═══════════════════════ FOOTER ═══════════════════════ */
 function Footer() {
   return (
-    <footer style={{ padding: "32px 0", borderTop: `1px solid ${V.divider}`, position: "relative", zIndex: 1 }}>
-      <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "0.8rem", color: V.muted }}>BANKAI<span style={{ color: V.accent, opacity: 0.5 }}>.</span></div>
-        <div style={{ fontSize: "0.68rem", color: V.muted }}>© 2026</div>
-      </div>
-    </footer>
+    <Reveal type="fade" duration={1}>
+      <footer style={{ padding: "32px 0", borderTop: `1px solid ${V.divider}`, position: "relative", zIndex: 1 }}>
+        <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "0.8rem", color: V.muted }}>BANKAI<span style={{ color: V.accent, opacity: 0.5 }}>.</span></div>
+          <div style={{ fontSize: "0.68rem", color: V.muted }}>© 2026</div>
+        </div>
+      </footer>
+    </Reveal>
   );
 }
 
