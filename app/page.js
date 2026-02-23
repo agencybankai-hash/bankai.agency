@@ -9,16 +9,16 @@ const V = {
   card: "#111111",
   cardHover: "#161616",
   text: "#A8A8A8",
-  dim: "#666666",
-  muted: "#444444",
+  dim: "#888888",
+  muted: "#666666",
   bright: "#FFFFFF",
   accent: "#A01C2D",       // deep wine — subtle
   accentLit: "#C8354A",    // lit crimson — rare highlights
   accentDim: "rgba(160,28,45,0.07)",
   accentGlow: "rgba(160,28,45,0.15)",
-  border: "rgba(255,255,255,0.06)",
-  borderHover: "rgba(255,255,255,0.10)",
-  divider: "rgba(255,255,255,0.04)",
+  border: "rgba(255,255,255,0.08)",
+  borderHover: "rgba(255,255,255,0.14)",
+  divider: "rgba(255,255,255,0.06)",
   radius: 16,
   radiusSm: 10,
   heading: "'Unbounded', sans-serif",
@@ -96,15 +96,64 @@ const mainServices = [
   },
 ];
 
+/* ───── service icons (inline SVG) ───── */
+function SvcIcon({ name, size = 28 }) {
+  const s = { width: size, height: size, flexShrink: 0 };
+  const c = V.accentLit;
+  const icons = {
+    google: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>
+      </svg>
+    ),
+    meta: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7 3 13 6 13s6-6 6-13z"/><path d="M6 8c0 7-3 13-3 13M18 8c0 7 3 13 3 13"/>
+      </svg>
+    ),
+    seo: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/>
+      </svg>
+    ),
+    web: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+      </svg>
+    ),
+    crm: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    ),
+    analytics: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 20V10M12 20V4M6 20v-6"/>
+      </svg>
+    ),
+    content: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+    ),
+    branding: (
+      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    ),
+  };
+  return icons[name] || null;
+}
+
 const services = [
-  { t: "Google Ads", d: "Search, Performance Max, YouTube — настройка и масштабирование." },
-  { t: "Meta Ads", d: "Facebook + Instagram с фокусом на конверсии." },
-  { t: "SEO", d: "Технический SEO, контент-стратегия, линкбилдинг." },
-  { t: "Web Dev", d: "Next.js, React — быстрые сайты и лендинги." },
-  { t: "CRM", d: "HubSpot, Salesforce — настройка и автоматизация." },
-  { t: "Analytics", d: "GA4, Looker Studio, сквозная аналитика." },
-  { t: "Content", d: "Блоги, рассылки, SMM, видео — контент, что продаёт." },
-  { t: "Branding", d: "Логотипы, UI/UX, фирменный стиль, креативы." },
+  { t: "Google Ads", d: "Search, Performance Max, YouTube — настройка и масштабирование.", icon: "google" },
+  { t: "Meta Ads", d: "Facebook + Instagram с фокусом на конверсии.", icon: "meta" },
+  { t: "SEO", d: "Технический SEO, контент-стратегия, линкбилдинг.", icon: "seo" },
+  { t: "Web Dev", d: "Next.js, React — быстрые сайты и лендинги.", icon: "web" },
+  { t: "CRM", d: "HubSpot, Salesforce — настройка и автоматизация.", icon: "crm" },
+  { t: "Analytics", d: "GA4, Looker Studio, сквозная аналитика.", icon: "analytics" },
+  { t: "Content", d: "Блоги, рассылки, SMM, видео — контент, что продаёт.", icon: "content" },
+  { t: "Branding", d: "Логотипы, UI/UX, фирменный стиль, креативы.", icon: "branding" },
 ];
 
 const steps = [
@@ -350,7 +399,7 @@ function Marquee() {
     <span key={i} style={{
       fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
       letterSpacing: "0.2em",
-      color: i % 2 === 0 ? "rgba(160,28,45,0.3)" : "rgba(255,255,255,0.08)",
+      color: i % 2 === 0 ? "rgba(200,53,74,0.5)" : "rgba(255,255,255,0.18)",
       whiteSpace: "nowrap", padding: "0 36px",
     }}>{w}</span>
   ));
@@ -397,7 +446,7 @@ function MainServices() {
                 }} />}
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-                  <span style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 900, color: "rgba(255,255,255,0.025)", lineHeight: 1 }}>0{i + 1}</span>
+                  <span style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 900, color: "rgba(255,255,255,0.08)", lineHeight: 1 }}>0{i + 1}</span>
                   {s.flagship && (
                     <span style={{
                       padding: "3px 8px", background: V.accentDim, borderRadius: 4,
@@ -408,12 +457,12 @@ function MainServices() {
 
                 <h3 style={{ fontFamily: V.heading, fontSize: "1.35rem", fontWeight: 800, color: V.bright, marginBottom: 6, letterSpacing: "-0.03em" }}>{s.title}</h3>
                 <div style={{ fontSize: "0.75rem", color: V.dim, fontWeight: 600, marginBottom: 18 }}>{s.sub}</div>
-                <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.7, marginBottom: 28, opacity: 0.65 }}>{s.desc}</p>
+                <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.7, marginBottom: 28 }}>{s.desc}</p>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", marginBottom: 32, marginTop: "auto" }}>
                   {s.feats.map((f, j) => (
                     <div key={j} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ width: 3, height: 3, borderRadius: "50%", background: s.flagship ? V.accent : V.muted, opacity: 0.5, flexShrink: 0 }} />
+                      <span style={{ width: 3, height: 3, borderRadius: "50%", background: s.flagship ? V.accent : V.muted, flexShrink: 0 }} />
                       <span style={{ fontSize: "0.76rem", color: V.dim }}>{f}</span>
                     </div>
                   ))}
@@ -459,6 +508,9 @@ function ServicesGrid() {
                   transition: "all .35s cubic-bezier(.16,1,.3,1)",
                 }}
               >
+                <div style={{ marginBottom: 14, opacity: hi === i ? 1 : 0.6, transition: "opacity .35s" }}>
+                  <SvcIcon name={s.icon} />
+                </div>
                 <h4 style={{ fontFamily: V.heading, fontSize: "0.82rem", fontWeight: 700, color: V.bright, marginBottom: 6, letterSpacing: "-0.02em" }}>{s.t}</h4>
                 <p style={{ fontSize: "0.74rem", color: V.dim, lineHeight: 1.5, margin: 0 }}>{s.d}</p>
               </div>
@@ -497,7 +549,7 @@ function Process() {
               >
                 <div style={{
                   fontFamily: V.heading, fontSize: "2rem", fontWeight: 900,
-                  color: hi === i ? "rgba(160,28,45,0.12)" : "rgba(255,255,255,0.03)",
+                  color: hi === i ? "rgba(200,53,74,0.35)" : "rgba(255,255,255,0.08)",
                   letterSpacing: "-0.05em", marginBottom: 16, transition: "color .35s",
                 }}>{s.n}</div>
                 <h3 style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>{s.t}</h3>
@@ -520,7 +572,7 @@ function Statement() {
           <h2 style={{
             fontFamily: V.heading, fontSize: "clamp(1.5rem, 3vw, 2.3rem)",
             fontWeight: 800, lineHeight: 1.35, letterSpacing: "-0.03em",
-            color: V.muted, maxWidth: 850,
+            color: V.dim, maxWidth: 850,
           }}>
             Мы не просто запускаем рекламу.{" "}
             <span style={{ color: V.bright }}>Мы строим системы, где AI, данные и маркетинг работают как единый механизм</span>
