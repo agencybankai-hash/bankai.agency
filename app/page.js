@@ -150,7 +150,7 @@ function GradientArc() {
       ctx.clearRect(0, 0, w, h);
 
       const cxp = w * 0.52 + (s.x - 0.5) * w * 0.1;
-      const cyp = h * 0.58 + (s.y - 0.5) * h * 0.06;
+      const cyp = h * 0.92 + (s.y - 0.5) * h * 0.06;
       const R = Math.min(w, h) * 0.78;
       const mi = (s.x - 0.5) * 0.12;
 
