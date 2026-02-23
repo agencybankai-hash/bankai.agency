@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body style={{ margin: 0, padding: 0, background: "#08080A" }}>
+      <body style={{ margin: 0, padding: 0, background: "#0A0A0A" }}>
         {children}
       </body>
     </html>
