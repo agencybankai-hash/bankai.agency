@@ -288,8 +288,8 @@ function Nav() {
   }, []);
   return (
     <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: scrolled ? "16px 0" : "28px 0",
+      position: "fixed", top: 38, left: 0, right: 0, zIndex: 100,
+      padding: scrolled ? "14px 0" : "24px 0",
       background: scrolled ? "rgba(6,6,11,0.9)" : "transparent",
       backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
       borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
@@ -314,25 +314,56 @@ function Nav() {
   );
 }
 
+/* ═══════════════════════ COMING SOON BANNER ═══════════════════════ */
+function ComingSoonBanner() {
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
+      background: `linear-gradient(90deg, ${V.accent}, ${V.accent2})`,
+      padding: "10px 0", textAlign: "center",
+    }}>
+      <div style={{
+        fontFamily: V.heading, fontSize: "0.72rem", fontWeight: 700,
+        color: V.bg, letterSpacing: "0.1em", textTransform: "uppercase",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+      }}>
+        <span style={{ width: 6, height: 6, background: V.bg, borderRadius: "50%", display: "inline-block", animation: "pulse2 1.5s ease-out infinite", position: "relative" }}>
+          <span style={{ position: "absolute", inset: -3, borderRadius: "50%", border: `2px solid ${V.bg}`, animation: "pulse2 1.5s ease-out infinite" }} />
+        </span>
+        Сайт в разработке — это превью будущего сайта. Оставьте заявку ниже.
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════ HERO ═══════════════════════ */
 function Hero() {
   return (
-    <section style={{ padding: "180px 0 100px", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
+    <section style={{ padding: "220px 0 100px", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
       <GradientArc />
       <div style={{ ...container, zIndex: 1, position: "relative", width: "100%" }}>
-        {/* status badge */}
+        {/* prominent coming soon block */}
         <Reveal>
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            padding: "6px 16px", background: "rgba(110,231,183,0.05)",
-            border: "1px solid rgba(110,231,183,0.12)", borderRadius: 100,
-            fontSize: "0.72rem", fontWeight: 600, color: V.accent, marginBottom: 48,
-            letterSpacing: "0.05em",
+            display: "inline-flex", alignItems: "center", gap: 12,
+            padding: "12px 24px",
+            background: "rgba(110,231,183,0.08)",
+            border: "1px solid rgba(110,231,183,0.25)", borderRadius: V.radiusSm,
+            marginBottom: 48,
           }}>
-            <span style={{ width: 6, height: 6, background: V.accent, borderRadius: "50%", display: "inline-block", position: "relative" }}>
-              <span style={{ position: "absolute", inset: -3, borderRadius: "50%", border: `2px solid ${V.accent}`, animation: "pulse2 2s ease-out infinite" }} />
-            </span>
-            Сайт в разработке
+            <div style={{
+              width: 8, height: 8, background: V.accent, borderRadius: "50%",
+              boxShadow: `0 0 12px ${V.accent}`,
+              animation: "pulse2 2s ease-out infinite", position: "relative",
+            }} />
+            <div>
+              <div style={{ fontFamily: V.heading, fontSize: "0.78rem", fontWeight: 700, color: V.accent, letterSpacing: "0.05em" }}>
+                COMING SOON
+              </div>
+              <div style={{ fontSize: "0.75rem", color: V.dim, marginTop: 2 }}>
+                Это заглушка. Полная версия сайта скоро будет готова.
+              </div>
+            </div>
           </div>
         </Reveal>
 
@@ -813,6 +844,7 @@ export default function Page() {
         background: V.bg, color: V.text, minHeight: "100vh",
         fontFamily: V.body, overflowX: "hidden",
       }}>
+        <ComingSoonBanner />
         <Nav />
         <Hero />
         <Marquee />
