@@ -72,13 +72,19 @@ html{scroll-behavior:smooth}
 
 /* useInView hook — fires once when element enters viewport */
 function useInView(opts = {}) {
-  const { threshold = 0.15, rootMargin = "0px 0px -60px 0px" } = opts;
+  const { threshold = 0.08, rootMargin = "0px 0px -40px 0px" } = opts;
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Immediately check if element is already in viewport (e.g. hero on load)
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setVisible(true);
+      return;
+    }
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); } },
       { threshold, rootMargin }
