@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 /* ───── design tokens ───── */
 const V = {
@@ -113,20 +113,168 @@ const otherServices = [
   { title: "Брендинг и дизайн", desc: "Логотипы, фирменный стиль, UI/UX дизайн, креативы для рекламы.", icon: "🎨" },
 ];
 
-/* ═══════════════════════ AURORA BG ═══════════════════════ */
-function AuroraBg() {
+/* ═══════════════════════ INTERACTIVE GRADIENT ARC ═══════════════════════ */
+function GradientArc() {
+  const canvasRef = useRef(null);
+  const mouse = useRef({ x: 0.5, y: 0.5 });
+  const smoothMouse = useRef({ x: 0.5, y: 0.5 });
+  const raf = useRef(null);
+  const time = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let w, h, dpr;
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.parentElement.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const onMove = (e) => {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      mouse.current.x = (e.clientX - rect.left) / rect.width;
+      mouse.current.y = (e.clientY - rect.top) / rect.height;
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+
+    const draw = () => {
+      time.current += 0.003;
+      const t = time.current;
+
+      // smooth interpolation
+      const sm = smoothMouse.current;
+      const m = mouse.current;
+      sm.x += (m.x - sm.x) * 0.04;
+      sm.y += (m.y - sm.y) * 0.04;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // center of the arc
+      const cx = w * 0.5 + (sm.x - 0.5) * w * 0.12;
+      const cy = h * 0.55 + (sm.y - 0.5) * h * 0.08;
+
+      // arc parameters — large sweeping curve
+      const baseRadius = Math.min(w, h) * 0.75;
+      const mouseInfluence = (sm.x - 0.5) * 0.15;
+
+      // draw multiple layered arcs
+      const layers = [
+        { radius: baseRadius * 1.1, width: 120, alpha: 0.12, hue: 160, speed: 0.7 },
+        { radius: baseRadius * 0.95, width: 90, alpha: 0.2, hue: 155, speed: 1 },
+        { radius: baseRadius * 0.82, width: 60, alpha: 0.3, hue: 150, speed: 1.3 },
+        { radius: baseRadius * 0.72, width: 35, alpha: 0.18, hue: 165, speed: 0.9 },
+        { radius: baseRadius * 0.6, width: 20, alpha: 0.12, hue: 170, speed: 1.5 },
+      ];
+
+      for (const layer of layers) {
+        const r = layer.radius + Math.sin(t * layer.speed) * 15 + (sm.y - 0.5) * 30;
+        const startAngle = -Math.PI * 0.85 + mouseInfluence + Math.sin(t * layer.speed * 0.5) * 0.08;
+        const endAngle = -Math.PI * 0.15 + mouseInfluence + Math.cos(t * layer.speed * 0.7) * 0.08;
+
+        // gradient along the arc
+        const x1 = cx + Math.cos(startAngle) * r;
+        const y1 = cy + Math.sin(startAngle) * r;
+        const x2 = cx + Math.cos(endAngle) * r;
+        const y2 = cy + Math.sin(endAngle) * r;
+
+        const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+        const h1 = layer.hue + Math.sin(t + layer.speed) * 10;
+        const h2 = layer.hue - 15 + Math.cos(t * 0.8) * 10;
+        grad.addColorStop(0, `hsla(${h1}, 75%, 65%, 0)`);
+        grad.addColorStop(0.2, `hsla(${h1}, 75%, 65%, ${layer.alpha * 0.7})`);
+        grad.addColorStop(0.5, `hsla(${(h1 + h2) / 2}, 80%, 60%, ${layer.alpha})`);
+        grad.addColorStop(0.8, `hsla(${h2}, 70%, 55%, ${layer.alpha * 0.7})`);
+        grad.addColorStop(1, `hsla(${h2}, 70%, 55%, 0)`);
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, startAngle, endAngle);
+        ctx.lineWidth = layer.width;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = grad;
+        ctx.filter = `blur(${layer.width * 0.4}px)`;
+        ctx.stroke();
+      }
+
+      // reset filter
+      ctx.filter = "none";
+
+      // bright core arc — thinner, sharper
+      const coreR = baseRadius * 0.82 + Math.sin(t * 1.2) * 8 + (sm.y - 0.5) * 20;
+      const coreStart = -Math.PI * 0.8 + mouseInfluence + Math.sin(t * 0.6) * 0.06;
+      const coreEnd = -Math.PI * 0.2 + mouseInfluence + Math.cos(t * 0.8) * 0.06;
+
+      const coreGrad = ctx.createLinearGradient(
+        cx + Math.cos(coreStart) * coreR, cy + Math.sin(coreStart) * coreR,
+        cx + Math.cos(coreEnd) * coreR, cy + Math.sin(coreEnd) * coreR
+      );
+      coreGrad.addColorStop(0, "hsla(160, 80%, 70%, 0)");
+      coreGrad.addColorStop(0.15, "hsla(160, 80%, 75%, 0.15)");
+      coreGrad.addColorStop(0.5, "hsla(155, 90%, 80%, 0.35)");
+      coreGrad.addColorStop(0.85, "hsla(150, 80%, 70%, 0.15)");
+      coreGrad.addColorStop(1, "hsla(150, 80%, 65%, 0)");
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, coreR, coreStart, coreEnd);
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = coreGrad;
+      ctx.filter = "blur(2px)";
+      ctx.stroke();
+      ctx.filter = "none";
+
+      // glow particles along the arc
+      const numParticles = 18;
+      for (let i = 0; i < numParticles; i++) {
+        const frac = i / numParticles;
+        const angle = coreStart + (coreEnd - coreStart) * frac;
+        const pr = coreR + Math.sin(t * 3 + i * 1.5) * 12;
+        const px = cx + Math.cos(angle) * pr;
+        const py = cy + Math.sin(angle) * pr;
+        const pAlpha = (0.15 + Math.sin(t * 2 + i) * 0.1) * (1 - Math.abs(frac - 0.5) * 1.6);
+        if (pAlpha <= 0) continue;
+        const pSize = 2 + Math.sin(t * 4 + i * 2) * 1;
+
+        const pg = ctx.createRadialGradient(px, py, 0, px, py, pSize * 4);
+        pg.addColorStop(0, `hsla(158, 85%, 75%, ${pAlpha})`);
+        pg.addColorStop(1, `hsla(158, 85%, 75%, 0)`);
+        ctx.beginPath();
+        ctx.arc(px, py, pSize * 4, 0, Math.PI * 2);
+        ctx.fillStyle = pg;
+        ctx.fill();
+      }
+
+      raf.current = requestAnimationFrame(draw);
+    };
+
+    raf.current = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf.current);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", onMove);
+    };
+  }, []);
+
   return (
-    <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 1400, height: 800, pointerEvents: "none", zIndex: 0 }}>
-      <div style={{
-        position: "absolute", top: 0, left: "10%", width: 500, height: 500,
-        background: "radial-gradient(ellipse, rgba(110,231,183,0.07) 0%, transparent 70%)",
-        filter: "blur(80px)", animation: "float 8s ease-in-out infinite",
-      }} />
-      <div style={{
-        position: "absolute", top: 100, right: "5%", width: 400, height: 400,
-        background: "radial-gradient(ellipse, rgba(52,211,153,0.05) 0%, transparent 70%)",
-        filter: "blur(60px)", animation: "float 10s ease-in-out infinite 2s",
-      }} />
+    <div style={{
+      position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+      zIndex: 0, pointerEvents: "none",
+    }}>
+      <canvas
+        ref={canvasRef}
+        style={{ display: "block", width: "100%", height: "100%" }}
+      />
     </div>
   );
 }
@@ -183,21 +331,8 @@ function Nav() {
 /* ═══════════════════════ HERO ═══════════════════════ */
 function Hero() {
   return (
-    <section style={{ padding: "160px 0 80px", position: "relative", overflow: "hidden" }}>
-      <AuroraBg />
-      {/* decorative ring */}
-      <div style={{
-        position: "absolute", top: "50%", right: "-8%", width: 450, height: 450,
-        border: `1px solid ${V.border}`, borderRadius: "50%",
-        transform: "translateY(-50%)", opacity: 0.3,
-        animation: "spinSlow 120s linear infinite",
-      }}>
-        <div style={{
-          position: "absolute", top: -4, left: "50%", width: 8, height: 8,
-          background: V.accent, borderRadius: "50%",
-          boxShadow: `0 0 20px ${V.accentGlow}`,
-        }} />
-      </div>
+    <section style={{ padding: "160px 0 80px", position: "relative", overflow: "hidden", minHeight: "100vh" }}>
+      <GradientArc />
       <div style={{ ...container, zIndex: 1, position: "relative" }}>
         {/* status badge */}
         <Reveal>
