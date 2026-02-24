@@ -108,8 +108,21 @@ html{scroll-behavior:smooth}
 .form-input::placeholder{color:#555}
 
 /* case card */
-.case-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:default}
+.case-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:pointer}
 .case-card:hover{border-color:rgba(255,255,255,0.14)!important;box-shadow:0 16px 48px rgba(0,0,0,0.3)}
+.case-card:hover .case-cta{opacity:1;transform:translateX(0)}
+
+/* case modal */
+.case-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
+.case-overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.case-modal{position:relative;width:100%;max-width:780px;max-height:85vh;overflow-y:auto;background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:16px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent}
+.case-modal::-webkit-scrollbar{width:4px}
+.case-modal::-webkit-scrollbar-track{background:transparent}
+.case-modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+.case-close{position:sticky;top:0;right:0;z-index:10;display:flex;justify-content:flex-end;padding:16px 20px 0}
+.case-close-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(10,10,10,0.9);color:#888;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:1.1rem;backdrop-filter:blur(8px)}
+.case-close-btn:hover{color:#fff;border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.06)}
+@media(max-width:768px){.case-modal{max-height:90vh;margin:8px}.case-modal-metrics{flex-direction:column!important;gap:20px!important}}
 
 /* footer */
 .footer-logo:hover .footer-dot{opacity:1!important;color:#C8354A!important}
@@ -636,6 +649,21 @@ const cases = [
     ],
     desc: "Полный маркетинг под ключ для мувинговой компании. Google Ads, SEO, аналитика — единая система, приносящая стабильный поток заказов.",
     scope: ["Google Ads", "SEO", "Аналитика", "CRM"],
+    detail: {
+      challenge: "SOS Moving — мувинговая компания с амбициями стать лидером рынка, но без выстроенной маркетинговой системы. Высокая конкуренция в нише, размытое позиционирование и отсутствие прозрачной аналитики тормозили рост.",
+      solution: [
+        { title: "Google Ads на полную мощность", text: "Настроили и масштабировали Search и Performance Max кампании. Постоянная оптимизация ставок, аудиторий и креативов позволила снизить стоимость лида и увеличить объём заявок." },
+        { title: "SEO-стратегия", text: "Провели полный технический аудит, переработали структуру сайта, внедрили schema markup и построили контент-стратегию. Результат — рост с 40-й на 26-ю позицию по ключевым запросам." },
+        { title: "Сквозная аналитика", text: "Связали GA4, CallRail и CRM в единую систему. Каждый звонок и заявка привязаны к источнику — клиент видит реальный ROI по каждому каналу." },
+        { title: "CRM и автоматизация", text: "Внедрили HubSpot с настроенным pipeline, автоматическими follow-up последовательностями и lead scoring. Горячие лиды обрабатываются в первые минуты." },
+      ],
+      results: [
+        { v: "$14.6M", l: "общий объём продаж" },
+        { v: "10,235", l: "выполненных заказов" },
+        { v: "$400K", l: "рекламный бюджет под управлением" },
+        { v: "40 → 26", l: "рост SEO позиций" },
+      ],
+    },
   },
   {
     client: "AK Cabinet Craft",
@@ -649,6 +677,21 @@ const cases = [
     ],
     desc: "Revenue-share партнёрство с производителем кастомных кухонь и шкафов. Весь маркетинг — от рекламы до офлайн-каналов — в обмен на процент от выручки.",
     scope: ["Google Ads", "SEO", "CRM", "GBP", "Контент", "Офлайн"],
+    detail: {
+      challenge: "AK Cabinet Craft — производитель кастомных кухонь и шкафов в Чикаго. Работали только по рекомендациям, без онлайн-присутствия. Нужна была полная маркетинговая инфраструктура с нуля — но без крупных авансов.",
+      solution: [
+        { title: "Revenue Share модель", text: "Вместо фиксированной оплаты выбрали модель 3% от продаж. Мы инвестируем своё время и экспертизу — и зарабатываем только когда клиент зарабатывает. Полное совпадение интересов." },
+        { title: "Google Ads + LSA", text: "Запустили контекстную рекламу и Local Services Ads, нацеленные на homeowners в Чикаго с высоким чеком. Постоянная оптимизация по стоимости лида и качеству заявок." },
+        { title: "SEO и Google Business Profile", text: "Полная оптимизация GBP с отзывами, постами и фотографиями. Параллельно — SEO-контент под ключевые запросы: custom cabinets Chicago, kitchen remodel и т.д." },
+        { title: "CRM + Offline Marketing", text: "Внедрили HubSpot для управления лидами и сделками. Добавили офлайн-каналы: postcards по целевым районам, партнёрства с дизайнерами интерьеров." },
+      ],
+      results: [
+        { v: "3%", l: "revenue share от продаж" },
+        { v: "Full-cycle", l: "маркетинг под ключ" },
+        { v: "HubSpot", l: "CRM с полной автоматизацией" },
+        { v: "Online + Offline", l: "мультиканальная стратегия" },
+      ],
+    },
   },
   {
     client: "Object First",
@@ -662,10 +705,157 @@ const cases = [
     ],
     desc: "Долгосрочный контракт на дизайн и разработку для tech-компании в сфере backup-решений. Позже приобретена Veeam — лидером рынка.",
     scope: ["UI/UX Дизайн", "Веб-разработка"],
+    detail: {
+      challenge: "Object First — стартап в сфере защиты данных и backup-решений. Нужна была сильная визуальная идентичность и постоянная дизайн-поддержка для быстро растущего продукта. Инхаус-команды не было.",
+      solution: [
+        { title: "UI/UX дизайн", text: "Разрабатывали интерфейсы и маркетинговые материалы в Figma. От лендингов и продуктовых страниц до презентаций для инвесторов и партнёров." },
+        { title: "Веб-разработка", text: "Вёрстка и разработка маркетингового сайта с фокусом на скорость, SEO и конверсию. Регулярные обновления контента и новые страницы под каждый продуктовый релиз." },
+        { title: "Долгосрочное партнёрство", text: "Работали как выделенная команда на протяжении 2+ лет. Часовая модель ($50/час) при стабильной загрузке 100-120 часов в месяц обеспечила глубокое погружение в продукт." },
+        { title: "Exit: приобретение Veeam", text: "Object First была приобретена Veeam — мировым лидером в сфере backup и data protection. Качество дизайна и продукта сыграло свою роль в привлечении внимания крупного игрока." },
+      ],
+      results: [
+        { v: "2+ лет", l: "длительность контракта" },
+        { v: "100-120ч", l: "ежемесячная загрузка" },
+        { v: "Veeam", l: "компания приобретена" },
+        { v: "$50/час", l: "стабильная hourly rate" },
+      ],
+    },
   },
 ];
 
+/* ───── case modal ───── */
+function CaseModal({ data, onClose }) {
+  const overlayRef = useRef(null);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setShow(true));
+    const onKey = (e) => { if (e.key === "Escape") handleClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, []);
+
+  const handleClose = () => {
+    setShow(false);
+    setTimeout(onClose, 350);
+  };
+
+  if (!data) return null;
+  const d = data.detail;
+
+  return (
+    <div className="case-overlay" ref={overlayRef} onClick={(e) => { if (e.target === overlayRef.current || e.target.classList.contains("case-overlay-bg")) handleClose(); }}>
+      <div className="case-overlay-bg" style={{
+        opacity: show ? 1 : 0, transition: "opacity .35s ease",
+      }} />
+      <div className="case-modal" style={{
+        opacity: show ? 1 : 0,
+        transform: show ? "translateY(0) scale(1)" : "translateY(30px) scale(0.97)",
+        transition: "all .4s cubic-bezier(.16,1,.3,1)",
+      }}>
+        <div className="case-close">
+          <button className="case-close-btn" onClick={handleClose} aria-label="Закрыть">✕</button>
+        </div>
+
+        <div style={{ padding: "8px 40px 48px" }}>
+          {/* header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <span style={{
+              padding: "4px 10px", background: V.accentDim, borderRadius: 4,
+              fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em",
+            }}>{data.tag}</span>
+          </div>
+
+          <h2 style={{
+            fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900,
+            color: V.bright, letterSpacing: "-0.03em", marginBottom: 8,
+          }}>{data.client}</h2>
+
+          <p style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.65, marginBottom: 36, maxWidth: 600 }}>{data.desc}</p>
+
+          {/* key metrics */}
+          <div className="case-modal-metrics" style={{
+            display: "flex", gap: 32, marginBottom: 40, padding: "24px 28px",
+            background: "rgba(255,255,255,0.02)", border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
+          }}>
+            {d.results.map((r, i) => (
+              <div key={i} style={{ flex: 1 }}>
+                <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 3 }}>{r.v}</div>
+                <div style={{ fontSize: "0.65rem", color: V.muted }}>{r.l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* challenge */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={{
+              fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12,
+            }}>ЗАДАЧА</div>
+            <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.7, maxWidth: 640 }}>{d.challenge}</p>
+          </div>
+
+          {/* solution steps */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={{
+              fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 20,
+            }}>ЧТО МЫ СДЕЛАЛИ</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {d.solution.map((s, i) => (
+                <div key={i} style={{
+                  padding: "20px 24px", background: "rgba(255,255,255,0.02)",
+                  border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                    <span style={{
+                      fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800,
+                      color: "rgba(200,53,74,0.4)", minWidth: 20,
+                    }}>0{i + 1}</span>
+                    <h4 style={{
+                      fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright,
+                      letterSpacing: "-0.02em", margin: 0,
+                    }}>{s.title}</h4>
+                  </div>
+                  <p style={{ fontSize: "0.82rem", color: V.dim, lineHeight: 1.6, margin: 0, paddingLeft: 32 }}>{s.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* scope tags */}
+          <div>
+            <div style={{
+              fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12,
+            }}>УСЛУГИ</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {data.scope.map((s, j) => (
+                <span key={j} style={{
+                  padding: "5px 12px", borderRadius: 100,
+                  background: "rgba(255,255,255,0.04)", border: `1px solid ${V.border}`,
+                  fontSize: "0.7rem", color: V.dim, fontWeight: 500,
+                }}>{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* cta */}
+          <div style={{ marginTop: 40, paddingTop: 28, borderTop: `1px solid ${V.divider}` }}>
+            <a href="#contact" onClick={handleClose} className="btn-primary" style={{ fontFamily: V.body, display: "inline-block" }}>
+              Обсудить похожий проект →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Cases() {
+  const [activeCase, setActiveCase] = useState(null);
+
   return (
     <section id="cases" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
@@ -680,7 +870,7 @@ function Cases() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {cases.map((c, i) => (
             <Reveal key={i} delay={120 + i * 100} type="up" duration={0.85}>
-              <div className="case-card" style={{
+              <div className="case-card" onClick={() => setActiveCase(c)} style={{
                 background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
                 padding: "40px 36px", position: "relative", overflow: "hidden",
               }}>
@@ -707,7 +897,7 @@ function Cases() {
 
                     <p style={{ fontSize: "0.85rem", color: V.dim, lineHeight: 1.65, marginBottom: 20, maxWidth: 420 }}>{c.desc}</p>
 
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                       {c.scope.map((s, j) => (
                         <span key={j} style={{
                           padding: "4px 10px", borderRadius: 100,
@@ -716,6 +906,13 @@ function Cases() {
                         }}>{s}</span>
                       ))}
                     </div>
+
+                    <span className="case-cta" style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      fontWeight: 600, fontSize: "0.75rem", color: V.accentLit,
+                      letterSpacing: "0.03em", opacity: 0.6,
+                      transform: "translateX(-4px)", transition: "all .35s cubic-bezier(.16,1,.3,1)",
+                    }}>ПОДРОБНЕЕ <span>→</span></span>
                   </div>
 
                   {/* right: metrics */}
@@ -746,6 +943,8 @@ function Cases() {
           ))}
         </div>
       </div>
+
+      {activeCase && <CaseModal data={activeCase} onClose={() => setActiveCase(null)} />}
     </section>
   );
 }
