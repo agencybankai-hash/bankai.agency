@@ -23,7 +23,7 @@ export default function CasePage() {
         .scope-tag:hover{background:rgba(160,28,45,0.06)!important;border-color:rgba(160,28,45,0.15)!important;color:${V.accent}!important}
         .cta-btn{border:none;padding:16px 40px;border-radius:100px;background:${V.accent};color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1);text-decoration:none;display:inline-block;font-family:${V.body}}
         .cta-btn:hover{background:${V.accentLit};transform:translateY(-2px);box-shadow:0 8px 32px rgba(160,28,45,0.25)}
-        @media(max-width:768px){.metrics-row{flex-direction:column!important;gap:20px!important}.sol-grid{grid-template-columns:1fr!important}}
+        @media(max-width:768px){.metrics-row{flex-direction:column!important;gap:20px!important;grid-template-columns:1fr!important}.sol-grid{grid-template-columns:1fr!important}.results-grid{grid-template-columns:1fr 1fr!important}}
       `}} />
 
       <div style={{ minHeight: "100vh", fontFamily: V.body, color: V.text }}>
@@ -94,22 +94,78 @@ export default function CasePage() {
 
         {/* content */}
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px 120px" }}>
+          {/* headline */}
+          {c.headline && (
+            <h2 style={{
+              fontFamily: V.heading, fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)", fontWeight: 800,
+              color: V.bright, letterSpacing: "-0.03em", lineHeight: 1.25, marginBottom: 20, maxWidth: 720,
+            }}>{c.headline}</h2>
+          )}
           {/* description */}
-          <p style={{ fontSize: "1.1rem", color: V.text, lineHeight: 1.75, maxWidth: 720, marginBottom: 48 }}>{c.desc}</p>
+          <p style={{ fontSize: "1.05rem", color: V.text, lineHeight: 1.8, maxWidth: 720, marginBottom: 24 }}>{c.desc}</p>
+
+          {/* timeline + model badges */}
+          {(d.timeline || d.model) && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 48 }}>
+              {d.timeline && (
+                <span style={{
+                  padding: "6px 14px", borderRadius: 8, background: V.accentDim,
+                  border: `1px solid rgba(160,28,45,0.1)`,
+                  fontSize: "0.72rem", fontWeight: 600, color: V.accent,
+                }}>{d.timeline}</span>
+              )}
+              {d.model && (
+                <span style={{
+                  padding: "6px 14px", borderRadius: 8, background: "rgba(0,0,0,0.03)",
+                  border: `1px solid ${V.border}`,
+                  fontSize: "0.72rem", fontWeight: 500, color: V.dim,
+                }}>{d.model}</span>
+              )}
+            </div>
+          )}
+
+          {/* before/after */}
+          {c.beforeAfter && (
+            <div style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 56,
+            }} className="metrics-row">
+              <div style={{
+                padding: "24px 28px", borderRadius: V.radius, background: "rgba(0,0,0,0.02)",
+                border: `1px solid ${V.divider}`,
+              }}>
+                <div style={{
+                  fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+                  letterSpacing: "0.14em", textTransform: "uppercase", color: V.muted, marginBottom: 10,
+                }}>ДО</div>
+                <p style={{ fontSize: "0.86rem", color: V.dim, lineHeight: 1.7, margin: 0 }}>{c.beforeAfter.before}</p>
+              </div>
+              <div style={{
+                padding: "24px 28px", borderRadius: V.radius,
+                background: V.accentDim, border: `1px solid rgba(160,28,45,0.1)`,
+              }}>
+                <div style={{
+                  fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+                  letterSpacing: "0.14em", textTransform: "uppercase", color: V.accent, marginBottom: 10,
+                }}>ПОСЛЕ</div>
+                <p style={{ fontSize: "0.86rem", color: V.text, lineHeight: 1.7, margin: 0 }}>{c.beforeAfter.after}</p>
+              </div>
+            </div>
+          )}
 
           {/* metrics row */}
-          <div className="metrics-row" style={{
-            display: "flex", gap: 0, marginBottom: 64, padding: "32px 0",
+          <div className="results-grid" style={{
+            display: "grid", gridTemplateColumns: `repeat(${Math.min(d.results.length, 4)}, 1fr)`,
+            gap: 0, marginBottom: 64, padding: "32px 0",
             borderTop: `1px solid ${V.divider}`, borderBottom: `1px solid ${V.divider}`,
           }}>
             {d.results.map((r, i) => (
               <div key={i} style={{
-                flex: 1, textAlign: "center",
-                borderLeft: i > 0 ? `1px solid ${V.divider}` : "none",
-                padding: "0 24px",
+                textAlign: "center",
+                borderLeft: i > 0 && i % Math.min(d.results.length, 4) !== 0 ? `1px solid ${V.divider}` : "none",
+                padding: "12px 20px",
               }}>
-                <div style={{ fontFamily: V.heading, fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 6 }}>{r.v}</div>
-                <div style={{ fontSize: "0.72rem", color: V.muted, fontWeight: 500 }}>{r.l}</div>
+                <div style={{ fontFamily: V.heading, fontSize: "clamp(1rem, 2vw, 1.5rem)", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 6 }}>{r.v}</div>
+                <div style={{ fontSize: "0.68rem", color: V.muted, fontWeight: 500 }}>{r.l}</div>
               </div>
             ))}
           </div>

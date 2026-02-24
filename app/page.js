@@ -474,6 +474,152 @@ function Nav() {
   );
 }
 
+/* ═══════════════════════ NETWORK ANIMATION (hero background) ═══════════════════════ */
+function NetworkCanvas() {
+  const canvasRef = useRef(null);
+  const raf = useRef(null);
+  const t = useRef(0);
+
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    let w, h, dpr;
+
+    // Node definitions with labels
+    const nodeLabels = ["AI", "CRM", "SEO", "ADS", "EMAIL", "DATA", "BOT", "API", "FUNNEL", "LEAD", "GA4", "AUTO"];
+    const nodes = nodeLabels.map((label, i) => ({
+      label,
+      x: 0.1 + Math.random() * 0.8,
+      y: 0.1 + Math.random() * 0.8,
+      vx: (Math.random() - 0.5) * 0.0003,
+      vy: (Math.random() - 0.5) * 0.0003,
+      phase: Math.random() * Math.PI * 2,
+      size: 3 + Math.random() * 2,
+    }));
+
+    // Particles that flow between nodes
+    const particles = [];
+    for (let i = 0; i < 20; i++) {
+      const fromIdx = Math.floor(Math.random() * nodes.length);
+      let toIdx = Math.floor(Math.random() * nodes.length);
+      if (toIdx === fromIdx) toIdx = (toIdx + 1) % nodes.length;
+      particles.push({ from: fromIdx, to: toIdx, progress: Math.random(), speed: 0.002 + Math.random() * 0.003 });
+    }
+
+    const resize = () => {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      const r = c.parentElement.getBoundingClientRect();
+      w = r.width; h = r.height;
+      c.width = w * dpr; c.height = h * dpr;
+      c.style.width = w + "px"; c.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    addEventListener("resize", resize);
+
+    const draw = () => {
+      t.current += 0.008;
+      const T = t.current;
+      ctx.clearRect(0, 0, w, h);
+
+      // Update node positions (gentle drift)
+      for (const n of nodes) {
+        n.x += n.vx + Math.sin(T * 0.5 + n.phase) * 0.0001;
+        n.y += n.vy + Math.cos(T * 0.4 + n.phase) * 0.0001;
+        // Bounce off edges
+        if (n.x < 0.05 || n.x > 0.95) n.vx *= -1;
+        if (n.y < 0.05 || n.y > 0.95) n.vy *= -1;
+        n.x = Math.max(0.05, Math.min(0.95, n.x));
+        n.y = Math.max(0.05, Math.min(0.95, n.y));
+      }
+
+      // Draw connections
+      const maxDist = 0.35;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x * w, nodes[i].y * h);
+            ctx.lineTo(nodes[j].x * w, nodes[j].y * h);
+            ctx.strokeStyle = `rgba(160,28,45,${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      for (const n of nodes) {
+        const px = n.x * w;
+        const py = n.y * h;
+        const pulse = 1 + Math.sin(T * 2 + n.phase) * 0.15;
+        const r = n.size * pulse;
+
+        // Outer glow
+        const grd = ctx.createRadialGradient(px, py, 0, px, py, r * 4);
+        grd.addColorStop(0, "rgba(160,28,45,0.08)");
+        grd.addColorStop(1, "rgba(160,28,45,0)");
+        ctx.beginPath();
+        ctx.arc(px, py, r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(160,28,45,0.2)";
+        ctx.fill();
+
+        // Label
+        ctx.font = `600 ${Math.max(7, 8)}px 'Manrope', sans-serif`;
+        ctx.fillStyle = "rgba(160,28,45,0.18)";
+        ctx.textAlign = "center";
+        ctx.fillText(n.label, px, py + r + 12);
+      }
+
+      // Draw flowing particles
+      for (const p of particles) {
+        p.progress += p.speed;
+        if (p.progress > 1) {
+          p.progress = 0;
+          p.from = p.to;
+          p.to = Math.floor(Math.random() * nodes.length);
+          if (p.to === p.from) p.to = (p.to + 1) % nodes.length;
+        }
+        const fromN = nodes[p.from];
+        const toN = nodes[p.to];
+        const px = (fromN.x + (toN.x - fromN.x) * p.progress) * w;
+        const py = (fromN.y + (toN.y - fromN.y) * p.progress) * h;
+        const alpha = Math.sin(p.progress * Math.PI) * 0.4;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,53,74,${alpha})`;
+        ctx.fill();
+      }
+
+      raf.current = requestAnimationFrame(draw);
+    };
+
+    raf.current = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(raf.current);
+      removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.7 }}>
+      <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "100%" }} />
+    </div>
+  );
+}
+
 /* ═══════════════════════ HERO ═══════════════════════ */
 function RotatingWord() {
   const words = ["выручку", "клиентов", "систему", "результат"];
@@ -563,10 +709,12 @@ function Hero() {
 
           {/* RIGHT — visual cards */}
           <div style={{ position: "relative", minHeight: 480 }}>
+            {/* network/automation animation background */}
+            <NetworkCanvas />
             {/* floating case cards */}
             <Reveal delay={400} type="scale" duration={1}>
               <div className="hero-float-1 hero-visual-card" style={{
-                position: "absolute", top: 20, right: 0, width: 280,
+                position: "absolute", top: 20, right: 0, width: 280, zIndex: 1,
                 background: "linear-gradient(135deg, #1a1a2e, #0f3460)",
                 borderRadius: 16, padding: "28px 24px", boxShadow: "0 12px 40px rgba(15,52,96,0.3)",
                 cursor: "default",
@@ -586,7 +734,7 @@ function Hero() {
 
             <Reveal delay={550} type="scale" duration={1}>
               <div className="hero-float-2 hero-visual-card" style={{
-                position: "absolute", top: 200, left: 10, width: 260,
+                position: "absolute", top: 200, left: 10, width: 260, zIndex: 1,
                 background: "linear-gradient(135deg, #0a1628, #243b63)",
                 borderRadius: 16, padding: "24px 22px", boxShadow: "0 12px 40px rgba(36,59,99,0.3)",
                 cursor: "default",
@@ -607,7 +755,7 @@ function Hero() {
 
             <Reveal delay={700} type="scale" duration={1}>
               <div className="hero-float-3 hero-visual-card" style={{
-                position: "absolute", bottom: 10, right: 30, width: 240,
+                position: "absolute", bottom: 10, right: 30, width: 240, zIndex: 1,
                 background: V.card,
                 border: `1px solid ${V.border}`,
                 borderRadius: 16, padding: "22px 20px", boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
