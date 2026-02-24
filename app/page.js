@@ -1,22 +1,22 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
-/* ───── design tokens ───── */
+/* ───── design tokens (creamy-white light theme) ───── */
 const V = {
-  bg: "#0A0A0A",
-  card: "#111111",
-  cardHover: "#161616",
-  text: "#A8A8A8",
-  dim: "#888888",
-  muted: "#666666",
-  bright: "#FFFFFF",
+  bg: "#FAF8F5",
+  card: "#FFFFFF",
+  cardHover: "#F5F2EE",
+  text: "#6B6560",
+  dim: "#8A857F",
+  muted: "#B0AAA3",
+  bright: "#1A1714",
   accent: "#A01C2D",
   accentLit: "#C8354A",
-  accentDim: "rgba(160,28,45,0.07)",
-  accentGlow: "rgba(160,28,45,0.15)",
-  border: "rgba(255,255,255,0.08)",
-  borderHover: "rgba(255,255,255,0.14)",
-  divider: "rgba(255,255,255,0.06)",
+  accentDim: "rgba(160,28,45,0.06)",
+  accentGlow: "rgba(160,28,45,0.12)",
+  border: "rgba(0,0,0,0.07)",
+  borderHover: "rgba(0,0,0,0.14)",
+  divider: "rgba(0,0,0,0.06)",
   radius: 16,
   radiusSm: 10,
   heading: "'Unbounded', sans-serif",
@@ -38,90 +38,90 @@ const globalCSS = `
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* base */
-*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;box-sizing:border-box}
+*{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.08) transparent;box-sizing:border-box}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
-::selection{background:rgba(160,28,45,0.3);color:#fff}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:2px}
+::selection{background:rgba(160,28,45,0.15);color:#1A1714}
 html{scroll-behavior:smooth}
 
 /* ═══ HOVER & FOCUS CLASSES ═══ */
 
 /* nav links */
-.nav-link{color:#888;font-size:0.8rem;text-decoration:none;font-weight:500;letter-spacing:0.02em;transition:color .3s}
-.nav-link:hover{color:#fff}
+.nav-link{color:#8A857F;font-size:0.8rem;text-decoration:none;font-weight:500;letter-spacing:0.02em;transition:color .3s}
+.nav-link:hover{color:#1A1714}
 
 /* nav cta */
-.nav-cta{border:1px solid rgba(255,255,255,0.14);color:#fff;padding:8px 20px;border-radius:100px;font-weight:600;font-size:0.75rem;text-decoration:none;letter-spacing:0.04em;transition:all .3s;cursor:pointer}
-.nav-cta:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.25)}
+.nav-cta{border:1px solid rgba(0,0,0,0.14);color:#1A1714;padding:8px 20px;border-radius:100px;font-weight:600;font-size:0.75rem;text-decoration:none;letter-spacing:0.04em;transition:all .3s;cursor:pointer;background:transparent}
+.nav-cta:hover{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.22)}
 
 /* primary cta (hero) */
-.btn-primary{border:1px solid rgba(255,255,255,0.14);color:#fff;padding:14px 36px;border-radius:100px;background:rgba(255,255,255,0.04);font-weight:600;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1)}
-.btn-primary:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.28);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.btn-primary{border:1px solid rgba(0,0,0,0.12);color:#1A1714;padding:14px 36px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1)}
+.btn-primary:hover{background:rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.08)}
 
 /* ghost cta */
-.btn-ghost{color:#888;padding:14px 36px;border-radius:100px;font-weight:500;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .3s;border:none;background:none}
-.btn-ghost:hover{color:#fff}
+.btn-ghost{color:#8A857F;padding:14px 36px;border-radius:100px;font-weight:500;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .3s;border:none;background:none}
+.btn-ghost:hover{color:#1A1714}
 .btn-ghost:hover .arrow{transform:translateX(4px)}
 .btn-ghost .arrow{display:inline-block;transition:transform .3s}
 
-/* card link (ПОДРОБНЕЕ/ОБСУДИТЬ) */
+/* card link */
 .card-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:0.78rem;text-decoration:none;letter-spacing:0.03em;transition:all .3s;cursor:pointer}
 .card-link:hover{gap:10px}
 .card-link.accent{color:#C8354A}
-.card-link.accent:hover{color:#e0475f}
-.card-link.dim{color:#888}
-.card-link.dim:hover{color:#fff}
+.card-link.accent:hover{color:#A01C2D}
+.card-link.dim{color:#8A857F}
+.card-link.dim:hover{color:#1A1714}
 
 /* service grid card */
-.svc-card{background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px 20px;transition:all .35s cubic-bezier(.16,1,.3,1);cursor:default}
-.svc-card:hover{background:#161616;border-color:rgba(255,255,255,0.14);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+.svc-card{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:24px 20px;transition:all .35s cubic-bezier(.16,1,.3,1);cursor:default}
+.svc-card:hover{background:#FDFCFA;border-color:rgba(0,0,0,0.12);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06)}
 .svc-card:hover .svc-icon{opacity:1;transform:scale(1.1)}
 .svc-icon{opacity:0.6;transition:all .35s;transform:scale(1)}
 
 /* process step */
 .process-step{padding:32px 24px;position:relative;transition:all .4s cubic-bezier(.16,1,.3,1);cursor:default;border-radius:8px}
-.process-step:hover{background:rgba(255,255,255,0.02)}
-.process-step:hover .step-num{color:rgba(200,53,74,0.35)!important}
-.process-step:hover .step-title{color:#C8354A!important}
+.process-step:hover{background:rgba(0,0,0,0.015)}
+.process-step:hover .step-num{color:rgba(200,53,74,0.3)!important}
+.process-step:hover .step-title{color:#A01C2D!important}
 .step-num{transition:color .35s}
 .step-title{transition:color .35s}
 
 /* main service card */
 .main-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:default}
-.main-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.35)}
+.main-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.08)}
 
 /* contact links */
 .contact-link{display:flex;align-items:center;gap:14px;text-decoration:none;transition:all .3s;cursor:pointer}
 .contact-link:hover{transform:translateX(6px)}
-.contact-link:hover .contact-icon{border-color:rgba(200,53,74,0.3);background:rgba(160,28,45,0.07)}
+.contact-link:hover .contact-icon{border-color:rgba(160,28,45,0.2);background:rgba(160,28,45,0.05)}
 .contact-icon{transition:all .3s}
 
 /* submit button */
-.btn-submit{border:1px solid rgba(255,255,255,0.14);color:#fff;padding:13px 28px;border-radius:100px;background:rgba(255,255,255,0.04);font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.03em;transition:all .35s cubic-bezier(.16,1,.3,1);width:100%}
-.btn-submit:hover:not(:disabled){background:rgba(160,28,45,0.12);border-color:rgba(200,53,74,0.4);color:#fff;transform:translateY(-1px);box-shadow:0 6px 24px rgba(160,28,45,0.15)}
+.btn-submit{border:1px solid rgba(0,0,0,0.12);color:#1A1714;padding:13px 28px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.03em;transition:all .35s cubic-bezier(.16,1,.3,1);width:100%}
+.btn-submit:hover:not(:disabled){background:rgba(160,28,45,0.08);border-color:rgba(200,53,74,0.25);color:#1A1714;transform:translateY(-1px);box-shadow:0 6px 24px rgba(160,28,45,0.08)}
 .btn-submit:disabled{opacity:0.5;cursor:not-allowed}
 
 /* input focus */
-.form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-size:0.88rem;outline:none;transition:all .3s}
-.form-input:focus{border-color:rgba(200,53,74,0.4);background:rgba(255,255,255,0.05);box-shadow:0 0 0 3px rgba(160,28,45,0.08)}
-.form-input::placeholder{color:#555}
+.form-input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.08);border-radius:10px;color:#1A1714;font-size:0.88rem;outline:none;transition:all .3s}
+.form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
+.form-input::placeholder{color:#B0AAA3}
 
 /* case card */
 .case-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:pointer}
-.case-card:hover{border-color:rgba(255,255,255,0.14)!important;box-shadow:0 16px 48px rgba(0,0,0,0.3)}
+.case-card:hover{border-color:rgba(0,0,0,0.12)!important;box-shadow:0 16px 48px rgba(0,0,0,0.06)}
 .case-card:hover .case-cta{opacity:1;transform:translateX(0)}
 
 /* case modal */
 .case-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
-.case-overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.case-modal{position:relative;width:100%;max-width:780px;max-height:85vh;overflow-y:auto;background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:16px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent}
+.case-overlay-bg{position:absolute;inset:0;background:rgba(250,248,245,0.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.case-modal{position:relative;width:100%;max-width:780px;max-height:85vh;overflow-y:auto;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:16px;box-shadow:0 32px 80px rgba(0,0,0,0.1);scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.08) transparent}
 .case-modal::-webkit-scrollbar{width:4px}
 .case-modal::-webkit-scrollbar-track{background:transparent}
-.case-modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+.case-modal::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:2px}
 .case-close{position:sticky;top:0;right:0;z-index:10;display:flex;justify-content:flex-end;padding:16px 20px 0}
-.case-close-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(10,10,10,0.9);color:#888;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:1.1rem;backdrop-filter:blur(8px)}
-.case-close-btn:hover{color:#fff;border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.06)}
+.case-close-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.9);color:#8A857F;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:1.1rem;backdrop-filter:blur(8px)}
+.case-close-btn:hover{color:#1A1714;border-color:rgba(0,0,0,0.18);background:#fff}
 @media(max-width:768px){.case-modal{max-height:90vh;margin:8px}.case-modal-metrics{flex-direction:column!important;gap:20px!important}}
 
 /* footer */
@@ -207,7 +207,7 @@ function Label({ num, text }) {
         transition: "all 0.6s cubic-bezier(.16,1,.3,1)",
       }}>{num}</span>
       <span style={{
-        height: 1, background: V.accent, opacity: 0.4,
+        height: 1, background: V.accent, opacity: 0.35,
         width: visible ? 24 : 0,
         transition: "width 0.8s cubic-bezier(.16,1,.3,1) 0.15s",
       }} />
@@ -291,7 +291,7 @@ const steps = [
   { n: "04", t: "Масштаб", d: "Оптимизируем и растим результаты." },
 ];
 
-/* ═══════════════════════ GRADIENT ARC ═══════════════════════ */
+/* ═══════════════════════ GRADIENT ARC (light theme) ═══════════════════════ */
 function GradientArc() {
   const ref = useRef(null);
   const mouse = useRef({ x: 0.5, y: 0.5 });
@@ -328,11 +328,11 @@ function GradientArc() {
       const R = Math.min(w, h) * 0.78;
       const mi = (s.x - 0.5) * 0.12;
       const layers = [
-        { r: R * 1.15, w: 140, a: 0.06, sat: 50, light: 25, sp: 0.6 },
-        { r: R * 0.98, w: 100, a: 0.10, sat: 55, light: 28, sp: 0.9 },
-        { r: R * 0.84, w: 65,  a: 0.14, sat: 60, light: 30, sp: 1.2 },
-        { r: R * 0.72, w: 35,  a: 0.08, sat: 45, light: 22, sp: 0.8 },
-        { r: R * 0.62, w: 18,  a: 0.05, sat: 40, light: 20, sp: 1.4 },
+        { r: R * 1.15, w: 140, a: 0.04, sat: 40, light: 75, sp: 0.6 },
+        { r: R * 0.98, w: 100, a: 0.06, sat: 45, light: 72, sp: 0.9 },
+        { r: R * 0.84, w: 65,  a: 0.08, sat: 50, light: 68, sp: 1.2 },
+        { r: R * 0.72, w: 35,  a: 0.05, sat: 35, light: 78, sp: 0.8 },
+        { r: R * 0.62, w: 18,  a: 0.03, sat: 30, light: 80, sp: 1.4 },
       ];
       for (const l of layers) {
         const lr = l.r + Math.sin(T * l.sp) * 12 + (s.y - 0.5) * 25;
@@ -342,7 +342,7 @@ function GradientArc() {
         const hue = 355 + Math.sin(T + l.sp) * 8;
         g.addColorStop(0, `hsla(${hue},${l.sat}%,${l.light}%,0)`);
         g.addColorStop(0.25, `hsla(${hue},${l.sat}%,${l.light}%,${l.a * 0.6})`);
-        g.addColorStop(0.5, `hsla(${hue},${l.sat + 5}%,${l.light + 3}%,${l.a})`);
+        g.addColorStop(0.5, `hsla(${hue},${l.sat + 5}%,${l.light - 3}%,${l.a})`);
         g.addColorStop(0.75, `hsla(${hue - 5},${l.sat}%,${l.light}%,${l.a * 0.6})`);
         g.addColorStop(1, `hsla(${hue - 5},${l.sat}%,${l.light}%,0)`);
         ctx.beginPath(); ctx.arc(cxp, cyp, lr, sa, ea);
@@ -354,9 +354,9 @@ function GradientArc() {
       const cs = -Math.PI * 0.78 + mi + Math.sin(T * 0.5) * 0.05;
       const ce = -Math.PI * 0.22 + mi + Math.cos(T * 0.7) * 0.05;
       const cg = ctx.createLinearGradient(cxp + Math.cos(cs) * cr, cyp + Math.sin(cs) * cr, cxp + Math.cos(ce) * cr, cyp + Math.sin(ce) * cr);
-      cg.addColorStop(0, "hsla(355,60%,40%,0)"); cg.addColorStop(0.2, "hsla(355,65%,45%,0.08)");
-      cg.addColorStop(0.5, "hsla(0,70%,50%,0.18)"); cg.addColorStop(0.8, "hsla(5,65%,45%,0.08)");
-      cg.addColorStop(1, "hsla(5,60%,40%,0)");
+      cg.addColorStop(0, "hsla(355,50%,65%,0)"); cg.addColorStop(0.2, "hsla(355,55%,60%,0.06)");
+      cg.addColorStop(0.5, "hsla(0,60%,55%,0.12)"); cg.addColorStop(0.8, "hsla(5,55%,60%,0.06)");
+      cg.addColorStop(1, "hsla(5,50%,65%,0)");
       ctx.beginPath(); ctx.arc(cxp, cyp, cr, cs, ce);
       ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.strokeStyle = cg;
       ctx.filter = "blur(1px)"; ctx.stroke(); ctx.filter = "none";
@@ -364,11 +364,11 @@ function GradientArc() {
         const f = i / 12; const a = cs + (ce - cs) * f;
         const pr = cr + Math.sin(T * 2.5 + i * 1.8) * 10;
         const px = cxp + Math.cos(a) * pr, py = cyp + Math.sin(a) * pr;
-        const pa = (0.08 + Math.sin(T * 1.5 + i) * 0.05) * (1 - Math.abs(f - 0.5) * 1.8);
+        const pa = (0.06 + Math.sin(T * 1.5 + i) * 0.03) * (1 - Math.abs(f - 0.5) * 1.8);
         if (pa <= 0) continue;
         const ps = 1.5 + Math.sin(T * 3 + i * 2) * 0.8;
         const pg = ctx.createRadialGradient(px, py, 0, px, py, ps * 4);
-        pg.addColorStop(0, `hsla(0,60%,55%,${pa})`); pg.addColorStop(1, `hsla(0,60%,55%,0)`);
+        pg.addColorStop(0, `hsla(0,50%,55%,${pa})`); pg.addColorStop(1, `hsla(0,50%,55%,0)`);
         ctx.beginPath(); ctx.arc(px, py, ps * 4, 0, Math.PI * 2); ctx.fillStyle = pg; ctx.fill();
       }
       raf.current = requestAnimationFrame(draw);
@@ -396,7 +396,7 @@ function Nav() {
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       padding: scrolled ? "14px 0" : "28px 0",
-      background: scrolled ? "rgba(10,10,10,0.92)" : "transparent",
+      background: scrolled ? "rgba(250,248,245,0.92)" : "transparent",
       backdropFilter: scrolled ? "blur(20px)" : "none",
       borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
       transition: "all .5s cubic-bezier(.16,1,.3,1)",
@@ -425,7 +425,7 @@ function Hero() {
         <Reveal type="fade" duration={1.2}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px",
-            background: V.accentDim, border: `1px solid rgba(160,28,45,0.15)`,
+            background: V.accentDim, border: `1px solid rgba(160,28,45,0.1)`,
             borderRadius: 100, marginBottom: 48,
           }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: V.accentLit, position: "relative", display: "block" }}>
@@ -443,7 +443,7 @@ function Hero() {
             fontWeight: 900, lineHeight: 1.04, letterSpacing: "-0.05em",
             color: V.bright, maxWidth: 850, marginBottom: 28,
           }}>
-            Строим системы,<br />которые приносят<br /><span style={{ color: V.text }}>выручку</span>
+            Строим системы,<br />которые приносят<br /><span style={{ color: V.dim }}>выручку</span>
           </h1>
         </Reveal>
 
@@ -491,7 +491,7 @@ function Marquee() {
   const row = words.map((w, i) => (
     <span key={i} style={{
       fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.2em",
-      color: i % 2 === 0 ? "rgba(200,53,74,0.5)" : "rgba(255,255,255,0.18)",
+      color: i % 2 === 0 ? "rgba(160,28,45,0.35)" : "rgba(0,0,0,0.12)",
       whiteSpace: "nowrap", padding: "0 36px",
     }}>{w}</span>
   ));
@@ -501,7 +501,6 @@ function Marquee() {
       borderTop: `1px solid ${V.divider}`, borderBottom: `1px solid ${V.divider}`,
       opacity: visible ? 1 : 0, transition: "opacity 1s cubic-bezier(.16,1,.3,1)",
     }}>
-      {/* gradient masks */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 80, background: `linear-gradient(90deg, ${V.bg}, transparent)`, zIndex: 2, pointerEvents: "none" }} />
       <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 80, background: `linear-gradient(270deg, ${V.bg}, transparent)`, zIndex: 2, pointerEvents: "none" }} />
       <div style={{ display: "flex", animation: "marquee 40s linear infinite", width: "max-content" }}>{row}{row}</div>
@@ -527,18 +526,19 @@ function MainServices() {
             <Reveal key={i} delay={180 + i * 120} type={i === 0 ? "left" : "right"} duration={0.9}>
               <div className="main-card" style={{
                 background: V.card,
-                border: `1px solid ${s.flagship ? "rgba(160,28,45,0.1)" : V.border}`,
+                border: `1px solid ${s.flagship ? "rgba(160,28,45,0.08)" : V.border}`,
                 borderRadius: V.radius, padding: "44px 36px",
                 position: "relative", overflow: "hidden",
                 height: "100%", display: "flex", flexDirection: "column",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
               }}>
                 {s.flagship && <div style={{
                   position: "absolute", top: 0, left: "15%", right: "15%", height: 1,
-                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.15), transparent)`,
+                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.12), transparent)`,
                 }} />}
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-                  <span style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 900, color: "rgba(255,255,255,0.08)", lineHeight: 1 }}>0{i + 1}</span>
+                  <span style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 900, color: "rgba(0,0,0,0.05)", lineHeight: 1 }}>0{i + 1}</span>
                   {s.flagship && (
                     <span style={{
                       padding: "3px 8px", background: V.accentDim, borderRadius: 4,
@@ -622,7 +622,7 @@ function Process() {
               <div className="process-step" style={{ borderLeft: i === 0 ? "none" : `1px solid ${V.divider}` }}>
                 <div className="step-num" style={{
                   fontFamily: V.heading, fontSize: "2rem", fontWeight: 900,
-                  color: "rgba(255,255,255,0.08)", letterSpacing: "-0.05em", marginBottom: 16,
+                  color: "rgba(0,0,0,0.06)", letterSpacing: "-0.05em", marginBottom: 16,
                 }}>{s.n}</div>
                 <h3 className="step-title" style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>{s.t}</h3>
                 <p style={{ fontSize: "0.78rem", color: V.dim, lineHeight: 1.55, margin: 0 }}>{s.d}</p>
@@ -638,15 +638,8 @@ function Process() {
 /* ═══════════════════════ CASES ═══════════════════════ */
 const cases = [
   {
-    client: "SOS Moving",
-    tag: "PERFORMANCE MARKETING",
-    result: "$14.6M",
-    resultLabel: "в продажах",
-    metrics: [
-      { v: "10,235", l: "заказов" },
-      { v: "$400K", l: "рекламный бюджет" },
-      { v: "40 → 26", l: "SEO позиция" },
-    ],
+    client: "SOS Moving", tag: "PERFORMANCE MARKETING", result: "$14.6M", resultLabel: "в продажах",
+    metrics: [{ v: "10,235", l: "заказов" },{ v: "$400K", l: "рекламный бюджет" },{ v: "40 → 26", l: "SEO позиция" }],
     desc: "Полный маркетинг под ключ для мувинговой компании. Google Ads, SEO, аналитика — единая система, приносящая стабильный поток заказов.",
     scope: ["Google Ads", "SEO", "Аналитика", "CRM"],
     detail: {
@@ -657,24 +650,12 @@ const cases = [
         { title: "Сквозная аналитика", text: "Связали GA4, CallRail и CRM в единую систему. Каждый звонок и заявка привязаны к источнику — клиент видит реальный ROI по каждому каналу." },
         { title: "CRM и автоматизация", text: "Внедрили HubSpot с настроенным pipeline, автоматическими follow-up последовательностями и lead scoring. Горячие лиды обрабатываются в первые минуты." },
       ],
-      results: [
-        { v: "$14.6M", l: "общий объём продаж" },
-        { v: "10,235", l: "выполненных заказов" },
-        { v: "$400K", l: "рекламный бюджет под управлением" },
-        { v: "40 → 26", l: "рост SEO позиций" },
-      ],
+      results: [{ v: "$14.6M", l: "общий объём продаж" },{ v: "10,235", l: "выполненных заказов" },{ v: "$400K", l: "рекламный бюджет под управлением" },{ v: "40 → 26", l: "рост SEO позиций" }],
     },
   },
   {
-    client: "AK Cabinet Craft",
-    tag: "REVENUE SHARE",
-    result: "3%",
-    resultLabel: "от продаж",
-    metrics: [
-      { v: "Чикаго", l: "рынок" },
-      { v: "Full-cycle", l: "маркетинг" },
-      { v: "HubSpot", l: "CRM" },
-    ],
+    client: "AK Cabinet Craft", tag: "REVENUE SHARE", result: "3%", resultLabel: "от продаж",
+    metrics: [{ v: "Чикаго", l: "рынок" },{ v: "Full-cycle", l: "маркетинг" },{ v: "HubSpot", l: "CRM" }],
     desc: "Revenue-share партнёрство с производителем кастомных кухонь и шкафов. Весь маркетинг — от рекламы до офлайн-каналов — в обмен на процент от выручки.",
     scope: ["Google Ads", "SEO", "CRM", "GBP", "Контент", "Офлайн"],
     detail: {
@@ -685,24 +666,12 @@ const cases = [
         { title: "SEO и Google Business Profile", text: "Полная оптимизация GBP с отзывами, постами и фотографиями. Параллельно — SEO-контент под ключевые запросы: custom cabinets Chicago, kitchen remodel и т.д." },
         { title: "CRM + Offline Marketing", text: "Внедрили HubSpot для управления лидами и сделками. Добавили офлайн-каналы: postcards по целевым районам, партнёрства с дизайнерами интерьеров." },
       ],
-      results: [
-        { v: "3%", l: "revenue share от продаж" },
-        { v: "Full-cycle", l: "маркетинг под ключ" },
-        { v: "HubSpot", l: "CRM с полной автоматизацией" },
-        { v: "Online + Offline", l: "мультиканальная стратегия" },
-      ],
+      results: [{ v: "3%", l: "revenue share от продаж" },{ v: "Full-cycle", l: "маркетинг под ключ" },{ v: "HubSpot", l: "CRM с полной автоматизацией" },{ v: "Online + Offline", l: "мультиканальная стратегия" }],
     },
   },
   {
-    client: "Object First",
-    tag: "ДИЗАЙН И РАЗРАБОТКА",
-    result: "2+",
-    resultLabel: "года контракт",
-    metrics: [
-      { v: "Veeam", l: "приобретена" },
-      { v: "$50/час", l: "модель оплаты" },
-      { v: "Долгосрочно", l: "партнёрство" },
-    ],
+    client: "Object First", tag: "ДИЗАЙН И РАЗРАБОТКА", result: "2+", resultLabel: "года контракт",
+    metrics: [{ v: "Veeam", l: "приобретена" },{ v: "$50/час", l: "модель оплаты" },{ v: "Долгосрочно", l: "партнёрство" }],
     desc: "Долгосрочный контракт на дизайн и разработку для tech-компании в сфере backup-решений. Позже приобретена Veeam — лидером рынка.",
     scope: ["UI/UX Дизайн", "Веб-разработка"],
     detail: {
@@ -713,12 +682,7 @@ const cases = [
         { title: "Долгосрочное партнёрство", text: "Работали как выделенная команда на протяжении 2+ лет. Часовая модель ($50/час) при стабильной загрузке 100-120 часов в месяц обеспечила глубокое погружение в продукт." },
         { title: "Exit: приобретение Veeam", text: "Object First была приобретена Veeam — мировым лидером в сфере backup и data protection. Качество дизайна и продукта сыграло свою роль в привлечении внимания крупного игрока." },
       ],
-      results: [
-        { v: "2+ лет", l: "длительность контракта" },
-        { v: "100-120ч", l: "ежемесячная загрузка" },
-        { v: "Veeam", l: "компания приобретена" },
-        { v: "$50/час", l: "стабильная hourly rate" },
-      ],
+      results: [{ v: "2+ лет", l: "длительность контракта" },{ v: "100-120ч", l: "ежемесячная загрузка" },{ v: "Veeam", l: "компания приобретена" },{ v: "$50/час", l: "стабильная hourly rate" }],
     },
   },
 ];
@@ -759,25 +723,16 @@ function CaseModal({ data, onClose }) {
         </div>
 
         <div style={{ padding: "8px 40px 48px" }}>
-          {/* header */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-            <span style={{
-              padding: "4px 10px", background: V.accentDim, borderRadius: 4,
-              fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em",
-            }}>{data.tag}</span>
+            <span style={{ padding: "4px 10px", background: V.accentDim, borderRadius: 4, fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em" }}>{data.tag}</span>
           </div>
 
-          <h2 style={{
-            fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900,
-            color: V.bright, letterSpacing: "-0.03em", marginBottom: 8,
-          }}>{data.client}</h2>
-
+          <h2 style={{ fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 8 }}>{data.client}</h2>
           <p style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.65, marginBottom: 36, maxWidth: 600 }}>{data.desc}</p>
 
-          {/* key metrics */}
           <div className="case-modal-metrics" style={{
             display: "flex", gap: 32, marginBottom: 40, padding: "24px 28px",
-            background: "rgba(255,255,255,0.02)", border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
+            background: "rgba(0,0,0,0.015)", border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
           }}>
             {d.results.map((r, i) => (
               <div key={i} style={{ flex: 1 }}>
@@ -787,36 +742,19 @@ function CaseModal({ data, onClose }) {
             ))}
           </div>
 
-          {/* challenge */}
           <div style={{ marginBottom: 36 }}>
-            <div style={{
-              fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-              letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12,
-            }}>ЗАДАЧА</div>
+            <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12 }}>ЗАДАЧА</div>
             <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.7, maxWidth: 640 }}>{d.challenge}</p>
           </div>
 
-          {/* solution steps */}
           <div style={{ marginBottom: 36 }}>
-            <div style={{
-              fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-              letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 20,
-            }}>ЧТО МЫ СДЕЛАЛИ</div>
+            <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 20 }}>ЧТО МЫ СДЕЛАЛИ</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {d.solution.map((s, i) => (
-                <div key={i} style={{
-                  padding: "20px 24px", background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
-                }}>
+                <div key={i} style={{ padding: "20px 24px", background: "rgba(0,0,0,0.015)", border: `1px solid ${V.border}`, borderRadius: V.radiusSm }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                    <span style={{
-                      fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800,
-                      color: "rgba(200,53,74,0.4)", minWidth: 20,
-                    }}>0{i + 1}</span>
-                    <h4 style={{
-                      fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright,
-                      letterSpacing: "-0.02em", margin: 0,
-                    }}>{s.title}</h4>
+                    <span style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800, color: "rgba(160,28,45,0.35)", minWidth: 20 }}>0{i + 1}</span>
+                    <h4 style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.02em", margin: 0 }}>{s.title}</h4>
                   </div>
                   <p style={{ fontSize: "0.82rem", color: V.dim, lineHeight: 1.6, margin: 0, paddingLeft: 32 }}>{s.text}</p>
                 </div>
@@ -824,24 +762,15 @@ function CaseModal({ data, onClose }) {
             </div>
           </div>
 
-          {/* scope tags */}
           <div>
-            <div style={{
-              fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-              letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12,
-            }}>УСЛУГИ</div>
+            <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12 }}>УСЛУГИ</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {data.scope.map((s, j) => (
-                <span key={j} style={{
-                  padding: "5px 12px", borderRadius: 100,
-                  background: "rgba(255,255,255,0.04)", border: `1px solid ${V.border}`,
-                  fontSize: "0.7rem", color: V.dim, fontWeight: 500,
-                }}>{s}</span>
+                <span key={j} style={{ padding: "5px 12px", borderRadius: 100, background: "rgba(0,0,0,0.03)", border: `1px solid ${V.border}`, fontSize: "0.7rem", color: V.dim, fontWeight: 500 }}>{s}</span>
               ))}
             </div>
           </div>
 
-          {/* cta */}
           <div style={{ marginTop: 40, paddingTop: 28, borderTop: `1px solid ${V.divider}` }}>
             <a href="#contact" onClick={handleClose} className="btn-primary" style={{ fontFamily: V.body, display: "inline-block" }}>
               Обсудить похожий проект →
@@ -873,40 +802,25 @@ function Cases() {
               <div className="case-card" onClick={() => setActiveCase(c)} style={{
                 background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
                 padding: "40px 36px", position: "relative", overflow: "hidden",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
               }}>
-                {/* accent line top */}
                 {i === 0 && <div style={{
                   position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
-                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.2), transparent)`,
+                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.12), transparent)`,
                 }} />}
 
                 <div className="case-inner" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
-                  {/* left: info */}
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                      <span style={{
-                        padding: "4px 10px", background: V.accentDim, borderRadius: 4,
-                        fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em",
-                      }}>{c.tag}</span>
+                      <span style={{ padding: "4px 10px", background: V.accentDim, borderRadius: 4, fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em" }}>{c.tag}</span>
                     </div>
-
-                    <h3 style={{
-                      fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 900,
-                      color: V.bright, letterSpacing: "-0.03em", marginBottom: 12,
-                    }}>{c.client}</h3>
-
+                    <h3 style={{ fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 12 }}>{c.client}</h3>
                     <p style={{ fontSize: "0.85rem", color: V.dim, lineHeight: 1.65, marginBottom: 20, maxWidth: 420 }}>{c.desc}</p>
-
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                       {c.scope.map((s, j) => (
-                        <span key={j} style={{
-                          padding: "4px 10px", borderRadius: 100,
-                          background: "rgba(255,255,255,0.04)", border: `1px solid ${V.border}`,
-                          fontSize: "0.65rem", color: V.dim, fontWeight: 500,
-                        }}>{s}</span>
+                        <span key={j} style={{ padding: "4px 10px", borderRadius: 100, background: "rgba(0,0,0,0.03)", border: `1px solid ${V.border}`, fontSize: "0.65rem", color: V.dim, fontWeight: 500 }}>{s}</span>
                       ))}
                     </div>
-
                     <span className="case-cta" style={{
                       display: "inline-flex", alignItems: "center", gap: 6,
                       fontWeight: 600, fontSize: "0.75rem", color: V.accentLit,
@@ -915,23 +829,15 @@ function Cases() {
                     }}>ПОДРОБНЕЕ <span>→</span></span>
                   </div>
 
-                  {/* right: metrics */}
                   <div>
                     <div style={{ marginBottom: 28 }}>
-                      <div style={{
-                        fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900,
-                        color: V.bright, letterSpacing: "-0.04em", lineHeight: 1,
-                      }}>{c.result}</div>
+                      <div style={{ fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, color: V.bright, letterSpacing: "-0.04em", lineHeight: 1 }}>{c.result}</div>
                       <div style={{ fontSize: "0.75rem", color: V.muted, fontWeight: 600, marginTop: 4 }}>{c.resultLabel}</div>
                     </div>
-
                     <div style={{ display: "flex", gap: 28 }}>
                       {c.metrics.map((m, j) => (
                         <div key={j} style={{ minWidth: 0 }}>
-                          <div style={{
-                            fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800,
-                            color: V.text, letterSpacing: "-0.02em", marginBottom: 2,
-                          }}>{m.v}</div>
+                          <div style={{ fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800, color: V.text, letterSpacing: "-0.02em", marginBottom: 2 }}>{m.v}</div>
                           <div style={{ fontSize: "0.65rem", color: V.muted }}>{m.l}</div>
                         </div>
                       ))}
@@ -964,7 +870,7 @@ function Statement() {
         }}>
           {dimText.split(" ").map((word, i) => (
             <span key={`d${i}`} style={{
-              color: V.dim, display: "inline-block", marginRight: "0.3em",
+              color: V.muted, display: "inline-block", marginRight: "0.3em",
               opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
               transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${i * 50}ms`,
             }}>{word}</span>
@@ -978,7 +884,7 @@ function Statement() {
           ))}
           {endText.split(" ").filter(Boolean).map((word, i) => (
             <span key={`e${i}`} style={{
-              color: V.dim, display: "inline-block", marginRight: "0.3em",
+              color: V.muted, display: "inline-block", marginRight: "0.3em",
               opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
               transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + brightText.split(" ").length + i) * 50}ms`,
             }}>{word}</span>
@@ -1036,7 +942,7 @@ function Contact() {
                   <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
                     <div className="contact-icon" style={{
                       width: 36, height: 36, borderRadius: 8,
-                      background: "rgba(255,255,255,0.03)", border: `1px solid ${V.border}`,
+                      background: "rgba(0,0,0,0.02)", border: `1px solid ${V.border}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: "0.6rem", fontFamily: V.heading, fontWeight: 700, color: V.muted,
                     }}>{c.label[0]}</div>
@@ -1051,7 +957,7 @@ function Contact() {
           </div>
 
           <Reveal delay={150} type="right" duration={0.9}>
-            <div style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius, padding: "36px 32px" }}>
+            <div style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius, padding: "36px 32px", boxShadow: "0 2px 12px rgba(0,0,0,0.03)" }}>
               {sent ? (
                 <div style={{ textAlign: "center", padding: "44px 0" }}>
                   <div style={{ fontFamily: V.heading, fontSize: "1.3rem", fontWeight: 800, color: V.bright, marginBottom: 10 }}>Заявка отправлена</div>
