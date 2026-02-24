@@ -53,15 +53,15 @@ html{scroll-behavior:smooth}
 
 /* nav cta */
 .nav-cta{border:1px solid rgba(0,0,0,0.14);color:#1A1714;padding:8px 20px;border-radius:100px;font-weight:600;font-size:0.75rem;text-decoration:none;letter-spacing:0.04em;transition:all .3s;cursor:pointer;background:transparent}
-.nav-cta:hover{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.22)}
+.nav-cta:hover{background:#A01C2D;border-color:#A01C2D;color:#fff}
 
 /* primary cta (hero) */
 .btn-primary{border:1px solid rgba(0,0,0,0.12);color:#1A1714;padding:14px 36px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1)}
-.btn-primary:hover{background:rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.08)}
+.btn-primary:hover{background:#A01C2D;border-color:#A01C2D;color:#fff;transform:translateY(-2px);box-shadow:0 8px 32px rgba(160,28,45,0.2)}
 
 /* ghost cta */
 .btn-ghost{color:#8A857F;padding:14px 36px;border-radius:100px;font-weight:500;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .3s;border:none;background:none}
-.btn-ghost:hover{color:#1A1714}
+.btn-ghost:hover{color:#A01C2D}
 .btn-ghost:hover .arrow{transform:translateX(4px)}
 .btn-ghost .arrow{display:inline-block;transition:transform .3s}
 
@@ -103,7 +103,7 @@ html{scroll-behavior:smooth}
 
 /* submit button */
 .btn-submit{border:1px solid rgba(0,0,0,0.12);color:#1A1714;padding:13px 28px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.03em;transition:all .35s cubic-bezier(.16,1,.3,1);width:100%}
-.btn-submit:hover:not(:disabled){background:rgba(160,28,45,0.08);border-color:rgba(200,53,74,0.25);color:#1A1714;transform:translateY(-1px);box-shadow:0 6px 24px rgba(160,28,45,0.08)}
+.btn-submit:hover:not(:disabled){background:#A01C2D;border-color:#A01C2D;color:#fff;transform:translateY(-1px);box-shadow:0 6px 24px rgba(160,28,45,0.2)}
 .btn-submit:disabled{opacity:0.5;cursor:not-allowed}
 
 /* input focus */
@@ -417,7 +417,7 @@ function Nav() {
     }}>
       <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em" }}>
-          BANKAI<span style={{ color: V.accent }}>.</span>
+          BANKAI<span style={{ color: V.accent }}>.</span>AGENCY
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 28, fontFamily: V.body }}>
           <a href="#services" className="nav-link">Услуги</a>
@@ -707,67 +707,67 @@ function Process() {
 /* ═══════════════════════ CASES ═══════════════════════ */
 const cases = [
   {
-    client: "Object First → Veeam", tag: "EXIT", result: "EXIT", resultLabel: "acquired by Veeam",
-    metrics: [{ v: "2+ года", l: "контракт" },{ v: "$100K+", l: "общий бюджет" },{ v: "Veeam", l: "приобретена" }],
-    desc: "Стартап в сфере Data Protection / Cybersecurity. Мы были единственной внешней командой на дизайне и разработке. Компания была приобретена Veeam — мировым лидером рынка.",
-    scope: ["UI/UX", "Веб-разработка", "Figma", "HubSpot CMS", "Маркетинг-материалы"],
+    client: "Object First → Veeam", tag: "SaaS · DATA PROTECTION · EXIT", result: "EXIT", resultLabel: "acquired by Veeam",
+    metrics: [{ v: "2+ года", l: "контракт" },{ v: "$100K+", l: "бюджет проекта" },{ v: "Veeam", l: "приобретена" }],
+    desc: "Стартап в сфере ransomware-proof backup storage. Мы были единственной внешней командой на дизайне и разработке на протяжении 2+ лет. Компания была приобретена Veeam — мировым лидером рынка data protection.",
+    scope: ["UI/UX Design", "Figma", "HubSpot CMS", "Веб-разработка", "Landing Pages", "Investor Decks", "One-Pagers", "Marketing Materials"],
     detail: {
-      challenge: "Object First — стартап, создающий ransomware-proof backup storage. Нужна была полная дизайн-инфраструктура с нуля: от бренда до продуктового сайта. Внутренней дизайн-команды не было — мы стали единственным внешним партнёром по дизайну и фронтенду.",
+      challenge: "Object First — стартап из Бостона, создающий ransomware-proof backup storage appliance (Ootbi). Продукт на стыке cybersecurity и data protection. Внутренней дизайн-команды нет, но нужна была полная дизайн- и веб-инфраструктура: брендинг, маркетинговый сайт, продуктовые страницы, материалы для инвесторов и партнёров. Мы стали единственным внешним партнёром по дизайну и фронтенд-разработке.",
       solution: [
-        { title: "UI/UX дизайн и бренд-система", text: "Разработали визуальную идентичность, дизайн-систему в Figma. Создавали всё — от лендингов и продуктовых страниц до презентаций для инвесторов, one-pagers и маркетинговых материалов." },
-        { title: "Веб-разработка на HubSpot CMS", text: "Построили и поддерживали маркетинговый сайт на HubSpot CMS. Регулярные обновления, новые страницы под каждый продуктовый релиз, оптимизация конверсии и SEO." },
-        { title: "Выделенная команда 2+ года", text: "Работали как embedded-команда: 100–120 часов в месяц, полное погружение в продукт. Часовая модель позволила масштабироваться под задачи компании на каждом этапе роста." },
-        { title: "Результат: EXIT → Veeam", text: "Object First была приобретена Veeam — мировым лидером в сфере backup и data protection. Качество дизайна и маркетинговых материалов сыграло роль в позиционировании компании для сделки." },
+        { title: "UI/UX дизайн и бренд-система", text: "Разработали полную дизайн-систему в Figma: компоненты, типографика, цветовая палитра, иконки. Создавали продуктовые лендинги, feature pages, сравнительные таблицы с конкурентами, презентации для инвесторов, partner one-pagers, case study templates и все маркетинговые материалы." },
+        { title: "Веб-разработка на HubSpot CMS", text: "Построили маркетинговый сайт с нуля на HubSpot CMS: кастомные модули, blog templates, gated content pages, интеграция с HubSpot CRM для lead capture. Регулярные обновления под каждый продуктовый релиз, A/B тесты лендингов, оптимизация Core Web Vitals." },
+        { title: "Embedded-команда на 2+ года", text: "Работали как выделенная команда: 100–120 часов в месяц, ежедневные стендапы, полное погружение в продукт и roadmap. Часовая модель ($50/час) при стабильной загрузке позволила масштабироваться под задачи — от тихих недель до интенсивных спринтов перед launch events." },
+        { title: "Результат: EXIT → Veeam", text: "Object First была приобретена Veeam — мировым лидером в сфере backup и data protection с оценкой $15B+. Качество дизайна, маркетинговых материалов и веб-присутствия сыграло прямую роль в позиционировании компании перед сделкой." },
       ],
-      results: [{ v: "EXIT", l: "приобретена Veeam" },{ v: "2+ лет", l: "длительность контракта" },{ v: "100–120ч/мес", l: "стабильная загрузка" },{ v: "$100K+", l: "общий бюджет проекта" }],
+      results: [{ v: "EXIT", l: "приобретена Veeam ($15B+)" },{ v: "2+ лет", l: "непрерывный контракт" },{ v: "100–120ч/мес", l: "стабильная загрузка" },{ v: "$100K+", l: "общий бюджет проекта" }],
     },
   },
   {
-    client: "AK Cabinet Craft", tag: "FULL-CYCLE MARKETING", result: "3%", resultLabel: "revenue share",
-    metrics: [{ v: "Чикаго", l: "рынок" },{ v: "Revenue Share", l: "модель" },{ v: "HubSpot", l: "CRM" }],
-    desc: "Revenue-share партнёрство с производителем кастомных кухонь в Чикаго. Весь маркетинг с нуля — от Google Ads до офлайн-каналов — за процент от продаж.",
-    scope: ["Google Ads", "LSA", "SEO", "GBP", "HubSpot CRM", "Email", "Контент", "Офлайн"],
+    client: "AK Cabinet Craft", tag: "MANUFACTURING · B2C · REVENUE SHARE", result: "3%", resultLabel: "revenue share",
+    metrics: [{ v: "Чикаго", l: "рынок" },{ v: "3%", l: "от выручки" },{ v: "Full-cycle", l: "с нуля" }],
+    desc: "Revenue-share партнёрство с производителем кастомных кухонь и шкафов в Чикаго. Построили весь маркетинг с нуля — от Google Ads и SEO до офлайн-каналов и CRM. Работаем за 3% от выручки вместо фиксированного ретейнера.",
+    scope: ["Google Ads", "Local Services Ads", "SEO", "Google Business Profile", "HubSpot CRM", "Email Sequences", "Контент-маркетинг", "Postcards", "Партнёрства с дизайнерами"],
     detail: {
-      challenge: "AK Cabinet Craft — производитель кастомных кухонь и шкафов в Чикаго. Клиенты приходили только по сарафану, онлайн-присутствия ноль. Нужна полная маркетинговая инфраструктура — но без крупных авансов. Мы предложили revenue share.",
+      challenge: "AK Cabinet Craft — семейный производитель кастомных кухонь и шкафов в Чикаго. Средний чек $15K–$40K. До нас клиенты приходили только по сарафану и рефералам от подрядчиков. Онлайн-присутствия ноль: нет рекламы, нет SEO, нет CRM. Нужна была полная маркетинговая инфраструктура — но бюджета на крупный ретейнер не было. Мы предложили revenue share модель.",
       solution: [
-        { title: "Revenue Share модель (3%)", text: "Вместо фиксированного ретейнера — 3% от выручки. Мы инвестируем время, экспертизу и рекламный бюджет; зарабатываем только когда клиент зарабатывает. Полное совпадение интересов." },
-        { title: "Google Ads + Local Services Ads", text: "Контекстная реклама и LSA, нацеленные на homeowners Чикаго с высоким чеком. Регулярная оптимизация по стоимости лида и качеству входящих заявок." },
-        { title: "SEO + Google Business Profile", text: "Полная оптимизация GBP: отзывы, посты, фотографии реальных проектов. SEO-контент под ключевые запросы: custom cabinets Chicago, kitchen remodel и т.д." },
-        { title: "HubSpot CRM + Email + Offline", text: "Внедрили HubSpot для управления лидами и сделками. Настроили email-последовательности. Запустили офлайн-каналы: postcards по целевым районам, партнёрства с дизайнерами интерьеров." },
+        { title: "Revenue Share модель (3%)", text: "Вместо фиксированного ретейнера — 3% от закрытых сделок. Мы инвестируем своё время, экспертизу и рекламный бюджет; зарабатываем только когда клиент зарабатывает. Полное совпадение интересов — мы заинтересованы не в лидах, а в закрытых продажах." },
+        { title: "Google Ads + Local Services Ads", text: "Запустили Search-кампании и LSA, нацеленные на homeowners в Чикаго и пригородах с высоким доходом. Ключевые запросы: custom kitchen cabinets, cabinet refacing, kitchen remodel Chicago. Постоянная оптимизация по стоимости лида и квалификации заявок — отсекаем нецелевые обращения." },
+        { title: "SEO + Google Business Profile", text: "Полная оптимизация GBP: регулярные посты, ответы на отзывы, фотографии реальных проектов до/после. SEO: технический аудит, оптимизация мета-тегов, создание location pages под Chicago suburbs, блог с kitchen renovation guides. Цель — доминировать в Local Pack." },
+        { title: "HubSpot CRM + Email + Offline", text: "Внедрили HubSpot: pipeline по этапам (lead → estimate → signed → completed), автоматические follow-up sequences, lead scoring. Email-маркетинг: nurture-серия для тех, кто запросил estimate но не подписал. Offline: direct mail postcards по целевым zip-кодам, партнёрства с interior designers и general contractors." },
       ],
-      results: [{ v: "3%", l: "revenue share модель" },{ v: "Full-cycle", l: "маркетинг под ключ" },{ v: "HubSpot", l: "CRM + автоматизация" },{ v: "Online + Offline", l: "мультиканальная стратегия" }],
+      results: [{ v: "3%", l: "revenue share вместо ретейнера" },{ v: "Full-cycle", l: "маркетинг полного цикла с нуля" },{ v: "HubSpot", l: "CRM + pipeline + автоматизация" },{ v: "Online + Offline", l: "Ads + SEO + GBP + Email + Direct Mail" }],
     },
   },
   {
-    client: "SOS Moving → AI Moving", tag: "PERFORMANCE + AI", result: "$14.6M", resultLabel: "в продажах",
-    metrics: [{ v: "10,235", l: "заказов" },{ v: "$400K+", l: "бюджет" },{ v: "AI SaaS", l: "продукт" }],
-    desc: "От мувинговой компании до AI SaaS-продукта. Performance marketing на $14.6M в продажах + разработка собственного AI-инструмента для индустрии переездов.",
-    scope: ["Google Ads", "SEO", "GA4", "CallRail", "HubSpot", "AI Dev"],
+    client: "SOS Moving → AI Moving", tag: "LOGISTICS · AI SaaS · PERFORMANCE", result: "$14.6M", resultLabel: "в продажах",
+    metrics: [{ v: "10,235", l: "заказов" },{ v: "$400K+", l: "рекламный бюджет" },{ v: "AI SaaS", l: "продукт" }],
+    desc: "Два этапа: performance-маркетинг, который принёс $14.6M в продажах и 10,235 заказов для мувинговой компании. Затем — трансформация накопленной экспертизы в AI SaaS-продукт для всей индустрии переездов.",
+    scope: ["Google Ads", "Performance Max", "SEO", "Schema Markup", "GA4", "CallRail", "HubSpot CRM", "Lead Scoring", "AI Development", "SaaS"],
     detail: {
-      challenge: "SOS Moving — мувинговая компания без маркетинговой системы. Высокая конкуренция, размытое позиционирование, отсутствие аналитики. Второй этап — трансформация опыта в AI SaaS-продукт для всей индустрии.",
+      challenge: "SOS Moving — мувинговая компания в конкурентном рынке. Проблемы: нет маркетинговой системы, высокая стоимость лида, нет трекинга звонков, CRM ведётся в таблицах. Цель первого этапа — построить прибыльную машину лидогенерации. Цель второго — превратить накопленный опыт и данные в отдельный AI SaaS-продукт для всей индустрии.",
       solution: [
-        { title: "Google Ads на масштаб", text: "Search и Performance Max кампании. Бюджет $400K+ под управлением. Непрерывная оптимизация ставок, аудиторий и креативов — снижение стоимости лида при росте объёма." },
-        { title: "SEO + контент-стратегия", text: "Полный технический аудит, новая структура сайта, schema markup. Контент-стратегия под все этапы воронки. Рост позиций по ключевым запросам." },
-        { title: "Сквозная аналитика", text: "GA4 + CallRail + HubSpot CRM в единой связке. Каждый звонок и заявка привязаны к источнику. Клиент видит реальный ROI по каждому каналу в реальном времени." },
-        { title: "AI Moving — SaaS-продукт", text: "На основе накопленных данных и экспертизы запустили AI Moving — AI-инструмент для мувинговых компаний. Автоматизация оценки, маршрутизации и коммуникации с клиентами." },
+        { title: "Google Ads: Search + PMax", text: "Запустили и масштабировали Search и Performance Max кампании. $400K+ рекламного бюджета под управлением. Разделение по типам переезда (local, long-distance, commercial), гео-таргетинг, негативные ключевые слова. Постоянная оптимизация ставок и креативов — снижение CPA при росте объёма заказов." },
+        { title: "SEO + контент-стратегия", text: "Полный технический аудит: исправление crawl errors, canonical tags, page speed. Новая архитектура сайта: service pages по типам переезда, location pages по городам. Schema markup (LocalBusiness, FAQ, Review). Контент-стратегия: moving guides, cost calculators, checklists — контент на каждый этап воронки." },
+        { title: "Сквозная аналитика и CRM", text: "Интеграция GA4 + CallRail + HubSpot в единую систему. Каждый звонок записывается, привязывается к keyword и campaign. HubSpot: кастомный pipeline, автоматические follow-up sequences, lead scoring по размеру переезда и срочности. Клиент видит реальный ROI по каждому каналу в реальном времени." },
+        { title: "AI Moving — SaaS-продукт", text: "На основе 10K+ обработанных заказов и накопленных данных создали AI Moving — AI-платформу для мувинговых компаний. Автоматическая оценка стоимости по фото, оптимизация маршрутов, AI-чатбот для квалификации лидов, predictive analytics по загрузке. Из клиентского проекта — в самостоятельный продукт." },
       ],
-      results: [{ v: "$14.6M", l: "общий объём продаж" },{ v: "10,235", l: "выполненных заказов" },{ v: "$400K+", l: "бюджет под управлением" },{ v: "AI SaaS", l: "собственный продукт" }],
+      results: [{ v: "$14.6M", l: "общий объём продаж клиента" },{ v: "10,235", l: "выполненных заказов" },{ v: "$400K+", l: "рекламный бюджет под управлением" },{ v: "AI SaaS", l: "собственный продукт из экспертизы" }],
     },
   },
   {
-    client: "R.O.C.S.", tag: "ENTERPRISE BRAND", result: "2+ года", resultLabel: "партнёрство",
+    client: "R.O.C.S.", tag: "FMCG · ENTERPRISE · BRAND DESIGN", result: "2+ года", resultLabel: "партнёрство",
     metrics: [{ v: "Enterprise", l: "масштаб" },{ v: "3 бренда", l: "R.O.C.S. / Splat / BioMio" },{ v: "360°", l: "дизайн" }],
-    desc: "Работа с одним из крупнейших FMCG-брендов России. Дизайн-поддержка трёх брендов: R.O.C.S., Splat, BioMio — от упаковки до digital-кампаний.",
-    scope: ["Brand Design", "Упаковка", "Digital-кампании", "Key Visual", "Ритейл"],
+    desc: "Дизайн-партнёрство с одним из крупнейших FMCG-холдингов России (Splat Global). Поддержка трёх брендов с разным позиционированием: R.O.C.S., Splat, BioMio — от упаковки и key visuals до digital-кампаний и ритейл-материалов.",
+    scope: ["Brand Design", "Key Visual", "Упаковка", "POS-материалы", "Digital-кампании", "SMM-контент", "Промо-лендинги", "Ритейл-оформление"],
     detail: {
-      challenge: "R.O.C.S. — крупный FMCG-бренд (группа компаний Splat Global). Три бренда с разным позиционированием: R.O.C.S. (премиум oral care), Splat (масс-маркет), BioMio (эко). Нужна была единая дизайн-команда, способная работать на enterprise-уровне с высоким темпом и качеством.",
+      challenge: "R.O.C.S. — часть группы компаний Splat Global, один из крупнейших FMCG-холдингов России. Три бренда с принципиально разным позиционированием: R.O.C.S. (премиум oral care, высокая наценка), Splat (масс-маркет, широкая дистрибуция), BioMio (эко-сегмент, осознанное потребление). Нужна была внешняя дизайн-команда, способная работать на enterprise-уровне: быстрые сроки, корпоративные согласования, множество стейкхолдеров, работа по brand guidelines каждого бренда.",
       solution: [
-        { title: "Brand Design для 3 брендов", text: "Работали одновременно с R.O.C.S., Splat и BioMio. Разрабатывали визуальные концепции, key visuals и адаптации для каждого бренда с учётом их уникального позиционирования." },
-        { title: "Упаковка и ритейл-материалы", text: "Дизайн упаковки, POS-материалы, оформление полок. Работа с требованиями федеральных ритейл-сетей и международных рынков." },
-        { title: "Digital-кампании", text: "Креативы для performance-рекламы, SMM-контент, лендинги под промо-акции. Быстрый цикл производства — от брифа до готового материала." },
-        { title: "Enterprise-процессы", text: "Встроились в корпоративные процессы: согласования, brand guidelines, работа с несколькими стейкхолдерами. Стабильное партнёрство 2+ года." },
+        { title: "Brand Design для 3 брендов", text: "Работали параллельно с R.O.C.S., Splat и BioMio. Разрабатывали key visuals для сезонных кампаний, адаптации под разные каналы и форматы. Каждый бренд — свой tone of voice, своя цветовая палитра, свои правила. Переключение между брендами в рамках одного дня." },
+        { title: "Упаковка и ритейл", text: "Дизайн упаковки для новых SKU, обновление существующих линеек. POS-материалы: шелфтокеры, воблеры, стенды. Оформление полок для федеральных сетей (Магнит, Пятёрочка, Перекрёсток). Адаптация под требования международных рынков — разные языки, разные регуляции." },
+        { title: "Digital-кампании и контент", text: "Креативы для performance-рекламы (ВК, Яндекс, Google), SMM-контент для трёх аккаунтов параллельно, промо-лендинги под акции и новинки. Быстрый цикл: от брифа до финального материала за 2–5 дней. Баннеры, сторис, reels, email-шаблоны." },
+        { title: "Enterprise-процессы", text: "Встроились в корпоративную структуру: регулярные созвоны, работа через корпоративный таск-трекер, согласования с brand-менеджерами и product-менеджерами. Строгое следование brand guidelines каждого бренда. Стабильное партнёрство 2+ года без перерывов." },
       ],
-      results: [{ v: "3 бренда", l: "R.O.C.S. / Splat / BioMio" },{ v: "2+ лет", l: "партнёрство" },{ v: "360°", l: "дизайн-поддержка" },{ v: "Enterprise", l: "корпоративный уровень" }],
+      results: [{ v: "3 бренда", l: "R.O.C.S. / Splat / BioMio" },{ v: "2+ лет", l: "непрерывное партнёрство" },{ v: "360°", l: "от упаковки до digital" },{ v: "Enterprise", l: "корпоративный масштаб и процессы" }],
     },
   },
 ];
@@ -1085,7 +1085,7 @@ function Footer() {
       <footer style={{ padding: "32px 0", borderTop: `1px solid ${V.divider}`, position: "relative", zIndex: 1 }}>
         <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div className="footer-logo" style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "0.8rem", color: V.muted, cursor: "default" }}>
-            BANKAI<span className="footer-dot" style={{ color: V.accent, opacity: 0.5 }}>.</span>
+            BANKAI<span className="footer-dot" style={{ color: V.accent, opacity: 0.5 }}>.</span>AGENCY
           </div>
           <div style={{ fontSize: "0.68rem", color: V.muted }}>© 2026</div>
         </div>
