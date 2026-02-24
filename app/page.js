@@ -825,7 +825,7 @@ function NetworkCanvas() {
 
 /* ═══════════════════════ HERO ═══════════════════════ */
 function RotatingWord() {
-  const words = ["выручку", "клиентов", "систему", "результат"];
+  const words = ["выручку", "клиентов", "стабильность", "результат"];
   const [idx, setIdx] = useState(0);
   useEffect(() => { const t = setInterval(() => setIdx(p => (p + 1) % words.length), 2800); return () => clearInterval(t); }, []);
   // Find the longest word to set container width
