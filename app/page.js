@@ -120,6 +120,9 @@ html{scroll-behavior:smooth}
 /* configurator chips */
 .cfg-chip:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
 
+/* footer */
+.footer-nav-link:hover{color:rgba(255,255,255,0.85)!important}
+
 /* input focus */
 .form-input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.08);border-radius:10px;color:#1A1714;font-size:0.88rem;outline:none;transition:all .3s}
 .form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
@@ -161,6 +164,8 @@ html{scroll-behavior:smooth}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
   .contact-card-wrap{padding:36px 24px!important}
+  .footer-top{grid-template-columns:1fr!important;gap:32px!important}
+  .footer-bottom{flex-direction:column!important;gap:16px!important;align-items:flex-start!important}
   .cases-masonry{grid-template-columns:1fr!important}
   .cases-masonry>div:last-child{padding-top:0!important}
   .case-card-new{height:300px!important}
@@ -1689,16 +1694,90 @@ function Contact() {
 function Footer() {
   return (
     <Reveal type="fade" duration={1}>
-      <footer style={{ padding: "32px 0", borderTop: `1px solid ${V.divider}`, position: "relative", zIndex: 1 }}>
-        <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div className="footer-logo" style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "0.8rem", color: V.muted, cursor: "default", display: "flex", alignItems: "center", gap: 6 }}>
-            <svg width="18" height="18" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, opacity: 0.5 }}>
-              <rect width="256" height="256" rx="42.6667" fill="#DF5440"/>
-              <path d="M87.0069 78.4321L172.234 53.5611L172.234 53.5611C196.129 46.5881 208.077 43.1017 210.843 48.0941C213.609 53.0866 204.317 61.367 185.734 77.9279L153.845 106.347C146.512 112.882 142.846 116.15 143.738 119.537C144.63 122.925 149.443 123.966 159.07 126.049C170.467 128.514 176.165 129.747 177.353 133.831C178.542 137.916 174.405 142.001 166.132 150.173L128.971 186.878C114.297 201.372 106.96 208.619 102.485 206.586C101.963 206.348 101.47 206.048 101.02 205.693C97.1598 202.65 100.234 192.806 106.382 173.118C108.3 166.976 109.259 163.905 107.908 161.695C107.739 161.418 107.546 161.156 107.333 160.912C105.626 158.963 102.409 158.963 95.9739 158.963H91.6315C76.3852 158.963 68.7621 158.963 64.4942 154.069C60.2262 149.174 61.2642 141.622 63.34 126.518L66.7154 101.958C67.9389 93.0553 68.5507 88.604 71.309 85.4061C74.0673 82.2081 78.3805 80.9494 87.0069 78.4321Z" fill="white"/>
-            </svg>
-            <span>BANKAI<span className="footer-dot" style={{ color: V.accent, opacity: 0.5, margin: "0 0.01em" }}>.</span>AGENCY</span>
+      <footer style={{
+        background: "#111110", position: "relative", zIndex: 1,
+        borderRadius: "24px 24px 0 0", overflow: "hidden",
+      }}>
+        {/* animated accent line at top */}
+        <div style={{
+          height: 2, width: "100%",
+          background: "linear-gradient(90deg, transparent, rgba(160,28,45,0.6), rgba(200,53,74,0.8), rgba(160,28,45,0.6), transparent)",
+          backgroundSize: "200% 100%",
+          animation: "shimmer 4s linear infinite",
+        }} />
+
+        <div style={{ ...cx, padding: "64px 0 40px" }}>
+          {/* Top row: big logo + nav + socials */}
+          <div className="footer-top" style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 48, alignItems: "start", marginBottom: 56 }}>
+            {/* Logo + tagline */}
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                <svg width="32" height="32" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+                  <rect width="256" height="256" rx="42.6667" fill="#DF5440"/>
+                  <path d="M87.0069 78.4321L172.234 53.5611L172.234 53.5611C196.129 46.5881 208.077 43.1017 210.843 48.0941C213.609 53.0866 204.317 61.367 185.734 77.9279L153.845 106.347C146.512 112.882 142.846 116.15 143.738 119.537C144.63 122.925 149.443 123.966 159.07 126.049C170.467 128.514 176.165 129.747 177.353 133.831C178.542 137.916 174.405 142.001 166.132 150.173L128.971 186.878C114.297 201.372 106.96 208.619 102.485 206.586C101.963 206.348 101.47 206.048 101.02 205.693C97.1598 202.65 100.234 192.806 106.382 173.118C108.3 166.976 109.259 163.905 107.908 161.695C107.739 161.418 107.546 161.156 107.333 160.912C105.626 158.963 102.409 158.963 95.9739 158.963H91.6315C76.3852 158.963 68.7621 158.963 64.4942 154.069C60.2262 149.174 61.2642 141.622 63.34 126.518L66.7154 101.958C67.9389 93.0553 68.5507 88.604 71.309 85.4061C74.0673 82.2081 78.3805 80.9494 87.0069 78.4321Z" fill="white"/>
+                </svg>
+                <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.2rem", color: "#fff", letterSpacing: "-0.04em" }}>
+                  <span>BANKAI<span style={{ color: V.accentLit, margin: "0 0.01em" }}>.</span>AGENCY</span>
+                </div>
+              </div>
+              <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.6, maxWidth: 300 }}>
+                Digital-партнёр на процент от выручки. Маркетинг, автоматизация, дизайн, разработка.
+              </p>
+            </div>
+
+            {/* Navigation */}
+            <div>
+              <div style={{ fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>Навигация</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  { label: "Направления", href: "#services" },
+                  { label: "Услуги", href: "#services" },
+                  { label: "Процесс", href: "#process" },
+                  { label: "Кейсы", href: "#cases" },
+                  { label: "Контакты", href: "#contact" },
+                ].map((item, i) => (
+                  <a key={i} href={item.href} className="footer-nav-link" style={{
+                    color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
+                    transition: "color .3s", fontWeight: 500,
+                  }}>{item.label}</a>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <div style={{ fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>Связь</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <a href="mailto:agency.bankai@gmail.com" className="footer-nav-link" style={{
+                  color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
+                  transition: "color .3s", fontWeight: 500,
+                }}>agency.bankai@gmail.com</a>
+                <a href="https://t.me/may_work" target="_blank" rel="noopener" className="footer-nav-link" style={{
+                  color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
+                  transition: "color .3s", fontWeight: 500,
+                }}>Telegram: @may_work</a>
+              </div>
+            </div>
           </div>
-          <div style={{ fontSize: "0.68rem", color: V.muted }}>© 2026</div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 28 }} />
+
+          {/* Bottom row */}
+          <div className="footer-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.2)" }}>
+              © {new Date().getFullYear()} Bankai Agency. Все права защищены.
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {["AI", "ADS", "CRM", "SEO"].map((tag, i) => (
+                <span key={i} style={{
+                  padding: "3px 8px", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700,
+                  background: "rgba(160,28,45,0.1)", color: "rgba(200,53,74,0.5)",
+                  letterSpacing: "0.1em",
+                }}>{tag}</span>
+              ))}
+            </div>
+          </div>
         </div>
       </footer>
     </Reveal>
