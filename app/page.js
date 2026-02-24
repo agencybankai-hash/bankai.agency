@@ -649,7 +649,7 @@ function Hero() {
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
       <GradientArc />
       <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 120, paddingBottom: 60 }}>
-        <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 60, alignItems: "center" }}>
+        <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr", gap: 48, alignItems: "center" }}>
           {/* LEFT — text */}
           <div>
             <Reveal type="fade" duration={1.2}>
@@ -712,7 +712,7 @@ function Hero() {
           </div>
 
           {/* RIGHT — visual cards */}
-          <div style={{ position: "relative", minHeight: 480 }}>
+          <div style={{ position: "relative", minHeight: 480, paddingTop: 60 }}>
             {/* network/automation animation background */}
             <NetworkCanvas />
             {/* floating case cards */}
