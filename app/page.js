@@ -1,9 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
-/* ───── design tokens ─────
-   Premium black/crimson: red is a whisper, not a scream.
-   White text carries the hierarchy; deep crimson adds warmth. */
+/* ───── design tokens ───── */
 const V = {
   bg: "#0A0A0A",
   card: "#111111",
@@ -12,8 +10,8 @@ const V = {
   dim: "#888888",
   muted: "#666666",
   bright: "#FFFFFF",
-  accent: "#A01C2D",       // deep wine — subtle
-  accentLit: "#C8354A",    // lit crimson — rare highlights
+  accent: "#A01C2D",
+  accentLit: "#C8354A",
   accentDim: "rgba(160,28,45,0.07)",
   accentGlow: "rgba(160,28,45,0.15)",
   border: "rgba(255,255,255,0.08)",
@@ -25,33 +23,95 @@ const V = {
   body: "'Manrope', -apple-system, sans-serif",
 };
 
-/* ───── css keyframes ───── */
+/* ───── global CSS with hover/focus classes ───── */
 const globalCSS = `
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap');
 
-/* scroll-triggered animations */
+/* scroll animations */
 @keyframes revealUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 @keyframes revealDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
 @keyframes revealLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
 @keyframes revealRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
 @keyframes revealScale{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
 @keyframes revealFade{from{opacity:0}to{opacity:1}}
-@keyframes lineGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes dividerGrow{from{width:0}to{width:100%}}
-@keyframes labelLine{from{width:0}to{width:24px}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-
-/* existing */
 @keyframes pulse2{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:0}}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
+/* base */
 *{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;box-sizing:border-box}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 ::selection{background:rgba(160,28,45,0.3);color:#fff}
 html{scroll-behavior:smooth}
+
+/* ═══ HOVER & FOCUS CLASSES ═══ */
+
+/* nav links */
+.nav-link{color:#888;font-size:0.8rem;text-decoration:none;font-weight:500;letter-spacing:0.02em;transition:color .3s}
+.nav-link:hover{color:#fff}
+
+/* nav cta */
+.nav-cta{border:1px solid rgba(255,255,255,0.14);color:#fff;padding:8px 20px;border-radius:100px;font-weight:600;font-size:0.75rem;text-decoration:none;letter-spacing:0.04em;transition:all .3s;cursor:pointer}
+.nav-cta:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.25)}
+
+/* primary cta (hero) */
+.btn-primary{border:1px solid rgba(255,255,255,0.14);color:#fff;padding:14px 36px;border-radius:100px;background:rgba(255,255,255,0.04);font-weight:600;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1)}
+.btn-primary:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.28);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+
+/* ghost cta */
+.btn-ghost{color:#888;padding:14px 36px;border-radius:100px;font-weight:500;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .3s;border:none;background:none}
+.btn-ghost:hover{color:#fff}
+.btn-ghost:hover .arrow{transform:translateX(4px)}
+.btn-ghost .arrow{display:inline-block;transition:transform .3s}
+
+/* card link (ПОДРОБНЕЕ/ОБСУДИТЬ) */
+.card-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:0.78rem;text-decoration:none;letter-spacing:0.03em;transition:all .3s;cursor:pointer}
+.card-link:hover{gap:10px}
+.card-link.accent{color:#C8354A}
+.card-link.accent:hover{color:#e0475f}
+.card-link.dim{color:#888}
+.card-link.dim:hover{color:#fff}
+
+/* service grid card */
+.svc-card{background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px 20px;transition:all .35s cubic-bezier(.16,1,.3,1);cursor:default}
+.svc-card:hover{background:#161616;border-color:rgba(255,255,255,0.14);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+.svc-card:hover .svc-icon{opacity:1;transform:scale(1.1)}
+.svc-icon{opacity:0.6;transition:all .35s;transform:scale(1)}
+
+/* process step */
+.process-step{padding:32px 24px;position:relative;transition:all .4s cubic-bezier(.16,1,.3,1);cursor:default;border-radius:8px}
+.process-step:hover{background:rgba(255,255,255,0.02)}
+.process-step:hover .step-num{color:rgba(200,53,74,0.35)!important}
+.process-step:hover .step-title{color:#C8354A!important}
+.step-num{transition:color .35s}
+.step-title{transition:color .35s}
+
+/* main service card */
+.main-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:default}
+.main-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.35)}
+
+/* contact links */
+.contact-link{display:flex;align-items:center;gap:14px;text-decoration:none;transition:all .3s;cursor:pointer}
+.contact-link:hover{transform:translateX(6px)}
+.contact-link:hover .contact-icon{border-color:rgba(200,53,74,0.3);background:rgba(160,28,45,0.07)}
+.contact-icon{transition:all .3s}
+
+/* submit button */
+.btn-submit{border:1px solid rgba(255,255,255,0.14);color:#fff;padding:13px 28px;border-radius:100px;background:rgba(255,255,255,0.04);font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.03em;transition:all .35s cubic-bezier(.16,1,.3,1);width:100%}
+.btn-submit:hover:not(:disabled){background:rgba(160,28,45,0.12);border-color:rgba(200,53,74,0.4);color:#fff;transform:translateY(-1px);box-shadow:0 6px 24px rgba(160,28,45,0.15)}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed}
+
+/* input focus */
+.form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-size:0.88rem;outline:none;transition:all .3s}
+.form-input:focus{border-color:rgba(200,53,74,0.4);background:rgba(255,255,255,0.05);box-shadow:0 0 0 3px rgba(160,28,45,0.08)}
+.form-input::placeholder{color:#555}
+
+/* footer */
+.footer-logo:hover .footer-dot{opacity:1!important;color:#C8354A!important}
+.footer-dot{transition:opacity .3s}
+
+/* responsive */
 @media(max-width:768px){
   .grid-2{grid-template-columns:1fr!important}
   .grid-4{grid-template-columns:1fr 1fr!important}
@@ -69,22 +129,15 @@ html{scroll-behavior:smooth}
 `;
 
 /* ═══════════════════════ SCROLL ANIMATION SYSTEM ═══════════════════════ */
-
-/* useInView hook — fires once when element enters viewport */
 function useInView(opts = {}) {
   const { threshold = 0.08, rootMargin = "0px 0px -40px 0px" } = opts;
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // Immediately check if element is already in viewport (e.g. hero on load)
     const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      setVisible(true);
-      return;
-    }
+    if (rect.top < window.innerHeight && rect.bottom > 0) { setVisible(true); return; }
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); } },
       { threshold, rootMargin }
@@ -92,38 +145,18 @@ function useInView(opts = {}) {
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold, rootMargin]);
-
   return [ref, visible];
 }
 
-/* Reveal — scroll-triggered with multiple animation types */
-function Reveal({
-  children, style: extra, delay = 0,
-  type = "up", // up | down | left | right | scale | fade
-  duration = 0.8,
-  tag: Tag = "div",
-  ...props
-}) {
+function Reveal({ children, style: extra, delay = 0, type = "up", duration = 0.8, tag: Tag = "div", ...props }) {
   const [ref, visible] = useInView();
-  const animMap = {
-    up: "revealUp", down: "revealDown",
-    left: "revealLeft", right: "revealRight",
-    scale: "revealScale", fade: "revealFade",
-  };
+  const animMap = { up: "revealUp", down: "revealDown", left: "revealLeft", right: "revealRight", scale: "revealScale", fade: "revealFade" };
   return (
-    <Tag
-      ref={ref}
-      style={{
-        opacity: visible ? 1 : 0,
-        animation: visible
-          ? `${animMap[type] || "revealUp"} ${duration}s cubic-bezier(.16,1,.3,1) ${delay}ms both`
-          : "none",
-        ...extra,
-      }}
-      {...props}
-    >
-      {children}
-    </Tag>
+    <Tag ref={ref} style={{
+      opacity: visible ? 1 : 0,
+      animation: visible ? `${animMap[type] || "revealUp"} ${duration}s cubic-bezier(.16,1,.3,1) ${delay}ms both` : "none",
+      ...extra,
+    }} {...props}>{children}</Tag>
   );
 }
 
@@ -136,8 +169,7 @@ function Divider() {
   return (
     <div ref={ref} style={{ maxWidth: 1140, margin: "0 auto", padding: "0 32px" }}>
       <div style={{
-        height: 1,
-        background: V.divider,
+        height: 1, background: V.divider,
         transform: visible ? "scaleX(1)" : "scaleX(0)",
         transformOrigin: "left center",
         transition: "transform 1.2s cubic-bezier(.16,1,.3,1)",
@@ -171,11 +203,10 @@ function Label({ num, text }) {
   );
 }
 
-/* ───── counter animation ───── */
+/* ───── counter ───── */
 function Counter({ value, suffix = "", duration = 1800 }) {
   const [ref, visible] = useInView();
   const [display, setDisplay] = useState("0");
-
   useEffect(() => {
     if (!visible) return;
     const num = parseInt(value);
@@ -183,79 +214,43 @@ function Counter({ value, suffix = "", duration = 1800 }) {
     const start = performance.now();
     const tick = (now) => {
       const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      const ease = 1 - Math.pow(1 - p, 3);
       setDisplay(Math.round(num * ease).toString());
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }, [visible, value, duration]);
-
   return <span ref={ref}>{display}{suffix}</span>;
 }
 
 /* ───── data ───── */
 const mainServices = [
   {
-    title: "AI-Ядро бизнеса",
-    sub: "Внедрение AI-систем для принятия решений",
+    title: "AI-Ядро бизнеса", sub: "Внедрение AI-систем для принятия решений",
     desc: "Строим операционную систему вашего бизнеса на базе ИИ. AI-агенты берут на себя рутину, аналитику и часть решений — вы получаете масштабируемый бизнес без раздутого штата.",
     feats: ["AI-агенты для автоматизации", "Система принятия решений", "Интеграция с CRM и рекламой", "Прогнозирование и алерты"],
     flagship: true, link: "/ai-core",
   },
   {
-    title: "Маркетинг полного цикла",
-    sub: "С нуля или для действующего бизнеса",
+    title: "Маркетинг полного цикла", sub: "С нуля или для действующего бизнеса",
     desc: "Весь маркетинг под ключ: от стратегии и позиционирования до лидогенерации и аналитики. Строим систему, которая приносит выручку, а не просто трафик.",
     feats: ["Стратегия и позиционирование", "Воронки продаж", "Контент и креативы", "Сквозная аналитика ROI"],
     flagship: false, link: null,
   },
 ];
 
-/* ───── service icons (inline SVG) ───── */
 function SvcIcon({ name, size = 28 }) {
   const s = { width: size, height: size, flexShrink: 0 };
   const c = V.accentLit;
   const icons = {
-    google: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>
-      </svg>
-    ),
-    meta: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 8a6 6 0 0 0-12 0c0 7 3 13 6 13s6-6 6-13z"/><path d="M6 8c0 7-3 13-3 13M18 8c0 7 3 13 3 13"/>
-      </svg>
-    ),
-    seo: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/>
-      </svg>
-    ),
-    web: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-      </svg>
-    ),
-    crm: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-    ),
-    analytics: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 20V10M12 20V4M6 20v-6"/>
-      </svg>
-    ),
-    content: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-      </svg>
-    ),
-    branding: (
-      <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    ),
+    google: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>,
+    meta: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7 3 13 6 13s6-6 6-13z"/><path d="M6 8c0 7-3 13-3 13M18 8c0 7 3 13 3 13"/></svg>,
+    seo: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/></svg>,
+    web: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+    crm: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    analytics: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>,
+    content: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
+    branding: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
   };
   return icons[name] || null;
 }
@@ -305,19 +300,15 @@ function GradientArc() {
       mouse.current.y = (e.clientY - r.top) / r.height;
     };
     addEventListener("mousemove", onMove, { passive: true });
-
     const draw = () => {
-      t.current += 0.002;
-      const T = t.current;
+      t.current += 0.002; const T = t.current;
       const s = sm.current, m = mouse.current;
       s.x += (m.x - s.x) * 0.03; s.y += (m.y - s.y) * 0.03;
       ctx.clearRect(0, 0, w, h);
-
       const cxp = w * 0.52 + (s.x - 0.5) * w * 0.1;
       const cyp = h * 0.92 + (s.y - 0.5) * h * 0.06;
       const R = Math.min(w, h) * 0.78;
       const mi = (s.x - 0.5) * 0.12;
-
       const layers = [
         { r: R * 1.15, w: 140, a: 0.06, sat: 50, light: 25, sp: 0.6 },
         { r: R * 0.98, w: 100, a: 0.10, sat: 55, light: 28, sp: 0.9 },
@@ -325,57 +316,42 @@ function GradientArc() {
         { r: R * 0.72, w: 35,  a: 0.08, sat: 45, light: 22, sp: 0.8 },
         { r: R * 0.62, w: 18,  a: 0.05, sat: 40, light: 20, sp: 1.4 },
       ];
-
       for (const l of layers) {
         const lr = l.r + Math.sin(T * l.sp) * 12 + (s.y - 0.5) * 25;
         const sa = -Math.PI * 0.82 + mi + Math.sin(T * l.sp * 0.5) * 0.06;
         const ea = -Math.PI * 0.18 + mi + Math.cos(T * l.sp * 0.7) * 0.06;
-        const x1 = cxp + Math.cos(sa) * lr, y1 = cyp + Math.sin(sa) * lr;
-        const x2 = cxp + Math.cos(ea) * lr, y2 = cyp + Math.sin(ea) * lr;
-        const g = ctx.createLinearGradient(x1, y1, x2, y2);
+        const g = ctx.createLinearGradient(cxp + Math.cos(sa) * lr, cyp + Math.sin(sa) * lr, cxp + Math.cos(ea) * lr, cyp + Math.sin(ea) * lr);
         const hue = 355 + Math.sin(T + l.sp) * 8;
         g.addColorStop(0, `hsla(${hue},${l.sat}%,${l.light}%,0)`);
         g.addColorStop(0.25, `hsla(${hue},${l.sat}%,${l.light}%,${l.a * 0.6})`);
         g.addColorStop(0.5, `hsla(${hue},${l.sat + 5}%,${l.light + 3}%,${l.a})`);
         g.addColorStop(0.75, `hsla(${hue - 5},${l.sat}%,${l.light}%,${l.a * 0.6})`);
         g.addColorStop(1, `hsla(${hue - 5},${l.sat}%,${l.light}%,0)`);
-        ctx.beginPath();
-        ctx.arc(cxp, cyp, lr, sa, ea);
+        ctx.beginPath(); ctx.arc(cxp, cyp, lr, sa, ea);
         ctx.lineWidth = l.w; ctx.lineCap = "round"; ctx.strokeStyle = g;
-        ctx.filter = `blur(${l.w * 0.45}px)`;
-        ctx.stroke();
+        ctx.filter = `blur(${l.w * 0.45}px)`; ctx.stroke();
       }
       ctx.filter = "none";
-
       const cr = R * 0.84 + Math.sin(T * 1.1) * 6 + (s.y - 0.5) * 16;
       const cs = -Math.PI * 0.78 + mi + Math.sin(T * 0.5) * 0.05;
       const ce = -Math.PI * 0.22 + mi + Math.cos(T * 0.7) * 0.05;
-      const cg = ctx.createLinearGradient(
-        cxp + Math.cos(cs) * cr, cyp + Math.sin(cs) * cr,
-        cxp + Math.cos(ce) * cr, cyp + Math.sin(ce) * cr
-      );
-      cg.addColorStop(0, "hsla(355,60%,40%,0)");
-      cg.addColorStop(0.2, "hsla(355,65%,45%,0.08)");
-      cg.addColorStop(0.5, "hsla(0,70%,50%,0.18)");
-      cg.addColorStop(0.8, "hsla(5,65%,45%,0.08)");
+      const cg = ctx.createLinearGradient(cxp + Math.cos(cs) * cr, cyp + Math.sin(cs) * cr, cxp + Math.cos(ce) * cr, cyp + Math.sin(ce) * cr);
+      cg.addColorStop(0, "hsla(355,60%,40%,0)"); cg.addColorStop(0.2, "hsla(355,65%,45%,0.08)");
+      cg.addColorStop(0.5, "hsla(0,70%,50%,0.18)"); cg.addColorStop(0.8, "hsla(5,65%,45%,0.08)");
       cg.addColorStop(1, "hsla(5,60%,40%,0)");
       ctx.beginPath(); ctx.arc(cxp, cyp, cr, cs, ce);
       ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.strokeStyle = cg;
       ctx.filter = "blur(1px)"; ctx.stroke(); ctx.filter = "none";
-
       for (let i = 0; i < 12; i++) {
-        const f = i / 12;
-        const a = cs + (ce - cs) * f;
+        const f = i / 12; const a = cs + (ce - cs) * f;
         const pr = cr + Math.sin(T * 2.5 + i * 1.8) * 10;
         const px = cxp + Math.cos(a) * pr, py = cyp + Math.sin(a) * pr;
         const pa = (0.08 + Math.sin(T * 1.5 + i) * 0.05) * (1 - Math.abs(f - 0.5) * 1.8);
         if (pa <= 0) continue;
         const ps = 1.5 + Math.sin(T * 3 + i * 2) * 0.8;
         const pg = ctx.createRadialGradient(px, py, 0, px, py, ps * 4);
-        pg.addColorStop(0, `hsla(0,60%,55%,${pa})`);
-        pg.addColorStop(1, `hsla(0,60%,55%,0)`);
-        ctx.beginPath(); ctx.arc(px, py, ps * 4, 0, Math.PI * 2);
-        ctx.fillStyle = pg; ctx.fill();
+        pg.addColorStop(0, `hsla(0,60%,55%,${pa})`); pg.addColorStop(1, `hsla(0,60%,55%,0)`);
+        ctx.beginPath(); ctx.arc(px, py, ps * 4, 0, Math.PI * 2); ctx.fillStyle = pg; ctx.fill();
       }
       raf.current = requestAnimationFrame(draw);
     };
@@ -411,14 +387,10 @@ function Nav() {
         <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em" }}>
           BANKAI<span style={{ color: V.accent }}>.</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          <a href="#services" style={{ color: V.dim, fontSize: "0.8rem", textDecoration: "none", fontWeight: 500, letterSpacing: "0.02em" }}>Услуги</a>
-          <a href="#process" style={{ color: V.dim, fontSize: "0.8rem", textDecoration: "none", fontWeight: 500, letterSpacing: "0.02em" }}>Процесс</a>
-          <a href="#contact" style={{
-            border: `1px solid ${V.borderHover}`, color: V.bright,
-            padding: "8px 20px", borderRadius: 100,
-            fontWeight: 600, fontSize: "0.75rem", textDecoration: "none", letterSpacing: "0.04em",
-          }}>СВЯЗАТЬСЯ</a>
+        <div style={{ display: "flex", alignItems: "center", gap: 28, fontFamily: V.body }}>
+          <a href="#services" className="nav-link">Услуги</a>
+          <a href="#process" className="nav-link">Процесс</a>
+          <a href="#contact" className="nav-cta" style={{ fontFamily: V.heading }}>СВЯЗАТЬСЯ</a>
         </div>
       </div>
     </nav>
@@ -431,13 +403,10 @@ function Hero() {
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
       <GradientArc />
       <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 140, paddingBottom: 80 }}>
-        {/* Under construction pill */}
         <Reveal type="fade" duration={1.2}>
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            padding: "8px 18px",
-            background: V.accentDim,
-            border: `1px solid rgba(160,28,45,0.15)`,
+            display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px",
+            background: V.accentDim, border: `1px solid rgba(160,28,45,0.15)`,
             borderRadius: 100, marginBottom: 48,
           }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: V.accentLit, position: "relative", display: "block" }}>
@@ -455,30 +424,20 @@ function Hero() {
             fontWeight: 900, lineHeight: 1.04, letterSpacing: "-0.05em",
             color: V.bright, maxWidth: 850, marginBottom: 28,
           }}>
-            Строим системы,
-            <br />которые приносят
-            <br /><span style={{ color: V.text }}>выручку</span>
+            Строим системы,<br />которые приносят<br /><span style={{ color: V.text }}>выручку</span>
           </h1>
         </Reveal>
 
         <Reveal delay={300} type="fade" duration={1}>
           <p style={{ fontSize: "1.05rem", color: V.dim, maxWidth: 480, lineHeight: 1.7, marginBottom: 48 }}>
-            AI-автоматизация и маркетинг полного цикла
-            для бизнеса, который хочет расти быстрее.
+            AI-автоматизация и маркетинг полного цикла для бизнеса, который хочет расти быстрее.
           </p>
         </Reveal>
 
         <Reveal delay={450} type="up">
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <a href="#services" style={{
-              border: `1px solid ${V.borderHover}`, color: V.bright,
-              padding: "14px 36px", borderRadius: 100, background: "rgba(255,255,255,0.04)",
-              fontWeight: 600, fontSize: "0.85rem", textDecoration: "none",
-            }}>Смотреть услуги</a>
-            <a href="#contact" style={{
-              color: V.dim, padding: "14px 36px", borderRadius: 100,
-              fontWeight: 500, fontSize: "0.85rem", textDecoration: "none",
-            }}>Связаться →</a>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+            <a href="#services" className="btn-primary" style={{ fontFamily: V.body }}>Смотреть услуги</a>
+            <a href="#contact" className="btn-ghost" style={{ fontFamily: V.body }}>Связаться <span className="arrow">→</span></a>
           </div>
         </Reveal>
 
@@ -512,20 +471,20 @@ function Marquee() {
   const words = ["AI-АВТОМАТИЗАЦИЯ", "GOOGLE ADS", "SEO", "CRM", "АНАЛИТИКА", "PERFORMANCE", "ЛИДОГЕНЕРАЦИЯ", "КОНТЕНТ", "BRANDING", "WEB DEV"];
   const row = words.map((w, i) => (
     <span key={i} style={{
-      fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-      letterSpacing: "0.2em",
+      fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.2em",
       color: i % 2 === 0 ? "rgba(200,53,74,0.5)" : "rgba(255,255,255,0.18)",
       whiteSpace: "nowrap", padding: "0 36px",
     }}>{w}</span>
   ));
   return (
     <div ref={ref} style={{
-      overflow: "hidden", padding: "22px 0",
+      overflow: "hidden", padding: "22px 0", position: "relative", zIndex: 1,
       borderTop: `1px solid ${V.divider}`, borderBottom: `1px solid ${V.divider}`,
-      position: "relative", zIndex: 1,
-      opacity: visible ? 1 : 0,
-      transition: "opacity 1s cubic-bezier(.16,1,.3,1)",
+      opacity: visible ? 1 : 0, transition: "opacity 1s cubic-bezier(.16,1,.3,1)",
     }}>
+      {/* gradient masks */}
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 80, background: `linear-gradient(90deg, ${V.bg}, transparent)`, zIndex: 2, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 80, background: `linear-gradient(270deg, ${V.bg}, transparent)`, zIndex: 2, pointerEvents: "none" }} />
       <div style={{ display: "flex", animation: "marquee 40s linear infinite", width: "max-content" }}>{row}{row}</div>
     </div>
   );
@@ -533,7 +492,6 @@ function Marquee() {
 
 /* ═══════════════════════ MAIN SERVICES ═══════════════════════ */
 function MainServices() {
-  const [hi, setHi] = useState(-1);
   return (
     <section id="services" style={{ padding: "120px 0 80px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
@@ -548,21 +506,16 @@ function MainServices() {
         <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {mainServices.map((s, i) => (
             <Reveal key={i} delay={180 + i * 120} type={i === 0 ? "left" : "right"} duration={0.9}>
-              <div
-                onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
-                style={{
-                  background: hi === i ? V.cardHover : V.card,
-                  border: `1px solid ${hi === i ? (s.flagship ? "rgba(160,28,45,0.18)" : V.borderHover) : V.border}`,
-                  borderRadius: V.radius, padding: "44px 36px",
-                  transition: "all .45s cubic-bezier(.16,1,.3,1)",
-                  position: "relative", overflow: "hidden",
-                  height: "100%", display: "flex", flexDirection: "column",
-                }}
-              >
+              <div className="main-card" style={{
+                background: V.card,
+                border: `1px solid ${s.flagship ? "rgba(160,28,45,0.1)" : V.border}`,
+                borderRadius: V.radius, padding: "44px 36px",
+                position: "relative", overflow: "hidden",
+                height: "100%", display: "flex", flexDirection: "column",
+              }}>
                 {s.flagship && <div style={{
                   position: "absolute", top: 0, left: "15%", right: "15%", height: 1,
-                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,${hi === 0 ? 0.3 : 0.12}), transparent)`,
-                  transition: "all .5s",
+                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.15), transparent)`,
                 }} />}
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
@@ -588,11 +541,9 @@ function MainServices() {
                   ))}
                 </div>
 
-                <a href={s.link || "#contact"} style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  color: s.flagship ? V.accentLit : V.dim,
-                  fontWeight: 600, fontSize: "0.78rem", textDecoration: "none", alignSelf: "flex-start", letterSpacing: "0.03em",
-                }}>{s.link ? "ПОДРОБНЕЕ" : "ОБСУДИТЬ"} →</a>
+                <a href={s.link || "#contact"} className={`card-link ${s.flagship ? "accent" : "dim"}`}>
+                  {s.link ? "ПОДРОБНЕЕ" : "ОБСУДИТЬ"} <span>→</span>
+                </a>
               </div>
             </Reveal>
           ))}
@@ -604,7 +555,6 @@ function MainServices() {
 
 /* ═══════════════════════ SERVICES GRID ═══════════════════════ */
 function ServicesGrid() {
-  const [hi, setHi] = useState(-1);
   return (
     <section style={{ padding: "80px 0 120px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
@@ -619,16 +569,8 @@ function ServicesGrid() {
         <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
           {services.map((s, i) => (
             <Reveal key={i} delay={100 + i * 60} type="scale" duration={0.7}>
-              <div
-                onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
-                style={{
-                  background: hi === i ? V.cardHover : V.card,
-                  border: `1px solid ${hi === i ? V.borderHover : V.border}`,
-                  borderRadius: V.radiusSm, padding: "24px 20px",
-                  transition: "all .35s cubic-bezier(.16,1,.3,1)",
-                }}
-              >
-                <div style={{ marginBottom: 14, opacity: hi === i ? 1 : 0.6, transition: "opacity .35s" }}>
+              <div className="svc-card">
+                <div className="svc-icon" style={{ marginBottom: 14 }}>
                   <SvcIcon name={s.icon} />
                 </div>
                 <h4 style={{ fontFamily: V.heading, fontSize: "0.82rem", fontWeight: 700, color: V.bright, marginBottom: 6, letterSpacing: "-0.02em" }}>{s.t}</h4>
@@ -644,7 +586,6 @@ function ServicesGrid() {
 
 /* ═══════════════════════ PROCESS ═══════════════════════ */
 function Process() {
-  const [hi, setHi] = useState(-1);
   return (
     <section id="process" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
@@ -659,20 +600,12 @@ function Process() {
         <div className="process-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
           {steps.map((s, i) => (
             <Reveal key={i} delay={120 + i * 100} type="left" duration={0.85}>
-              <div
-                onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
-                style={{
-                  padding: "32px 24px", position: "relative",
-                  borderLeft: i === 0 ? "none" : `1px solid ${V.divider}`,
-                  transition: "all .35s",
-                }}
-              >
-                <div style={{
+              <div className="process-step" style={{ borderLeft: i === 0 ? "none" : `1px solid ${V.divider}` }}>
+                <div className="step-num" style={{
                   fontFamily: V.heading, fontSize: "2rem", fontWeight: 900,
-                  color: hi === i ? "rgba(200,53,74,0.35)" : "rgba(255,255,255,0.08)",
-                  letterSpacing: "-0.05em", marginBottom: 16, transition: "color .35s",
+                  color: "rgba(255,255,255,0.08)", letterSpacing: "-0.05em", marginBottom: 16,
                 }}>{s.n}</div>
-                <h3 style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>{s.t}</h3>
+                <h3 className="step-title" style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>{s.t}</h3>
                 <p style={{ fontSize: "0.78rem", color: V.dim, lineHeight: 1.55, margin: 0 }}>{s.d}</p>
               </div>
             </Reveal>
@@ -689,39 +622,31 @@ function Statement() {
   const dimText = "Мы не просто запускаем рекламу. ";
   const brightText = "Мы строим системы, где AI, данные и маркетинг работают как единый механизм";
   const endText = " — и приносят измеримый результат.";
-
   return (
     <section style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
         <h2 ref={ref} style={{
           fontFamily: V.heading, fontSize: "clamp(1.5rem, 3vw, 2.3rem)",
-          fontWeight: 800, lineHeight: 1.35, letterSpacing: "-0.03em",
-          maxWidth: 850,
+          fontWeight: 800, lineHeight: 1.35, letterSpacing: "-0.03em", maxWidth: 850,
         }}>
           {dimText.split(" ").map((word, i) => (
             <span key={`d${i}`} style={{
-              color: V.dim,
-              display: "inline-block", marginRight: "0.3em",
-              opacity: visible ? 1 : 0,
-              transform: visible ? "translateY(0)" : "translateY(12px)",
+              color: V.dim, display: "inline-block", marginRight: "0.3em",
+              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
               transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${i * 50}ms`,
             }}>{word}</span>
           ))}
           {brightText.split(" ").map((word, i) => (
             <span key={`b${i}`} style={{
-              color: V.bright,
-              display: "inline-block", marginRight: "0.3em",
-              opacity: visible ? 1 : 0,
-              transform: visible ? "translateY(0)" : "translateY(12px)",
+              color: V.bright, display: "inline-block", marginRight: "0.3em",
+              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
               transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + i) * 50}ms`,
             }}>{word}</span>
           ))}
           {endText.split(" ").filter(Boolean).map((word, i) => (
             <span key={`e${i}`} style={{
-              color: V.dim,
-              display: "inline-block", marginRight: "0.3em",
-              opacity: visible ? 1 : 0,
-              transform: visible ? "translateY(0)" : "translateY(12px)",
+              color: V.dim, display: "inline-block", marginRight: "0.3em",
+              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
               transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + brightText.split(" ").length + i) * 50}ms`,
             }}>{word}</span>
           ))}
@@ -736,12 +661,6 @@ function Contact() {
   const [form, setForm] = useState({ name: "", contact: "", message: "" });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
-
-  const inp = {
-    width: "100%", padding: "13px 16px", background: "rgba(255,255,255,0.03)",
-    border: `1px solid ${V.border}`, borderRadius: V.radiusSm, color: V.bright,
-    fontSize: "0.88rem", outline: "none", transition: "border .3s", fontFamily: V.body,
-  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -781,8 +700,8 @@ function Contact() {
                   { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com" },
                   { label: "Telegram", value: "@bankaiagency", href: "https://t.me/bankaiagency" },
                 ].map((c, i) => (
-                  <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none" }}>
-                    <div style={{
+                  <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
+                    <div className="contact-icon" style={{
                       width: 36, height: 36, borderRadius: 8,
                       background: "rgba(255,255,255,0.03)", border: `1px solid ${V.border}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -811,23 +730,19 @@ function Contact() {
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                     <div>
                       <label style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Имя</label>
-                      <input style={inp} placeholder="Как вас зовут" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                      <input className="form-input" style={{ fontFamily: V.body }} placeholder="Как вас зовут" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
                     </div>
                     <div>
                       <label style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Контакт</label>
-                      <input style={inp} placeholder="Телефон или email" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
+                      <input className="form-input" style={{ fontFamily: V.body }} placeholder="Телефон или email" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
                     </div>
                     <div>
                       <label style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>О проекте</label>
-                      <textarea style={{ ...inp, minHeight: 80, resize: "vertical" }} placeholder="Расскажите кратко" value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
+                      <textarea className="form-input" style={{ fontFamily: V.body, minHeight: 80, resize: "vertical" }} placeholder="Расскажите кратко" value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
                     </div>
-                    <button type="submit" disabled={sending} style={{
-                      border: `1px solid ${V.borderHover}`, color: V.bright,
-                      padding: "13px 28px", borderRadius: 100, background: "rgba(255,255,255,0.04)",
-                      fontWeight: 600, fontSize: "0.82rem", cursor: "pointer",
-                      fontFamily: V.body, letterSpacing: "0.03em",
-                      opacity: sending ? 0.5 : 1, transition: "all .3s",
-                    }}>{sending ? "Отправляем..." : "Отправить заявку →"}</button>
+                    <button type="submit" disabled={sending} className="btn-submit" style={{ fontFamily: V.body }}>
+                      {sending ? "Отправляем..." : "Отправить заявку →"}
+                    </button>
                   </div>
                 </form>
               )}
@@ -845,7 +760,9 @@ function Footer() {
     <Reveal type="fade" duration={1}>
       <footer style={{ padding: "32px 0", borderTop: `1px solid ${V.divider}`, position: "relative", zIndex: 1 }}>
         <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "0.8rem", color: V.muted }}>BANKAI<span style={{ color: V.accent, opacity: 0.5 }}>.</span></div>
+          <div className="footer-logo" style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "0.8rem", color: V.muted, cursor: "default" }}>
+            BANKAI<span className="footer-dot" style={{ color: V.accent, opacity: 0.5 }}>.</span>
+          </div>
           <div style={{ fontSize: "0.68rem", color: V.muted }}>© 2026</div>
         </div>
       </footer>
