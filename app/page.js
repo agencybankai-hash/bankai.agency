@@ -872,8 +872,8 @@ function Hero() {
 
             <Reveal delay={150} duration={1}>
               <h1 className="hero-heading" style={{
-                fontFamily: V.heading, fontSize: "clamp(2.4rem, 5vw, 4.2rem)",
-                fontWeight: 900, lineHeight: 1.06, letterSpacing: "-0.05em",
+                fontFamily: V.heading, fontSize: "clamp(2.2rem, 4.2vw, 3.4rem)",
+                fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.05em",
                 color: V.bright, marginBottom: 28,
               }}>
                 Строим системы,<br />которые приносят<br /><RotatingWord />
@@ -907,7 +907,7 @@ function Hero() {
                     <div style={{ fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.04em", marginBottom: 2 }}>
                       {stat.s === "M" ? <><span style={{ fontSize: "0.85em" }}>$</span><Counter value="14" suffix=".6M" /></> : <Counter value={stat.v} suffix={stat.s} />}
                     </div>
-                    <div style={{ fontSize: "0.68rem", color: V.muted }}>{stat.l}</div>
+                    <div style={{ fontSize: "0.72rem", color: V.dim, fontWeight: 500 }}>{stat.l}</div>
                   </div>
                 ))}
               </div>
@@ -962,7 +962,7 @@ function Hero() {
 
             <Reveal delay={700} type="scale" duration={1}>
               <div className="hero-float-3 hero-visual-card" style={{
-                position: "absolute", bottom: 10, right: 30, width: 240, zIndex: 1,
+                position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)", width: 240, zIndex: 1,
                 background: V.card,
                 border: `1px solid ${V.border}`,
                 borderRadius: 16, padding: "22px 20px", boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
