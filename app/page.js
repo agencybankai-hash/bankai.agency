@@ -335,16 +335,23 @@ const directions = [
 
 function SvcIcon({ name, size = 28 }) {
   const s = { width: size, height: size, flexShrink: 0 };
-  const c = V.accentLit;
   const icons = {
-    google: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>,
-    meta: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7 3 13 6 13s6-6 6-13z"/><path d="M6 8c0 7-3 13-3 13M18 8c0 7 3 13 3 13"/></svg>,
-    seo: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/></svg>,
-    web: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
-    crm: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-    analytics: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>,
-    content: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
-    branding: <svg style={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    /* Google Ads — official G triangle */
+    google: <svg style={s} viewBox="0 0 256 256"><path d="M5.3 178.2l55.5-96.1c12.6-21.8 40.5-29.3 62.3-16.7 21.8 12.6 29.3 40.5 16.7 62.3l-55.5 96.1c-12.6 21.8-40.5 29.3-62.3 16.7-21.8-12.6-29.3-40.5-16.7-62.3z" fill="#FBBC04"/><path d="M250.7 178.2c12.6 21.8 5.1 49.7-16.7 62.3-21.8 12.6-49.7 5.1-62.3-16.7l-55.5-96.1c-12.6-21.8-5.1-49.7 16.7-62.3 21.8-12.6 49.7-5.1 62.3 16.7l55.5 96.1z" fill="#4285F4"/><circle cx="42.4" cy="128" r="46.3" fill="#34A853"/></svg>,
+    /* Meta — infinity logo */
+    meta: <svg style={s} viewBox="0 0 256 256"><path d="M128 150c-17.7-23.8-33.5-43.3-47-55.7-10.9-10-20.4-14.3-28.7-14.3-17 0-30.6 17.7-30.6 48 0 28.5 12.3 48 29 48 9.6 0 21.7-8.7 36.8-30l40.5-53.6c14-18.5 26.2-30 42.3-30 28.3 0 49.7 27.8 49.7 65.6 0 37.8-22 65.6-51.3 65.6-14.6 0-27.1-6.8-40.7-22.6" stroke="#0081FB" strokeWidth="18" fill="none" strokeLinecap="round"/><path d="M128 150c17.7-23.8 33.5-43.3 47-55.7 10.9-10 20.4-14.3 28.7-14.3 17 0 30.6 17.7 30.6 48 0 28.5-12.3 48-29 48-9.6 0-21.7-8.7-36.8-30" stroke="#0081FB" strokeWidth="18" fill="none" strokeLinecap="round"/></svg>,
+    /* SEO — Google Search magnifying glass */
+    seo: <svg style={s} viewBox="0 0 256 256"><circle cx="116" cy="116" r="72" stroke="#4285F4" strokeWidth="20" fill="none"/><line x1="168" y1="168" x2="232" y2="232" stroke="#34A853" strokeWidth="24" strokeLinecap="round"/><circle cx="96" cy="96" r="8" fill="#EA4335"/><path d="M100 120h32" stroke="#FBBC04" strokeWidth="8" strokeLinecap="round"/></svg>,
+    /* Next.js / React — React atom */
+    web: <svg style={s} viewBox="0 0 256 256"><ellipse cx="128" cy="128" rx="108" ry="42" stroke="#61DAFB" strokeWidth="10" fill="none"/><ellipse cx="128" cy="128" rx="108" ry="42" stroke="#61DAFB" strokeWidth="10" fill="none" transform="rotate(60 128 128)"/><ellipse cx="128" cy="128" rx="108" ry="42" stroke="#61DAFB" strokeWidth="10" fill="none" transform="rotate(120 128 128)"/><circle cx="128" cy="128" r="16" fill="#61DAFB"/></svg>,
+    /* HubSpot — sprocket */
+    crm: <svg style={s} viewBox="0 0 256 256"><circle cx="128" cy="128" r="36" stroke="#FF7A59" strokeWidth="14" fill="none"/><circle cx="128" cy="128" r="12" fill="#FF7A59"/>{[0,60,120,180,240,300].map(a=><line key={a} x1={128+36*Math.cos(a*Math.PI/180)} y1={128+36*Math.sin(a*Math.PI/180)} x2={128+58*Math.cos(a*Math.PI/180)} y2={128+58*Math.sin(a*Math.PI/180)} stroke="#FF7A59" strokeWidth="14" strokeLinecap="round"/>)}<circle cx="128" cy="56" r="10" fill="#FF7A59"/><line x1="128" y1="66" x2="128" y2="92" stroke="#FF7A59" strokeWidth="10"/><circle cx="190" cy="200" r="14" fill="none" stroke="#FF7A59" strokeWidth="8"/><line x1="156" y1="156" x2="178" y2="190" stroke="#FF7A59" strokeWidth="8"/></svg>,
+    /* GA4 — analytics chart */
+    analytics: <svg style={s} viewBox="0 0 256 256"><rect x="24" y="140" width="48" height="92" rx="8" fill="#F9AB00"/><rect x="104" y="80" width="48" height="152" rx="8" fill="#E37400"/><circle cx="128" cy="40" r="28" fill="#E37400"/><rect x="184" y="24" width="48" height="208" rx="8" fill="#F9AB00"/></svg>,
+    /* Content — pen + paper */
+    content: <svg style={s} viewBox="0 0 256 256"><rect x="40" y="24" width="140" height="208" rx="16" fill="none" stroke="#EA4335" strokeWidth="12"/><line x1="72" y1="72" x2="148" y2="72" stroke="#EA4335" strokeWidth="10" strokeLinecap="round"/><line x1="72" y1="104" x2="148" y2="104" stroke="#FBBC04" strokeWidth="10" strokeLinecap="round"/><line x1="72" y1="136" x2="120" y2="136" stroke="#EA4335" strokeWidth="10" strokeLinecap="round"/><path d="M176 148l40-40c8-8 20-8 28 0s8 20 0 28l-40 40-36 12 8-40z" fill="#34A853"/></svg>,
+    /* Figma — branding */
+    branding: <svg style={s} viewBox="0 0 256 256"><rect x="64" y="16" width="56" height="56" rx="28" fill="#F24E1E"/><rect x="136" y="16" width="56" height="56" rx="28" fill="#FF7262"/><rect x="64" y="100" width="56" height="56" rx="28" fill="#A259FF"/><circle cx="164" cy="128" r="28" fill="#1ABCFE"/><path d="M64 184c0-15.5 12.5-28 28-28h28v28c0 15.5-12.5 28-28 28s-28-12.5-28-28z" fill="#0ACF83"/></svg>,
   };
   return icons[name] || null;
 }
