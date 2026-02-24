@@ -370,7 +370,8 @@ const steps = [
 ];
 
 /* ═══════════════════════ GRADIENT ARC (light theme) ═══════════════════════ */
-function GradientArc() {
+/* ═══════════════════════ DIGITAL GRID BG (hero) ═══════════════════════ */
+function DigitalGrid() {
   const ref = useRef(null);
   const mouse = useRef({ x: 0.5, y: 0.5 });
   const sm = useRef({ x: 0.5, y: 0.5 });
@@ -381,6 +382,49 @@ function GradientArc() {
     const c = ref.current; if (!c) return;
     const ctx = c.getContext("2d");
     let w, h, dpr;
+
+    /* grid config */
+    const CELL = 52;
+    const accentR = 160, accentG = 28, accentB = 45;
+
+    /* data streams — horizontal flowing pulses */
+    const streams = [];
+    for (let i = 0; i < 18; i++) {
+      streams.push({
+        row: Math.floor(Math.random() * 30),
+        x: Math.random(),
+        speed: 0.0008 + Math.random() * 0.0018,
+        len: 0.06 + Math.random() * 0.14,
+        alpha: 0.12 + Math.random() * 0.18,
+        dir: Math.random() > 0.5 ? 1 : -1,
+        isVertical: Math.random() > 0.6,
+      });
+    }
+
+    /* floating binary snippets */
+    const bits = [];
+    for (let i = 0; i < 10; i++) {
+      bits.push({
+        x: 0.05 + Math.random() * 0.9,
+        y: 0.05 + Math.random() * 0.9,
+        text: Array.from({ length: 6 + Math.floor(Math.random() * 8) }, () => Math.random() > 0.5 ? "1" : "0").join(""),
+        alpha: 0.04 + Math.random() * 0.06,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.3 + Math.random() * 0.5,
+      });
+    }
+
+    /* circuit nodes — bright accent dots at intersections */
+    const circuitNodes = [];
+    for (let i = 0; i < 14; i++) {
+      circuitNodes.push({
+        gx: 2 + Math.floor(Math.random() * 18),
+        gy: 1 + Math.floor(Math.random() * 14),
+        pulse: Math.random() * Math.PI * 2,
+        size: 2 + Math.random() * 2,
+      });
+    }
+
     const resize = () => {
       dpr = Math.min(devicePixelRatio || 1, 2);
       const r = c.parentElement.getBoundingClientRect();
@@ -390,69 +434,170 @@ function GradientArc() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize(); addEventListener("resize", resize);
+
     const onMove = (e) => {
       const r = c.parentElement.getBoundingClientRect();
       mouse.current.x = (e.clientX - r.left) / r.width;
       mouse.current.y = (e.clientY - r.top) / r.height;
     };
     addEventListener("mousemove", onMove, { passive: true });
+
     const draw = () => {
-      t.current += 0.002; const T = t.current;
+      t.current += 0.006;
+      const T = t.current;
       const s = sm.current, m = mouse.current;
-      s.x += (m.x - s.x) * 0.03; s.y += (m.y - s.y) * 0.03;
+      s.x += (m.x - s.x) * 0.04;
+      s.y += (m.y - s.y) * 0.04;
       ctx.clearRect(0, 0, w, h);
-      const cxp = w * 0.52 + (s.x - 0.5) * w * 0.1;
-      const cyp = h * 0.92 + (s.y - 0.5) * h * 0.06;
-      const R = Math.min(w, h) * 0.78;
-      const mi = (s.x - 0.5) * 0.12;
-      const layers = [
-        { r: R * 1.15, w: 140, a: 0.04, sat: 40, light: 75, sp: 0.6 },
-        { r: R * 0.98, w: 100, a: 0.06, sat: 45, light: 72, sp: 0.9 },
-        { r: R * 0.84, w: 65,  a: 0.08, sat: 50, light: 68, sp: 1.2 },
-        { r: R * 0.72, w: 35,  a: 0.05, sat: 35, light: 78, sp: 0.8 },
-        { r: R * 0.62, w: 18,  a: 0.03, sat: 30, light: 80, sp: 1.4 },
-      ];
-      for (const l of layers) {
-        const lr = l.r + Math.sin(T * l.sp) * 12 + (s.y - 0.5) * 25;
-        const sa = -Math.PI * 0.82 + mi + Math.sin(T * l.sp * 0.5) * 0.06;
-        const ea = -Math.PI * 0.18 + mi + Math.cos(T * l.sp * 0.7) * 0.06;
-        const g = ctx.createLinearGradient(cxp + Math.cos(sa) * lr, cyp + Math.sin(sa) * lr, cxp + Math.cos(ea) * lr, cyp + Math.sin(ea) * lr);
-        const hue = 355 + Math.sin(T + l.sp) * 8;
-        g.addColorStop(0, `hsla(${hue},${l.sat}%,${l.light}%,0)`);
-        g.addColorStop(0.25, `hsla(${hue},${l.sat}%,${l.light}%,${l.a * 0.6})`);
-        g.addColorStop(0.5, `hsla(${hue},${l.sat + 5}%,${l.light - 3}%,${l.a})`);
-        g.addColorStop(0.75, `hsla(${hue - 5},${l.sat}%,${l.light}%,${l.a * 0.6})`);
-        g.addColorStop(1, `hsla(${hue - 5},${l.sat}%,${l.light}%,0)`);
-        ctx.beginPath(); ctx.arc(cxp, cyp, lr, sa, ea);
-        ctx.lineWidth = l.w; ctx.lineCap = "round"; ctx.strokeStyle = g;
-        ctx.filter = `blur(${l.w * 0.45}px)`; ctx.stroke();
+
+      const cols = Math.ceil(w / CELL) + 1;
+      const rows = Math.ceil(h / CELL) + 1;
+
+      /* ── 1. dot grid ── */
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const px = col * CELL;
+          const py = row * CELL;
+          /* mouse proximity highlight */
+          const dx = px / w - s.x;
+          const dy = py / h - s.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const proximity = Math.max(0, 1 - dist / 0.35);
+          const dotAlpha = 0.06 + proximity * 0.14;
+          const dotSize = 1 + proximity * 1.5;
+
+          ctx.beginPath();
+          ctx.arc(px, py, dotSize, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${accentR},${accentG},${accentB},${dotAlpha})`;
+          ctx.fill();
+        }
       }
-      ctx.filter = "none";
-      const cr = R * 0.84 + Math.sin(T * 1.1) * 6 + (s.y - 0.5) * 16;
-      const cs = -Math.PI * 0.78 + mi + Math.sin(T * 0.5) * 0.05;
-      const ce = -Math.PI * 0.22 + mi + Math.cos(T * 0.7) * 0.05;
-      const cg = ctx.createLinearGradient(cxp + Math.cos(cs) * cr, cyp + Math.sin(cs) * cr, cxp + Math.cos(ce) * cr, cyp + Math.sin(ce) * cr);
-      cg.addColorStop(0, "hsla(355,50%,65%,0)"); cg.addColorStop(0.2, "hsla(355,55%,60%,0.06)");
-      cg.addColorStop(0.5, "hsla(0,60%,55%,0.12)"); cg.addColorStop(0.8, "hsla(5,55%,60%,0.06)");
-      cg.addColorStop(1, "hsla(5,50%,65%,0)");
-      ctx.beginPath(); ctx.arc(cxp, cyp, cr, cs, ce);
-      ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.strokeStyle = cg;
-      ctx.filter = "blur(1px)"; ctx.stroke(); ctx.filter = "none";
-      for (let i = 0; i < 12; i++) {
-        const f = i / 12; const a = cs + (ce - cs) * f;
-        const pr = cr + Math.sin(T * 2.5 + i * 1.8) * 10;
-        const px = cxp + Math.cos(a) * pr, py = cyp + Math.sin(a) * pr;
-        const pa = (0.06 + Math.sin(T * 1.5 + i) * 0.03) * (1 - Math.abs(f - 0.5) * 1.8);
-        if (pa <= 0) continue;
-        const ps = 1.5 + Math.sin(T * 3 + i * 2) * 0.8;
-        const pg = ctx.createRadialGradient(px, py, 0, px, py, ps * 4);
-        pg.addColorStop(0, `hsla(0,50%,55%,${pa})`); pg.addColorStop(1, `hsla(0,50%,55%,0)`);
-        ctx.beginPath(); ctx.arc(px, py, ps * 4, 0, Math.PI * 2); ctx.fillStyle = pg; ctx.fill();
+
+      /* ── 2. grid lines (very subtle) ── */
+      ctx.lineWidth = 0.5;
+      for (let row = 0; row < rows; row++) {
+        const py = row * CELL;
+        const dy = py / h - s.y;
+        const dist = Math.abs(dy);
+        const alpha = 0.02 + Math.max(0, 1 - dist / 0.3) * 0.04;
+        ctx.beginPath();
+        ctx.moveTo(0, py);
+        ctx.lineTo(w, py);
+        ctx.strokeStyle = `rgba(${accentR},${accentG},${accentB},${alpha})`;
+        ctx.stroke();
       }
+      for (let col = 0; col < cols; col++) {
+        const px = col * CELL;
+        const dx = px / w - s.x;
+        const dist = Math.abs(dx);
+        const alpha = 0.02 + Math.max(0, 1 - dist / 0.3) * 0.04;
+        ctx.beginPath();
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px, h);
+        ctx.strokeStyle = `rgba(${accentR},${accentG},${accentB},${alpha})`;
+        ctx.stroke();
+      }
+
+      /* ── 3. data streams (flowing pulses along grid) ── */
+      for (const st of streams) {
+        st.x += st.speed * st.dir;
+        if (st.x > 1.2) st.x = -0.2;
+        if (st.x < -0.2) st.x = 1.2;
+
+        const isV = st.isVertical;
+        const linePos = st.row * CELL;
+        const headPos = st.x * (isV ? h : w);
+        const tailLen = st.len * (isV ? h : w);
+
+        const grad = isV
+          ? ctx.createLinearGradient(linePos, headPos - tailLen * st.dir, linePos, headPos)
+          : ctx.createLinearGradient(headPos - tailLen * st.dir, linePos, headPos, linePos);
+
+        grad.addColorStop(0, `rgba(${accentR},${accentG},${accentB},0)`);
+        grad.addColorStop(0.7, `rgba(${accentR},${accentG},${accentB},${st.alpha * 0.5})`);
+        grad.addColorStop(1, `rgba(${accentR},${accentG},${accentB},${st.alpha})`);
+
+        ctx.beginPath();
+        if (isV) {
+          ctx.moveTo(linePos, headPos - tailLen * st.dir);
+          ctx.lineTo(linePos, headPos);
+        } else {
+          ctx.moveTo(headPos - tailLen * st.dir, linePos);
+          ctx.lineTo(headPos, linePos);
+        }
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        /* head glow */
+        const hx = isV ? linePos : headPos;
+        const hy = isV ? headPos : linePos;
+        const grd = ctx.createRadialGradient(hx, hy, 0, hx, hy, 8);
+        grd.addColorStop(0, `rgba(${accentR},${accentG},${accentB},${st.alpha * 0.6})`);
+        grd.addColorStop(1, `rgba(${accentR},${accentG},${accentB},0)`);
+        ctx.beginPath();
+        ctx.arc(hx, hy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+      }
+
+      /* ── 4. circuit nodes (pulsing dots at intersections) ── */
+      for (const cn of circuitNodes) {
+        const px = cn.gx * CELL;
+        const py = cn.gy * CELL;
+        const pulse = 0.6 + Math.sin(T * 1.8 + cn.pulse) * 0.4;
+        const r = cn.size * pulse;
+
+        /* outer glow */
+        const grd = ctx.createRadialGradient(px, py, 0, px, py, r * 6);
+        grd.addColorStop(0, `rgba(${accentR},${accentG},${accentB},${0.1 * pulse})`);
+        grd.addColorStop(1, `rgba(${accentR},${accentG},${accentB},0)`);
+        ctx.beginPath();
+        ctx.arc(px, py, r * 6, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        /* core */
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${accentR},${accentG},${accentB},${0.25 * pulse})`;
+        ctx.fill();
+      }
+
+      /* ── 5. floating binary snippets ── */
+      ctx.font = "500 9px 'Manrope', monospace";
+      ctx.textAlign = "left";
+      for (const b of bits) {
+        const floatY = Math.sin(T * b.speed + b.phase) * 8;
+        const px = b.x * w;
+        const py = b.y * h + floatY;
+        const fadePulse = 0.5 + Math.sin(T * 0.8 + b.phase) * 0.5;
+        ctx.fillStyle = `rgba(${accentR},${accentG},${accentB},${b.alpha * fadePulse})`;
+        ctx.fillText(b.text, px, py);
+      }
+
+      /* ── 6. mouse interaction ring ── */
+      const mx = s.x * w;
+      const my = s.y * h;
+      const ringR = 80 + Math.sin(T * 1.2) * 10;
+      const ringGrd = ctx.createRadialGradient(mx, my, ringR * 0.4, mx, my, ringR);
+      ringGrd.addColorStop(0, `rgba(${accentR},${accentG},${accentB},0)`);
+      ringGrd.addColorStop(0.7, `rgba(${accentR},${accentG},${accentB},0.03)`);
+      ringGrd.addColorStop(1, `rgba(${accentR},${accentG},${accentB},0)`);
+      ctx.beginPath();
+      ctx.arc(mx, my, ringR, 0, Math.PI * 2);
+      ctx.fillStyle = ringGrd;
+      ctx.fill();
+
       raf.current = requestAnimationFrame(draw);
     };
+
     raf.current = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf.current); removeEventListener("resize", resize); removeEventListener("mousemove", onMove); };
+    return () => {
+      cancelAnimationFrame(raf.current);
+      removeEventListener("resize", resize);
+      removeEventListener("mousemove", onMove);
+    };
   }, []);
 
   return (
@@ -701,7 +846,7 @@ function RotatingWord() {
 function Hero() {
   return (
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
-      <GradientArc />
+      <DigitalGrid />
       <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 120, paddingBottom: 60 }}>
         <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr", gap: 48, alignItems: "center" }}>
           {/* LEFT — text */}
