@@ -1,12 +1,15 @@
 "use client";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { cases, V } from "../data";
+import { getCases, V } from "../data";
+import { getDictionary } from "../../../i18n";
 
 export default function CasePage() {
-  const { slug } = useParams();
+  const { slug, locale } = useParams();
+  const t = getDictionary(locale);
+  const cases = getCases(locale);
   const c = cases.find(x => x.slug === slug);
-  if (!c) return <div style={{ padding: 80, textAlign: "center", fontFamily: V.body, color: V.dim }}>Кейс не найден</div>;
+  if (!c) return <div style={{ padding: 80, textAlign: "center", fontFamily: V.body, color: V.dim }}>{t.caseDetail.notFound}</div>;
   const d = c.detail;
 
   return (
@@ -23,6 +26,8 @@ export default function CasePage() {
         .scope-tag:hover{background:rgba(160,28,45,0.06)!important;border-color:rgba(160,28,45,0.15)!important;color:${V.accent}!important}
         .cta-btn{border:none;padding:16px 40px;border-radius:100px;background:${V.accent};color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1);text-decoration:none;display:inline-block;font-family:${V.body}}
         .cta-btn:hover{background:${V.accentLit};transform:translateY(-2px);box-shadow:0 8px 32px rgba(160,28,45,0.25)}
+        .lang-switch{display:inline-flex;gap:4px;position:absolute;top:28px;right:120px;z-index:10}
+        .lang-switch a{font-size:0.7rem;font-weight:700;text-decoration:none;padding:4px 8px;border-radius:4px;transition:all .3s}
         @media(max-width:768px){
           .metrics-row{flex-direction:column!important;gap:16px!important;grid-template-columns:1fr!important}
           .sol-grid{grid-template-columns:1fr!important}
@@ -34,6 +39,7 @@ export default function CasePage() {
           .case-badge .badge-val{font-size:1.2rem!important}
           .timeline-badges{flex-direction:column!important}
           .timeline-badges span{font-size:0.65rem!important}
+          .lang-switch{right:60px}
         }
         @media(max-width:480px){
           .results-grid{grid-template-columns:1fr!important}
@@ -69,12 +75,12 @@ export default function CasePage() {
             padding: "0 max(24px, calc((100% - 1100px)/2))",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              {c.tag.split(" · ").map((t, i) => (
+              {c.tag.split(" · ").map((tag, i) => (
                 <span key={i} style={{
                   padding: "5px 12px", borderRadius: 6, fontSize: "0.58rem", fontWeight: 700,
                   background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)",
                   letterSpacing: "0.1em", backdropFilter: "blur(8px)",
-                }}>{t}</span>
+                }}>{tag}</span>
               ))}
             </div>
             <h1 style={{
@@ -88,13 +94,32 @@ export default function CasePage() {
             position: "absolute", top: 28, left: 0, right: 0,
             padding: "0 max(24px, calc((100% - 1100px)/2))",
           }}>
-            <Link href="/#cases" className="case-back" style={{ color: "rgba(255,255,255,0.7)" }}>
-              <span>←</span> Назад к кейсам
+            <Link href={`/${locale}/#cases`} className="case-back" style={{ color: "rgba(255,255,255,0.7)" }}>
+              <span>←</span> {t.caseDetail.backLink}
             </Link>
+          </div>
+          {/* language switcher */}
+          <div className="lang-switch" style={{
+            position: "absolute", top: 28, right: 0,
+            padding: "0 max(24px, calc((100% - 1100px)/2))",
+            display: "flex", gap: 4,
+          }}>
+            <Link href={`/ru/cases/${slug}`} style={{
+              fontSize: "0.7rem", fontWeight: 700, textDecoration: "none",
+              padding: "4px 8px", borderRadius: 4,
+              background: locale === "ru" ? "rgba(255,255,255,0.2)" : "transparent",
+              color: locale === "ru" ? "#fff" : "rgba(255,255,255,0.5)",
+            }}>RU</Link>
+            <Link href={`/en/cases/${slug}`} style={{
+              fontSize: "0.7rem", fontWeight: 700, textDecoration: "none",
+              padding: "4px 8px", borderRadius: 4,
+              background: locale === "en" ? "rgba(255,255,255,0.2)" : "transparent",
+              color: locale === "en" ? "#fff" : "rgba(255,255,255,0.5)",
+            }}>EN</Link>
           </div>
           {/* result badge */}
           <div style={{
-            position: "absolute", top: 28, right: 0,
+            position: "absolute", top: 68, right: 0,
             padding: "0 max(24px, calc((100% - 1100px)/2))",
           }}>
             <div style={{
@@ -152,7 +177,7 @@ export default function CasePage() {
                 <div style={{
                   fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
                   letterSpacing: "0.14em", textTransform: "uppercase", color: V.muted, marginBottom: 10,
-                }}>ДО</div>
+                }}>{t.caseDetail.before}</div>
                 <p style={{ fontSize: "0.86rem", color: V.dim, lineHeight: 1.7, margin: 0 }}>{c.beforeAfter.before}</p>
               </div>
               <div style={{
@@ -162,7 +187,7 @@ export default function CasePage() {
                 <div style={{
                   fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
                   letterSpacing: "0.14em", textTransform: "uppercase", color: V.accent, marginBottom: 10,
-                }}>ПОСЛЕ</div>
+                }}>{t.caseDetail.after}</div>
                 <p style={{ fontSize: "0.86rem", color: V.text, lineHeight: 1.7, margin: 0 }}>{c.beforeAfter.after}</p>
               </div>
             </div>
@@ -191,7 +216,7 @@ export default function CasePage() {
             <div style={{
               fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
               letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 16,
-            }}>ЗАДАЧА</div>
+            }}>{t.caseDetail.challenge}</div>
             <p style={{ fontSize: "0.95rem", color: V.text, lineHeight: 1.8, maxWidth: 720 }}>{d.challenge}</p>
           </div>
 
@@ -200,7 +225,7 @@ export default function CasePage() {
             <div style={{
               fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
               letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 24,
-            }}>ЧТО МЫ СДЕЛАЛИ</div>
+            }}>{t.caseDetail.solution}</div>
             <div className="sol-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               {d.solution.map((s, i) => (
                 <div key={i} className="sol-card" style={{
@@ -229,7 +254,7 @@ export default function CasePage() {
             <div style={{
               fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
               letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 16,
-            }}>УСЛУГИ И ИНСТРУМЕНТЫ</div>
+            }}>{t.caseDetail.scope}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {c.scope.map((s, j) => (
                 <span key={j} className="scope-tag" style={{
@@ -249,12 +274,12 @@ export default function CasePage() {
             <h3 style={{
               fontFamily: V.heading, fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)", fontWeight: 800,
               color: "#fff", letterSpacing: "-0.03em", marginBottom: 12,
-            }}>Хотите похожий результат?</h3>
+            }}>{t.caseDetail.ctaTitle}</h3>
             <p style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.6)", marginBottom: 28, lineHeight: 1.6 }}>
-              Расскажите о вашем проекте — обсудим, как мы можем помочь
+              {t.caseDetail.ctaSub}
             </p>
-            <Link href="/#contact" className="cta-btn">
-              Обсудить проект →
+            <Link href={`/${locale}/#contact`} className="cta-btn">
+              {t.caseDetail.ctaButton}
             </Link>
           </div>
 
@@ -263,10 +288,10 @@ export default function CasePage() {
             <div style={{
               fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
               letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 24,
-            }}>ДРУГИЕ КЕЙСЫ</div>
+            }}>{t.caseDetail.otherCases}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {cases.filter(x => x.slug !== slug).slice(0, 3).map((oc, i) => (
-                <Link key={i} href={`/cases/${oc.slug}`} style={{
+                <Link key={i} href={`/${locale}/cases/${oc.slug}`} style={{
                   display: "flex", alignItems: "center", gap: 20, padding: "20px 24px",
                   background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
                   textDecoration: "none", transition: "all .3s", boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
