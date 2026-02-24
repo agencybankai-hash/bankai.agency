@@ -113,8 +113,8 @@ html{scroll-behavior:smooth}
 .contact-icon{transition:all .3s}
 
 /* submit button */
-.btn-submit{border:1px solid rgba(0,0,0,0.12);color:#1A1714;padding:13px 28px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.82rem;cursor:pointer;letter-spacing:0.03em;transition:all .35s cubic-bezier(.16,1,.3,1);width:100%}
-.btn-submit:hover:not(:disabled){background:#A01C2D;border-color:#A01C2D;color:#fff;transform:translateY(-1px);box-shadow:0 6px 24px rgba(160,28,45,0.2)}
+.btn-submit{border:none;color:#fff;padding:16px 32px;border-radius:100px;background:linear-gradient(135deg,#A01C2D,#C8354A);font-weight:700;font-size:0.88rem;cursor:pointer;letter-spacing:0.04em;transition:all .4s cubic-bezier(.16,1,.3,1);width:100%;box-shadow:0 4px 20px rgba(160,28,45,0.35)}
+.btn-submit:hover:not(:disabled){background:linear-gradient(135deg,#8a1725,#B02A3E);transform:translateY(-2px);box-shadow:0 10px 36px rgba(160,28,45,0.5)}
 .btn-submit:disabled{opacity:0.5;cursor:not-allowed}
 
 /* input focus */
