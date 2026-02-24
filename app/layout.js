@@ -1,10 +1,6 @@
 import "./globals.css";
 
 export const metadata = {
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
   title: "Bankai Agency — AI-автоматизация и маркетинг полного цикла",
   description: "Строим системы, которые приносят выручку. AI-ядро бизнеса, маркетинг под ключ, Google Ads, SEO, CRM, аналитика.",
   keywords: ["AI автоматизация", "performance marketing", "digital agency", "Google Ads", "SEO", "CRM", "маркетинг полного цикла", "AI-ядро"],
