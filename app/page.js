@@ -773,8 +773,8 @@ function Hero() {
             <Reveal delay={400} type="scale" duration={1}>
               <div className="hero-float-1 hero-visual-card" style={{
                 position: "absolute", top: 20, right: 0, width: 280, zIndex: 1,
-                background: "linear-gradient(135deg, #1a1a2e, #0f3460)",
-                borderRadius: 16, padding: "28px 24px", boxShadow: "0 12px 40px rgba(15,52,96,0.3)",
+                background: "linear-gradient(135deg, #1a1a1a, #2d2d2d)",
+                borderRadius: 16, padding: "28px 24px", boxShadow: "0 12px 40px rgba(0,0,0,0.35)",
                 cursor: "default",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
@@ -793,8 +793,8 @@ function Hero() {
             <Reveal delay={550} type="scale" duration={1}>
               <div className="hero-float-2 hero-visual-card" style={{
                 position: "absolute", top: 200, left: 10, width: 260, zIndex: 1,
-                background: "linear-gradient(135deg, #0a1628, #243b63)",
-                borderRadius: 16, padding: "24px 22px", boxShadow: "0 12px 40px rgba(36,59,99,0.3)",
+                background: "linear-gradient(135deg, #111111, #262626)",
+                borderRadius: 16, padding: "24px 22px", boxShadow: "0 12px 40px rgba(0,0,0,0.35)",
                 cursor: "default",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
