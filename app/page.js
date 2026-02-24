@@ -123,12 +123,15 @@ html{scroll-behavior:smooth}
 .form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
 .form-input::placeholder{color:#B0AAA3}
 
-/* case card — Altalogy style */
-.case-card-new{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:pointer}
-.case-card-new:hover{border-color:rgba(0,0,0,0.12)!important;box-shadow:0 20px 60px rgba(0,0,0,0.08);transform:translateY(-4px)}
-.case-card-new:hover .case-img-wrap{transform:scale(1)}
-.case-card-new .case-img-wrap{transition:all .6s cubic-bezier(.16,1,.3,1)}
-.case-card-new:hover .case-arrow span{transform:translateX(4px)}
+/* case card — image-only, overlay on hover */
+.case-card-new{position:relative;overflow:hidden;border-radius:16px;cursor:pointer;transition:all .5s cubic-bezier(.16,1,.3,1)}
+.case-card-new:hover{transform:translateY(-6px);box-shadow:0 24px 64px rgba(0,0,0,0.12)}
+.case-card-new .case-overlay-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:36px;opacity:0;transition:all .45s cubic-bezier(.16,1,.3,1);background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 50%,rgba(0,0,0,0.05) 100%)}
+.case-card-new:hover .case-overlay-content{opacity:1}
+.case-card-new .case-img-inner{transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.case-card-new:hover .case-img-inner{transform:scale(1.05)}
+.case-card-new .case-arrow-btn{transform:translateY(12px);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1) .1s}
+.case-card-new:hover .case-arrow-btn{transform:translateY(0);opacity:1}
 .case-card-link{display:block;text-decoration:none!important}
 
 /* footer */
@@ -143,7 +146,8 @@ html{scroll-behavior:smooth}
   .section-heading{font-size:1.8rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
-  .case-img-wrap{height:240px!important}
+  .cases-grid{grid-template-columns:1fr!important}
+  .case-card-new{height:360px!important}
   .stat-grid{grid-template-columns:1fr 1fr!important}
   .services-split{grid-template-columns:1fr!important}
   .hero-grid{grid-template-columns:1fr!important;gap:40px!important}
@@ -802,44 +806,7 @@ function Process() {
   );
 }
 
-/* ═══════════════════════ CASES (Altalogy-style with images) ═══════════════════════ */
-function CaseImage({ c, style }) {
-  return (
-    <div style={{
-      width: "100%", height: "100%", position: "relative", overflow: "hidden",
-      background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
-      borderRadius: "inherit",
-      ...style,
-    }}>
-      {/* decorative orbs */}
-      <div style={{
-        position: "absolute", top: "10%", right: "8%", width: "45%", height: "45%", borderRadius: "50%",
-        background: `radial-gradient(circle, ${c.accent}22, transparent 70%)`,
-      }} />
-      <div style={{
-        position: "absolute", bottom: "15%", left: "5%", width: "30%", height: "30%", borderRadius: "50%",
-        background: `radial-gradient(circle, ${c.accent}18, transparent 70%)`,
-      }} />
-      {/* grid overlay */}
-      <div style={{
-        position: "absolute", inset: 0, opacity: 0.04,
-        backgroundImage: `linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)`,
-        backgroundSize: "50px 50px",
-      }} />
-      {/* result badge */}
-      <div style={{
-        position: "absolute", bottom: 24, right: 24,
-        background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)",
-        borderRadius: 10, padding: "12px 20px", textAlign: "center",
-        border: "1px solid rgba(255,255,255,0.12)",
-      }}>
-        <div style={{ fontFamily: V.heading, fontSize: "1.4rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
-        <div style={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.55)", fontWeight: 600, marginTop: 3 }}>{c.resultLabel}</div>
-      </div>
-    </div>
-  );
-}
-
+/* ═══════════════════════ CASES (image-only, overlay on hover) ═══════════════════════ */
 function Cases() {
   return (
     <section id="cases" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
@@ -852,55 +819,87 @@ function Cases() {
           }}>Результаты говорят за нас</h2>
         </Reveal>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="cases-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           {cases.map((c, i) => (
-            <Reveal key={i} delay={120 + i * 100} type="up" duration={0.85}>
-              <Link href={`/cases/${c.slug}`} className="case-card-link" style={{ textDecoration: "none", display: "block" }}>
-                <div className="case-card-new" style={{
-                  background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                  overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
-                }}>
-                  {/* image */}
-                  <div className="case-img-wrap" style={{ height: 340, overflow: "hidden" }}>
-                    <CaseImage c={c} />
+            <Reveal key={i} delay={120 + i * 80} type="scale" duration={0.8} style={i === 0 ? { gridColumn: "1 / -1" } : {}}>
+              <Link href={`/cases/${c.slug}`} className="case-card-link">
+                <div className="case-card-new" style={{ height: i === 0 ? 480 : 380, borderRadius: V.radius }}>
+                  {/* full-bleed image background */}
+                  <div className="case-img-inner" style={{
+                    position: "absolute", inset: 0,
+                    background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
+                    borderRadius: "inherit",
+                  }}>
+                    {/* decorative orbs */}
+                    <div style={{
+                      position: "absolute", top: "10%", right: "8%", width: "50%", height: "50%", borderRadius: "50%",
+                      background: `radial-gradient(circle, ${c.accent}25, transparent 65%)`,
+                    }} />
+                    <div style={{
+                      position: "absolute", bottom: "12%", left: "5%", width: "35%", height: "35%", borderRadius: "50%",
+                      background: `radial-gradient(circle, ${c.accent}18, transparent 70%)`,
+                    }} />
+                    {/* grid */}
+                    <div style={{
+                      position: "absolute", inset: 0, opacity: 0.04,
+                      backgroundImage: `linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)`,
+                      backgroundSize: "50px 50px",
+                    }} />
+                    {/* always-visible: small client name + result in corner */}
+                    <div style={{ position: "absolute", top: 24, left: 28 }}>
+                      <div style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>{c.client}</div>
+                    </div>
+                    <div style={{
+                      position: "absolute", top: 20, right: 24,
+                      background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)",
+                      borderRadius: 8, padding: "8px 14px", textAlign: "center",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                    }}>
+                      <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
+                      <div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.5)", fontWeight: 600, marginTop: 2 }}>{c.resultLabel}</div>
+                    </div>
                   </div>
 
-                  {/* content */}
-                  <div style={{ padding: "32px 36px 36px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                  {/* hover overlay with content */}
+                  <div className="case-overlay-content">
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
                       {c.tag.split(" · ").map((t, j) => (
                         <span key={j} style={{
-                          padding: "4px 10px", borderRadius: 4, fontSize: "0.55rem", fontWeight: 700,
-                          background: V.accentDim, color: V.accent, letterSpacing: "0.08em",
+                          padding: "4px 10px", borderRadius: 4, fontSize: "0.52rem", fontWeight: 700,
+                          background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.85)",
+                          letterSpacing: "0.08em", backdropFilter: "blur(4px)",
                         }}>{t}</span>
                       ))}
                     </div>
 
                     <h3 style={{
-                      fontFamily: V.heading, fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", fontWeight: 900,
-                      color: V.bright, letterSpacing: "-0.03em", marginBottom: 10, lineHeight: 1.15,
+                      fontFamily: V.heading, fontSize: "clamp(1.2rem, 2vw, 1.6rem)", fontWeight: 900,
+                      color: "#fff", letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.15,
                     }}>{c.client}</h3>
 
                     <p style={{
-                      fontSize: "0.88rem", color: V.dim, lineHeight: 1.7,
-                      marginBottom: 24, maxWidth: 600,
+                      fontSize: "0.82rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65,
+                      marginBottom: 20, maxWidth: 400,
+                      display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden",
                     }}>{c.desc}</p>
 
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", gap: 28 }}>
+                      <div style={{ display: "flex", gap: 24 }}>
                         {c.metrics.map((m, j) => (
                           <div key={j}>
-                            <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.02em", marginBottom: 2 }}>{m.v}</div>
-                            <div style={{ fontSize: "0.62rem", color: V.muted }}>{m.l}</div>
+                            <div style={{ fontFamily: V.heading, fontSize: "0.82rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 1 }}>{m.v}</div>
+                            <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>{m.l}</div>
                           </div>
                         ))}
                       </div>
 
-                      <span className="case-arrow" style={{
-                        display: "inline-flex", alignItems: "center", gap: 8,
-                        fontWeight: 600, fontSize: "0.78rem", color: V.accent,
-                        letterSpacing: "0.03em", transition: "all .35s",
-                      }}>Подробнее <span style={{ fontSize: "1.1rem", transition: "transform .35s" }}>→</span></span>
+                      <div className="case-arrow-btn" style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", fontSize: "1rem", flexShrink: 0,
+                      }}>→</div>
                     </div>
                   </div>
                 </div>
