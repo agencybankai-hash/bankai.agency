@@ -824,13 +824,12 @@ function Cases() {
             <Reveal key={i} delay={120 + i * 80} type="scale" duration={0.8} style={i === 0 ? { gridColumn: "1 / -1" } : {}}>
               <Link href={`/cases/${c.slug}`} className="case-card-link">
                 <div className="case-card-new" style={{ height: i === 0 ? 480 : 380, borderRadius: V.radius }}>
-                  {/* full-bleed image background */}
+                  {/* full-bleed image background (zoomable) */}
                   <div className="case-img-inner" style={{
                     position: "absolute", inset: 0,
                     background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
                     borderRadius: "inherit",
                   }}>
-                    {/* decorative orbs */}
                     <div style={{
                       position: "absolute", top: "10%", right: "8%", width: "50%", height: "50%", borderRadius: "50%",
                       background: `radial-gradient(circle, ${c.accent}25, transparent 65%)`,
@@ -839,25 +838,25 @@ function Cases() {
                       position: "absolute", bottom: "12%", left: "5%", width: "35%", height: "35%", borderRadius: "50%",
                       background: `radial-gradient(circle, ${c.accent}18, transparent 70%)`,
                     }} />
-                    {/* grid */}
                     <div style={{
                       position: "absolute", inset: 0, opacity: 0.04,
                       backgroundImage: `linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)`,
                       backgroundSize: "50px 50px",
                     }} />
-                    {/* always-visible: small client name + result in corner */}
-                    <div style={{ position: "absolute", top: 24, left: 28 }}>
-                      <div style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>{c.client}</div>
-                    </div>
-                    <div style={{
-                      position: "absolute", top: 20, right: 24,
-                      background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)",
-                      borderRadius: 8, padding: "8px 14px", textAlign: "center",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                    }}>
-                      <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
-                      <div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.5)", fontWeight: 600, marginTop: 2 }}>{c.resultLabel}</div>
-                    </div>
+                  </div>
+
+                  {/* always-visible labels — outside img-inner so they don't zoom */}
+                  <div style={{ position: "absolute", top: 24, left: 28, zIndex: 2 }}>
+                    <div style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>{c.client}</div>
+                  </div>
+                  <div style={{
+                    position: "absolute", top: 20, right: 24, zIndex: 2,
+                    background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)",
+                    borderRadius: 8, padding: "8px 14px", textAlign: "center",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}>
+                    <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
+                    <div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.5)", fontWeight: 600, marginTop: 2 }}>{c.resultLabel}</div>
                   </div>
 
                   {/* hover overlay with content */}
