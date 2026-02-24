@@ -408,8 +408,8 @@ function Nav() {
       borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
       transition: "background .5s cubic-bezier(.16,1,.3,1), backdrop-filter .5s, border-bottom .5s",
     }}>
-      <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em" }}>
+      <div style={{ ...cx, width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em", flexShrink: 0 }}>
           BANKAI<span style={{ color: V.accent }}>.</span>AGENCY
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 28, fontFamily: V.body }}>
