@@ -1123,7 +1123,7 @@ function MainServices() {
           }}>
             <div style={{ width: 3, height: 40, borderRadius: 2, background: V.accent, flexShrink: 0 }} />
             <p style={{ fontSize: "0.82rem", color: V.dim, lineHeight: 1.65, margin: 0 }}>
-              <strong style={{ color: V.bright, fontWeight: 700 }}>Полный цикл</strong> — когда нужен сильный digital-партнёр на долгосрок. <strong style={{ color: V.bright, fontWeight: 700 }}>Отдельное направление</strong> — когда нужна конкретная экспертиза: запустить рекламу, построить CRM, обновить сайт или провести аудит.
+              <strong style={{ color: V.bright, fontWeight: 700 }}>Полный цикл</strong> — когда нужен сильный digital-партнёр на долгосрок.<br/><strong style={{ color: V.bright, fontWeight: 700 }}>Отдельное направление</strong> — когда нужна конкретная экспертиза: запустить рекламу, построить CRM, обновить сайт или провести аудит.
             </p>
           </div>
         </Reveal>
