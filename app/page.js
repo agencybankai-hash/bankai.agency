@@ -993,7 +993,7 @@ function Contact() {
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {[
                   { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com" },
-                  { label: "Telegram", value: "@bankaiagency", href: "https://t.me/bankaiagency" },
+                  { label: "Telegram", value: "@may_work", href: "https://t.me/may_work" },
                 ].map((c, i) => (
                   <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
                     <div className="contact-icon" style={{
