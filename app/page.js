@@ -107,6 +107,10 @@ html{scroll-behavior:smooth}
 .form-input:focus{border-color:rgba(200,53,74,0.4);background:rgba(255,255,255,0.05);box-shadow:0 0 0 3px rgba(160,28,45,0.08)}
 .form-input::placeholder{color:#555}
 
+/* case card */
+.case-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:default}
+.case-card:hover{border-color:rgba(255,255,255,0.14)!important;box-shadow:0 16px 48px rgba(0,0,0,0.3)}
+
 /* footer */
 .footer-logo:hover .footer-dot{opacity:1!important;color:#C8354A!important}
 .footer-dot{transition:opacity .3s}
@@ -119,6 +123,7 @@ html{scroll-behavior:smooth}
   .section-heading{font-size:1.8rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
+  .case-inner{grid-template-columns:1fr!important}
   .stat-grid{grid-template-columns:1fr 1fr!important}
 }
 @media(max-width:480px){
@@ -390,6 +395,7 @@ function Nav() {
         <div style={{ display: "flex", alignItems: "center", gap: 28, fontFamily: V.body }}>
           <a href="#services" className="nav-link">Услуги</a>
           <a href="#process" className="nav-link">Процесс</a>
+          <a href="#cases" className="nav-link">Кейсы</a>
           <a href="#contact" className="nav-cta" style={{ fontFamily: V.heading }}>СВЯЗАТЬСЯ</a>
         </div>
       </div>
@@ -616,6 +622,134 @@ function Process() {
   );
 }
 
+/* ═══════════════════════ CASES ═══════════════════════ */
+const cases = [
+  {
+    client: "SOS Moving",
+    tag: "PERFORMANCE MARKETING",
+    result: "$14.6M",
+    resultLabel: "в продажах",
+    metrics: [
+      { v: "10,235", l: "заказов" },
+      { v: "$400K", l: "рекламный бюджет" },
+      { v: "40 → 26", l: "SEO позиция" },
+    ],
+    desc: "Полный маркетинг под ключ для мувинговой компании. Google Ads, SEO, аналитика — единая система, приносящая стабильный поток заказов.",
+    scope: ["Google Ads", "SEO", "Аналитика", "CRM"],
+  },
+  {
+    client: "AK Cabinet Craft",
+    tag: "REVENUE SHARE",
+    result: "3%",
+    resultLabel: "от продаж",
+    metrics: [
+      { v: "Чикаго", l: "рынок" },
+      { v: "Full-cycle", l: "маркетинг" },
+      { v: "HubSpot", l: "CRM" },
+    ],
+    desc: "Revenue-share партнёрство с производителем кастомных кухонь и шкафов. Весь маркетинг — от рекламы до офлайн-каналов — в обмен на процент от выручки.",
+    scope: ["Google Ads", "SEO", "CRM", "GBP", "Контент", "Офлайн"],
+  },
+  {
+    client: "Object First",
+    tag: "ДИЗАЙН И РАЗРАБОТКА",
+    result: "2+",
+    resultLabel: "года контракт",
+    metrics: [
+      { v: "Veeam", l: "приобретена" },
+      { v: "$50/час", l: "модель оплаты" },
+      { v: "Долгосрочно", l: "партнёрство" },
+    ],
+    desc: "Долгосрочный контракт на дизайн и разработку для tech-компании в сфере backup-решений. Позже приобретена Veeam — лидером рынка.",
+    scope: ["UI/UX Дизайн", "Веб-разработка"],
+  },
+];
+
+function Cases() {
+  return (
+    <section id="cases" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
+      <div style={cx}>
+        <Reveal type="fade"><Label num="04" text="Кейсы" /></Reveal>
+        <Reveal delay={80}>
+          <h2 className="section-heading" style={{
+            fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
+          }}>Результаты говорят за нас</h2>
+        </Reveal>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {cases.map((c, i) => (
+            <Reveal key={i} delay={120 + i * 100} type="up" duration={0.85}>
+              <div className="case-card" style={{
+                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
+                padding: "40px 36px", position: "relative", overflow: "hidden",
+              }}>
+                {/* accent line top */}
+                {i === 0 && <div style={{
+                  position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
+                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.2), transparent)`,
+                }} />}
+
+                <div className="case-inner" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+                  {/* left: info */}
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+                      <span style={{
+                        padding: "4px 10px", background: V.accentDim, borderRadius: 4,
+                        fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em",
+                      }}>{c.tag}</span>
+                    </div>
+
+                    <h3 style={{
+                      fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 900,
+                      color: V.bright, letterSpacing: "-0.03em", marginBottom: 12,
+                    }}>{c.client}</h3>
+
+                    <p style={{ fontSize: "0.85rem", color: V.dim, lineHeight: 1.65, marginBottom: 20, maxWidth: 420 }}>{c.desc}</p>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {c.scope.map((s, j) => (
+                        <span key={j} style={{
+                          padding: "4px 10px", borderRadius: 100,
+                          background: "rgba(255,255,255,0.04)", border: `1px solid ${V.border}`,
+                          fontSize: "0.65rem", color: V.dim, fontWeight: 500,
+                        }}>{s}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* right: metrics */}
+                  <div>
+                    <div style={{ marginBottom: 28 }}>
+                      <div style={{
+                        fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900,
+                        color: V.bright, letterSpacing: "-0.04em", lineHeight: 1,
+                      }}>{c.result}</div>
+                      <div style={{ fontSize: "0.75rem", color: V.muted, fontWeight: 600, marginTop: 4 }}>{c.resultLabel}</div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 28 }}>
+                      {c.metrics.map((m, j) => (
+                        <div key={j} style={{ minWidth: 0 }}>
+                          <div style={{
+                            fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800,
+                            color: V.text, letterSpacing: "-0.02em", marginBottom: 2,
+                          }}>{m.v}</div>
+                          <div style={{ fontSize: "0.65rem", color: V.muted }}>{m.l}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ═══════════════════════ STATEMENT ═══════════════════════ */
 function Statement() {
   const [ref, visible] = useInView({ threshold: 0.3 });
@@ -682,7 +816,7 @@ function Contact() {
       <div style={cx}>
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "start" }}>
           <div>
-            <Reveal type="fade"><Label num="04" text="Контакты" /></Reveal>
+            <Reveal type="fade"><Label num="05" text="Контакты" /></Reveal>
             <Reveal delay={80} type="left">
               <h2 className="section-heading" style={{
                 fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
@@ -784,6 +918,8 @@ export default function Page() {
         <ServicesGrid />
         <Divider />
         <Process />
+        <Divider />
+        <Cases />
         <Divider />
         <Statement />
         <Divider />
