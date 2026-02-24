@@ -157,7 +157,7 @@ html{scroll-behavior:smooth}
   .section-heading{font-size:1.5rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
-  .cases-grid{grid-template-columns:1fr!important}
+  .cases-masonry{columns:1!important}
   .case-card-new{height:300px!important}
   .stat-grid{grid-template-columns:repeat(3,1fr)!important;gap:16px!important}
   .services-split{grid-template-columns:1fr!important}
@@ -1202,11 +1202,14 @@ function Cases() {
           lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
         }}>Не обещания — а цифры из реальных проектов</RevealHeading>
 
-        <div className="cases-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-          {cases.map((c, i) => (
-            <Reveal key={i} delay={120 + i * 80} type="scale" duration={0.8} style={i === 0 ? { gridColumn: "1 / -1" } : {}}>
+        <div className="cases-masonry" style={{ columns: 2, columnGap: 20 }}>
+          {cases.map((c, i) => {
+            const heights = [420, 340, 380, 440];
+            return (
+            <Reveal key={i} delay={120 + i * 80} type="scale" duration={0.8}>
+              <div style={{ breakInside: "avoid", marginBottom: 20 }}>
               <Link href={`/cases/${c.slug}`} className="case-card-link">
-                <div className="case-card-new" style={{ height: i === 0 ? 480 : 380, borderRadius: V.radius }}>
+                <div className="case-card-new" style={{ height: heights[i % heights.length], borderRadius: V.radius }}>
                   {/* full-bleed image background (zoomable) */}
                   <div className="case-img-inner" style={{
                     position: "absolute", inset: 0,
@@ -1286,8 +1289,10 @@ function Cases() {
                   </div>
                 </div>
               </Link>
+              </div>
             </Reveal>
-          ))}
+          );
+          })}
         </div>
       </div>
     </section>
