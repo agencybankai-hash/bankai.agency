@@ -157,7 +157,8 @@ html{scroll-behavior:smooth}
   .section-heading{font-size:1.5rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
-  .cases-masonry{columns:1!important}
+  .cases-masonry{grid-template-columns:1fr!important}
+  .cases-masonry>div:last-child{padding-top:0!important}
   .case-card-new{height:300px!important}
   .stat-grid{grid-template-columns:repeat(3,1fr)!important;gap:16px!important}
   .services-split{grid-template-columns:1fr!important}
@@ -1202,14 +1203,13 @@ function Cases() {
           lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
         }}>Не обещания — а цифры из реальных проектов</RevealHeading>
 
-        <div className="cases-masonry" style={{ columns: 2, columnGap: 20 }}>
-          {cases.map((c, i) => {
-            const heights = [420, 340, 380, 440];
-            return (
-            <Reveal key={i} delay={120 + i * 80} type="scale" duration={0.8}>
-              <div style={{ breakInside: "avoid", marginBottom: 20 }}>
+        <div className="cases-masonry" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+          {/* Left column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {cases.filter((_, i) => i % 2 === 0).map((c, i) => (
+            <Reveal key={c.slug} delay={120 + i * 160} type="scale" duration={0.8}>
               <Link href={`/cases/${c.slug}`} className="case-card-link">
-                <div className="case-card-new" style={{ height: heights[i % heights.length], borderRadius: V.radius }}>
+                <div className="case-card-new" style={{ height: 380, borderRadius: V.radius }}>
                   {/* full-bleed image background (zoomable) */}
                   <div className="case-img-inner" style={{
                     position: "absolute", inset: 0,
@@ -1289,10 +1289,88 @@ function Cases() {
                   </div>
                 </div>
               </Link>
-              </div>
             </Reveal>
-          );
-          })}
+            ))}
+          </div>
+          {/* Right column — offset down for Pinterest feel */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, paddingTop: 80 }}>
+            {cases.filter((_, i) => i % 2 === 1).map((c, i) => (
+            <Reveal key={c.slug} delay={200 + i * 160} type="scale" duration={0.8}>
+              <Link href={`/cases/${c.slug}`} className="case-card-link">
+                <div className="case-card-new" style={{ height: 380, borderRadius: V.radius }}>
+                  <div className="case-img-inner" style={{
+                    position: "absolute", inset: 0,
+                    background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
+                    borderRadius: "inherit",
+                  }}>
+                    <div style={{
+                      position: "absolute", top: "10%", right: "8%", width: "50%", height: "50%", borderRadius: "50%",
+                      background: `radial-gradient(circle, ${c.accent}25, transparent 65%)`,
+                    }} />
+                    <div style={{
+                      position: "absolute", bottom: "12%", left: "5%", width: "35%", height: "35%", borderRadius: "50%",
+                      background: `radial-gradient(circle, ${c.accent}18, transparent 70%)`,
+                    }} />
+                    <div style={{
+                      position: "absolute", inset: 0, opacity: 0.04,
+                      backgroundImage: `linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)`,
+                      backgroundSize: "50px 50px",
+                    }} />
+                  </div>
+                  <div style={{ position: "absolute", top: 24, left: 28, zIndex: 2 }}>
+                    <div style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>{c.client}</div>
+                  </div>
+                  <div style={{
+                    position: "absolute", top: 20, right: 24, zIndex: 2,
+                    background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)",
+                    borderRadius: 8, padding: "8px 14px", textAlign: "center",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}>
+                    <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
+                    <div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.5)", fontWeight: 600, marginTop: 2 }}>{c.resultLabel}</div>
+                  </div>
+                  <div className="case-overlay-content">
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+                      {c.tag.split(" · ").map((t, j) => (
+                        <span key={j} style={{
+                          padding: "4px 10px", borderRadius: 4, fontSize: "0.52rem", fontWeight: 700,
+                          background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.85)",
+                          letterSpacing: "0.08em", backdropFilter: "blur(4px)",
+                        }}>{t}</span>
+                      ))}
+                    </div>
+                    <h3 style={{
+                      fontFamily: V.heading, fontSize: "clamp(1.2rem, 2vw, 1.6rem)", fontWeight: 900,
+                      color: "#fff", letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.15,
+                    }}>{c.client}</h3>
+                    <p style={{
+                      fontSize: "0.82rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65,
+                      marginBottom: 20, maxWidth: 400,
+                      display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden",
+                    }}>{c.desc}</p>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", gap: 24 }}>
+                        {c.metrics.map((m, j) => (
+                          <div key={j}>
+                            <div style={{ fontFamily: V.heading, fontSize: "0.82rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 1 }}>{m.v}</div>
+                            <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>{m.l}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="case-arrow-btn" style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", fontSize: "1rem", flexShrink: 0,
+                      }}>→</div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>
