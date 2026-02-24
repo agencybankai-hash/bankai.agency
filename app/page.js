@@ -1586,16 +1586,17 @@ function Contact() {
                 <Reveal delay={240} type="left">
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                     {[
-                      { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com" },
-                      { label: "Telegram", value: "@may_work", href: "https://t.me/may_work" },
+                      { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
+                      { label: "Telegram", value: "@may_work", href: "https://t.me/may_work", icon: "https://cdn.simpleicons.org/telegram/26A5E4" },
                     ].map((c, i) => (
                       <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
                         <div className="contact-icon" style={{
                           width: 36, height: 36, borderRadius: 8,
                           background: "rgba(0,0,0,0.02)", border: `1px solid ${V.border}`,
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: "0.6rem", fontFamily: V.heading, fontWeight: 700, color: V.muted,
-                        }}>{c.label[0]}</div>
+                        }}>
+                          <img src={c.icon} alt={c.label} width="18" height="18" style={{ objectFit: "contain" }} loading="lazy" />
+                        </div>
                         <div>
                           <div style={{ fontSize: "0.65rem", color: V.muted, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 1 }}>{c.label}</div>
                           <div style={{ color: V.bright, fontWeight: 600, fontSize: "0.85rem" }}>{c.value}</div>
@@ -1747,15 +1748,21 @@ function Footer() {
             {/* Contact */}
             <div>
               <div style={{ fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>Связь</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <a href="mailto:agency.bankai@gmail.com" className="footer-nav-link" style={{
                   color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
-                  transition: "color .3s", fontWeight: 500,
-                }}>agency.bankai@gmail.com</a>
+                  transition: "color .3s", fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  <img src="https://cdn.simpleicons.org/gmail/EA4335" alt="Gmail" width="16" height="16" style={{ objectFit: "contain", opacity: 0.7 }} loading="lazy" />
+                  agency.bankai@gmail.com
+                </a>
                 <a href="https://t.me/may_work" target="_blank" rel="noopener" className="footer-nav-link" style={{
                   color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
-                  transition: "color .3s", fontWeight: 500,
-                }}>Telegram: @may_work</a>
+                  transition: "color .3s", fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  <img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="Telegram" width="16" height="16" style={{ objectFit: "contain", opacity: 0.7 }} loading="lazy" />
+                  @may_work
+                </a>
               </div>
             </div>
           </div>
