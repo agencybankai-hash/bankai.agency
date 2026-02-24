@@ -38,6 +38,16 @@ const globalCSS = `
 @keyframes revealFade{from{opacity:0}to{opacity:1}}
 @keyframes pulse2{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:0}}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes float1{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+@keyframes float2{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-10px) rotate(-1.5deg)}}
+@keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes slideWord{0%{opacity:0;transform:translateY(100%)}10%{opacity:1;transform:translateY(0)}30%{opacity:1;transform:translateY(0)}40%{opacity:0;transform:translateY(-100%)}100%{opacity:0;transform:translateY(-100%)}}
+.hero-float-1{animation:float1 6s ease-in-out infinite}
+.hero-float-2{animation:float2 7s ease-in-out infinite .5s}
+.hero-float-3{animation:float3 5s ease-in-out infinite 1s}
+.hero-visual-card{transition:all .4s cubic-bezier(.16,1,.3,1)}
+.hero-visual-card:hover{transform:translateY(-6px) scale(1.02)!important;box-shadow:0 20px 50px rgba(0,0,0,0.1)!important}
 
 /* base */
 *{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.08) transparent;box-sizing:border-box}
@@ -136,6 +146,7 @@ html{scroll-behavior:smooth}
   .case-img-wrap{height:240px!important}
   .stat-grid{grid-template-columns:1fr 1fr!important}
   .services-split{grid-template-columns:1fr!important}
+  .hero-grid{grid-template-columns:1fr!important;gap:40px!important}
 }
 @media(max-width:480px){
   .grid-4{grid-template-columns:1fr!important}
@@ -424,68 +435,162 @@ function Nav() {
 }
 
 /* ═══════════════════════ HERO ═══════════════════════ */
+function RotatingWord() {
+  const words = ["выручку", "клиентов", "систему", "результат"];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => { const t = setInterval(() => setIdx(p => (p + 1) % words.length), 2800); return () => clearInterval(t); }, []);
+  return (
+    <span style={{ display: "inline-block", position: "relative", height: "1.1em", overflow: "hidden", verticalAlign: "bottom", width: "auto" }}>
+      {words.map((w, i) => (
+        <span key={w} style={{
+          display: "block", position: i === 0 ? "relative" : "absolute", top: 0, left: 0,
+          color: V.accent,
+          transition: "all .5s cubic-bezier(.16,1,.3,1)",
+          transform: i === idx ? "translateY(0)" : i === (idx - 1 + words.length) % words.length ? "translateY(-110%)" : "translateY(110%)",
+          opacity: i === idx ? 1 : 0,
+        }}>{w}</span>
+      ))}
+    </span>
+  );
+}
+
 function Hero() {
   return (
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
       <GradientArc />
-      <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 140, paddingBottom: 80 }}>
-        <Reveal type="fade" duration={1.2}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px",
-            background: V.accentDim, border: `1px solid rgba(160,28,45,0.1)`,
-            borderRadius: 100, marginBottom: 48,
-          }}>
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: V.accentLit, position: "relative", display: "block" }}>
-              <span style={{ position: "absolute", inset: -3, borderRadius: "50%", border: `1.5px solid ${V.accentLit}`, animation: "pulse2 2.5s ease-out infinite" }} />
-            </span>
-            <span style={{ fontSize: "0.68rem", fontWeight: 600, color: V.text, letterSpacing: "0.04em" }}>
-              Сайт в разработке — это превью. Полная версия скоро.
-            </span>
-          </div>
-        </Reveal>
-
-        <Reveal delay={150} duration={1}>
-          <h1 className="hero-heading" style={{
-            fontFamily: V.heading, fontSize: "clamp(2.6rem, 5.5vw, 4.8rem)",
-            fontWeight: 900, lineHeight: 1.04, letterSpacing: "-0.05em",
-            color: V.bright, maxWidth: 850, marginBottom: 28,
-          }}>
-            Строим системы,<br />которые приносят<br /><span style={{ color: V.dim }}>выручку</span>
-          </h1>
-        </Reveal>
-
-        <Reveal delay={300} type="fade" duration={1}>
-          <p style={{ fontSize: "1.05rem", color: V.dim, maxWidth: 480, lineHeight: 1.7, marginBottom: 48 }}>
-            AI-автоматизация и маркетинг полного цикла для бизнеса, который хочет расти быстрее.
-          </p>
-        </Reveal>
-
-        <Reveal delay={450} type="up">
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-            <a href="#services" className="btn-primary" style={{ fontFamily: V.body }}>Смотреть услуги</a>
-            <a href="#contact" className="btn-ghost" style={{ fontFamily: V.body }}>Связаться <span className="arrow">→</span></a>
-          </div>
-        </Reveal>
-
-        <Reveal delay={600} type="fade" duration={1.2}>
-          <div className="stat-grid" style={{
-            display: "grid", gridTemplateColumns: "repeat(3, auto)", gap: 56,
-            marginTop: 80, paddingTop: 36, borderTop: `1px solid ${V.divider}`, maxWidth: 520,
-          }}>
-            {[
-              { v: "50", s: "+", l: "проектов" },
-              { v: "3", s: "x", l: "средний рост" },
-              { v: "24", s: "ч", l: "время ответа" },
-            ].map((stat, i) => (
-              <div key={i}>
-                <div style={{ fontFamily: V.heading, fontSize: "1.6rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.04em", marginBottom: 2 }}>
-                  <Counter value={stat.v} suffix={stat.s} />
-                </div>
-                <div style={{ fontSize: "0.72rem", color: V.muted }}>{stat.l}</div>
+      <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 120, paddingBottom: 60 }}>
+        <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 60, alignItems: "center" }}>
+          {/* LEFT — text */}
+          <div>
+            <Reveal type="fade" duration={1.2}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px",
+                background: V.accentDim, border: `1px solid rgba(160,28,45,0.1)`,
+                borderRadius: 100, marginBottom: 40,
+              }}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: V.accentLit, position: "relative", display: "block" }}>
+                  <span style={{ position: "absolute", inset: -3, borderRadius: "50%", border: `1.5px solid ${V.accentLit}`, animation: "pulse2 2.5s ease-out infinite" }} />
+                </span>
+                <span style={{ fontSize: "0.68rem", fontWeight: 600, color: V.text, letterSpacing: "0.04em" }}>
+                  Digital-партнёр на процент от выручки
+                </span>
               </div>
-            ))}
+            </Reveal>
+
+            <Reveal delay={150} duration={1}>
+              <h1 className="hero-heading" style={{
+                fontFamily: V.heading, fontSize: "clamp(2.4rem, 5vw, 4.2rem)",
+                fontWeight: 900, lineHeight: 1.06, letterSpacing: "-0.05em",
+                color: V.bright, marginBottom: 28,
+              }}>
+                Строим системы,<br />которые приносят<br /><RotatingWord />
+              </h1>
+            </Reveal>
+
+            <Reveal delay={300} type="fade" duration={1}>
+              <p style={{ fontSize: "1.02rem", color: V.dim, maxWidth: 440, lineHeight: 1.75, marginBottom: 40 }}>
+                Маркетинг, автоматизация, дизайн и разработка — единая digital-команда для вашего бизнеса. На проценте от оборота.
+              </p>
+            </Reveal>
+
+            <Reveal delay={450} type="up">
+              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center", marginBottom: 56 }}>
+                <a href="#contact" className="btn-primary" style={{ fontFamily: V.body }}>Обсудить проект</a>
+                <a href="#cases" className="btn-ghost" style={{ fontFamily: V.body }}>Кейсы <span className="arrow">→</span></a>
+              </div>
+            </Reveal>
+
+            <Reveal delay={600} type="fade" duration={1.2}>
+              <div className="stat-grid" style={{
+                display: "grid", gridTemplateColumns: "repeat(3, auto)", gap: 48,
+                paddingTop: 28, borderTop: `1px solid ${V.divider}`, maxWidth: 420,
+              }}>
+                {[
+                  { v: "50", s: "+", l: "проектов" },
+                  { v: "14.6", s: "M", l: "в продажах клиентов" },
+                  { v: "4", s: "", l: "направления" },
+                ].map((stat, i) => (
+                  <div key={i}>
+                    <div style={{ fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.04em", marginBottom: 2 }}>
+                      {stat.s === "M" ? <><span style={{ fontSize: "0.85em" }}>$</span><Counter value="14" suffix=".6M" /></> : <Counter value={stat.v} suffix={stat.s} />}
+                    </div>
+                    <div style={{ fontSize: "0.68rem", color: V.muted }}>{stat.l}</div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+
+          {/* RIGHT — visual cards */}
+          <div style={{ position: "relative", minHeight: 480 }}>
+            {/* floating case cards */}
+            <Reveal delay={400} type="scale" duration={1}>
+              <div className="hero-float-1 hero-visual-card" style={{
+                position: "absolute", top: 20, right: 0, width: 280,
+                background: "linear-gradient(135deg, #1a1a2e, #0f3460)",
+                borderRadius: 16, padding: "28px 24px", boxShadow: "0 12px 40px rgba(15,52,96,0.3)",
+                cursor: "default",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <span style={{ padding: "3px 8px", background: "rgba(233,69,96,0.15)", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700, color: "#e94560", letterSpacing: "0.1em" }}>EXIT</span>
+                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>SaaS · Data Protection</span>
+                </div>
+                <div style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 800, color: "#fff", marginBottom: 6 }}>Object First → Veeam</div>
+                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.5, marginBottom: 16 }}>Единственная внешняя дизайн-команда. 2+ года → приобретена Veeam.</div>
+                <div style={{ display: "flex", gap: 20 }}>
+                  <div><div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 900, color: "#e94560" }}>EXIT</div><div style={{ fontSize: "0.5rem", color: "rgba(255,255,255,0.3)" }}>acquired</div></div>
+                  <div><div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 900, color: "#fff" }}>2+</div><div style={{ fontSize: "0.5rem", color: "rgba(255,255,255,0.3)" }}>лет</div></div>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={550} type="scale" duration={1}>
+              <div className="hero-float-2 hero-visual-card" style={{
+                position: "absolute", top: 200, left: 10, width: 260,
+                background: "linear-gradient(135deg, #0a1628, #243b63)",
+                borderRadius: 16, padding: "24px 22px", boxShadow: "0 12px 40px rgba(36,59,99,0.3)",
+                cursor: "default",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{ padding: "3px 8px", background: "rgba(79,172,254,0.12)", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700, color: "#4facfe", letterSpacing: "0.1em" }}>$14.6M</span>
+                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>Performance + AI</span>
+                </div>
+                <div style={{ fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800, color: "#fff", marginBottom: 6 }}>SOS Moving → AI Moving</div>
+                <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", lineHeight: 1.5, marginBottom: 14 }}>$14.6M продаж, 10K+ заказов. Потом — свой AI SaaS.</div>
+                <div style={{ display: "flex", gap: 16 }}>
+                  {[{ v: "10,235", l: "заказов" },{ v: "$400K+", l: "бюджет" }].map((m, j) => (
+                    <div key={j}><div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: "#4facfe" }}>{m.v}</div><div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.3)" }}>{m.l}</div></div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={700} type="scale" duration={1}>
+              <div className="hero-float-3 hero-visual-card" style={{
+                position: "absolute", bottom: 10, right: 30, width: 240,
+                background: V.card,
+                border: `1px solid ${V.border}`,
+                borderRadius: 16, padding: "22px 20px", boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
+                cursor: "default",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <span style={{ padding: "3px 8px", background: "rgba(160,28,45,0.06)", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em" }}>REVENUE SHARE</span>
+                </div>
+                <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, marginBottom: 4 }}>AK Cabinet Craft</div>
+                <div style={{ fontSize: "0.68rem", color: V.dim, lineHeight: 1.5, marginBottom: 12 }}>Full-cycle маркетинг за 3% от выручки. Чикаго.</div>
+                <div style={{ display: "flex", gap: 16 }}>
+                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.accent }}>3%</div><div style={{ fontSize: "0.48rem", color: V.muted }}>rev share</div></div>
+                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.bright }}>Full</div><div style={{ fontSize: "0.48rem", color: V.muted }}>cycle</div></div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* decorative accent dots */}
+            <div style={{ position: "absolute", top: 160, right: 280, width: 8, height: 8, borderRadius: "50%", background: V.accentLit, opacity: 0.3, animation: "float1 4s ease-in-out infinite" }} />
+            <div style={{ position: "absolute", bottom: 100, left: 0, width: 6, height: 6, borderRadius: "50%", background: V.accent, opacity: 0.2, animation: "float2 5s ease-in-out infinite" }} />
+            <div style={{ position: "absolute", top: 60, left: 100, width: 4, height: 4, borderRadius: "50%", background: V.muted, opacity: 0.3, animation: "float3 6s ease-in-out infinite" }} />
+          </div>
+        </div>
       </div>
     </section>
   );
