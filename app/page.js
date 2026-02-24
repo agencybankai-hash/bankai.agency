@@ -647,8 +647,17 @@ function RotatingWord() {
 function Hero() {
   return (
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
+      {/* Dev banner */}
+      <div style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999,
+        background: V.accent, color: "#fff", textAlign: "center",
+        padding: "10px 20px", fontSize: "0.78rem", fontWeight: 600,
+        fontFamily: V.body, letterSpacing: "0.02em",
+      }}>
+        Сайт в разработке — информация представлена для ознакомления
+      </div>
       <GradientArc />
-      <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 120, paddingBottom: 60 }}>
+      <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 140, paddingBottom: 60 }}>
         <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr", gap: 48, alignItems: "center" }}>
           {/* LEFT — text */}
           <div>
