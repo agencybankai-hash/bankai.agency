@@ -402,11 +402,11 @@ function Nav() {
   return (
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: scrolled ? "14px 0" : "28px 0",
+      height: 64, display: "flex", alignItems: "center",
       background: scrolled ? "rgba(250,248,245,0.92)" : "transparent",
       backdropFilter: scrolled ? "blur(20px)" : "none",
       borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
-      transition: "all .5s cubic-bezier(.16,1,.3,1)",
+      transition: "background .5s cubic-bezier(.16,1,.3,1), backdrop-filter .5s, border-bottom .5s",
     }}>
       <div style={{ ...cx, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em" }}>
