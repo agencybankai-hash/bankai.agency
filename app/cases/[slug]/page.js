@@ -23,12 +23,28 @@ export default function CasePage() {
         .scope-tag:hover{background:rgba(160,28,45,0.06)!important;border-color:rgba(160,28,45,0.15)!important;color:${V.accent}!important}
         .cta-btn{border:none;padding:16px 40px;border-radius:100px;background:${V.accent};color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1);text-decoration:none;display:inline-block;font-family:${V.body}}
         .cta-btn:hover{background:${V.accentLit};transform:translateY(-2px);box-shadow:0 8px 32px rgba(160,28,45,0.25)}
-        @media(max-width:768px){.metrics-row{flex-direction:column!important;gap:20px!important;grid-template-columns:1fr!important}.sol-grid{grid-template-columns:1fr!important}.results-grid{grid-template-columns:1fr 1fr!important}}
+        @media(max-width:768px){
+          .metrics-row{flex-direction:column!important;gap:16px!important;grid-template-columns:1fr!important}
+          .sol-grid{grid-template-columns:1fr!important}
+          .results-grid{grid-template-columns:1fr 1fr!important}
+          .case-hero{min-height:360px!important}
+          .case-hero h1{font-size:1.8rem!important}
+          .case-tags{flex-wrap:wrap!important}
+          .case-badge{padding:10px 16px!important}
+          .case-badge .badge-val{font-size:1.2rem!important}
+          .timeline-badges{flex-direction:column!important}
+          .timeline-badges span{font-size:0.65rem!important}
+        }
+        @media(max-width:480px){
+          .results-grid{grid-template-columns:1fr!important}
+          .case-hero{min-height:280px!important}
+          .case-hero h1{font-size:1.4rem!important}
+        }
       `}} />
 
       <div style={{ minHeight: "100vh", fontFamily: V.body, color: V.text }}>
         {/* hero image area */}
-        <div style={{
+        <div className="case-hero" style={{
           width: "100%", minHeight: 480, position: "relative", overflow: "hidden",
           background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
         }}>
@@ -106,7 +122,7 @@ export default function CasePage() {
 
           {/* timeline + model badges */}
           {(d.timeline || d.model) && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 48 }}>
+            <div className="timeline-badges" style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 48 }}>
               {d.timeline && (
                 <span style={{
                   padding: "6px 14px", borderRadius: 8, background: V.accentDim,

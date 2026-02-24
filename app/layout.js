@@ -4,12 +4,24 @@ export const metadata = {
   title: "Bankai Agency — AI-автоматизация и маркетинг полного цикла",
   description: "Строим системы, которые приносят выручку. AI-ядро бизнеса, маркетинг под ключ, Google Ads, SEO, CRM, аналитика.",
   keywords: ["AI автоматизация", "performance marketing", "digital agency", "Google Ads", "SEO", "CRM", "маркетинг полного цикла", "AI-ядро"],
+  metadataBase: new URL("https://bankai.agency"),
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Bankai Agency — Строим системы, которые приносят выручку",
     description: "AI-автоматизация, маркетинг полного цикла и digital-продукты для бизнеса.",
     url: "https://bankai.agency",
     siteName: "Bankai Agency",
     type: "website",
+    locale: "ru_RU",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bankai Agency — AI-автоматизация и маркетинг",
+    description: "Строим системы, которые приносят выручку. Digital-партнёр на процент от оборота.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

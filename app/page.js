@@ -27,8 +27,6 @@ const V = {
 
 /* ───── global CSS with hover/focus classes ───── */
 const globalCSS = `
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap');
-
 /* scroll animations */
 @keyframes revealUp{from{opacity:0;filter:blur(8px);transform:translateY(60px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
 @keyframes revealDown{from{opacity:0;filter:blur(6px);transform:translateY(-40px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
@@ -139,24 +137,44 @@ html{scroll-behavior:smooth}
 .footer-logo:hover .footer-dot{opacity:1!important;color:#C8354A!important}
 .footer-dot{transition:opacity .3s}
 
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+  .hero-float-1,.hero-float-2,.hero-float-3{animation:none!important}
+}
+/* tablet breakpoint */
+@media(max-width:1024px){
+  .hero-grid{gridTemplateColumns:1fr!important;gap:40px!important}
+  .services-split{grid-template-columns:1fr!important}
+  .process-grid{grid-template-columns:1fr 1fr!important}
+  .nav-links{gap:16px!important}
+}
 /* responsive */
 @media(max-width:768px){
   .grid-2{grid-template-columns:1fr!important}
   .grid-4{grid-template-columns:1fr 1fr!important}
-  .hero-heading{font-size:2.4rem!important}
-  .section-heading{font-size:1.8rem!important}
+  .hero-heading{font-size:2rem!important}
+  .section-heading{font-size:1.5rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
   .cases-grid{grid-template-columns:1fr!important}
-  .case-card-new{height:360px!important}
-  .stat-grid{grid-template-columns:1fr 1fr!important}
+  .case-card-new{height:300px!important}
+  .stat-grid{grid-template-columns:repeat(3,1fr)!important;gap:16px!important}
   .services-split{grid-template-columns:1fr!important}
-  .hero-grid{grid-template-columns:1fr!important;gap:40px!important}
+  .hero-grid{grid-template-columns:1fr!important;gap:32px!important}
+  .hero-right{min-height:320px!important;padding-top:20px!important}
+  .hero-right .hero-visual-card{position:relative!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;width:100%!important;max-width:320px!important;margin-bottom:12px!important}
+  .dir-inner-grid{grid-template-columns:1fr!important}
+  .nav-links{display:none!important}
+  .nav-burger{display:flex!important}
+  .nav-mobile-menu{display:flex!important}
+  .dev-banner{font-size:0.68rem!important;padding:8px 12px!important}
 }
 @media(max-width:480px){
   .grid-4{grid-template-columns:1fr!important}
   .process-grid{grid-template-columns:1fr!important}
-  .stat-grid{grid-template-columns:1fr!important}
+  .stat-grid{grid-template-columns:1fr!important;gap:12px!important}
+  .hero-heading{font-size:1.7rem!important}
 }
 `;
 
@@ -445,32 +463,66 @@ function GradientArc() {
 /* ═══════════════════════ NAV ═══════════════════════ */
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => {
     const h = () => setScrolled(scrollY > 38);
     addEventListener("scroll", h, { passive: true });
     return () => removeEventListener("scroll", h);
   }, []);
   return (
-    <nav style={{
-      position: "fixed", top: scrolled ? 0 : 38, left: 0, right: 0, zIndex: 100,
-      height: 64, display: "flex", alignItems: "center",
-      background: scrolled ? "rgba(250,248,245,0.92)" : "transparent",
-      backdropFilter: scrolled ? "blur(20px)" : "none",
-      borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
-      transition: "all .5s cubic-bezier(.16,1,.3,1)",
-    }}>
-      <div style={{ ...cx, width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em", flexShrink: 0 }}>
-          BANKAI<span style={{ color: V.accent }}>.</span>AGENCY
+    <>
+      <nav role="navigation" aria-label="Основная навигация" style={{
+        position: "fixed", top: scrolled ? 0 : 38, left: 0, right: 0, zIndex: 100,
+        height: 64, display: "flex", alignItems: "center",
+        background: scrolled || mobileOpen ? "rgba(250,248,245,0.96)" : "transparent",
+        backdropFilter: scrolled || mobileOpen ? "blur(20px)" : "none",
+        borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
+        transition: "all .5s cubic-bezier(.16,1,.3,1)",
+      }}>
+        <div style={{ ...cx, width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em", flexShrink: 0 }}>
+            BANKAI<span style={{ color: V.accent }}>.</span>AGENCY
+          </div>
+          <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 28, fontFamily: V.body }}>
+            <a href="#services" className="nav-link">Услуги</a>
+            <a href="#process" className="nav-link">Процесс</a>
+            <a href="#cases" className="nav-link">Кейсы</a>
+            <a href="#contact" className="nav-cta" style={{ fontFamily: V.heading }}>СВЯЗАТЬСЯ</a>
+          </div>
+          {/* hamburger — hidden on desktop via CSS */}
+          <button className="nav-burger" aria-label="Открыть меню" onClick={() => setMobileOpen(!mobileOpen)} style={{
+            display: "none", background: "none", border: "none", cursor: "pointer", padding: 8,
+            flexDirection: "column", gap: 5, alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ display: "block", width: 22, height: 2, background: V.bright, borderRadius: 1, transition: "all .3s", transform: mobileOpen ? "rotate(45deg) translateY(3.5px)" : "none" }} />
+            <span style={{ display: "block", width: 22, height: 2, background: V.bright, borderRadius: 1, transition: "all .3s", opacity: mobileOpen ? 0 : 1 }} />
+            <span style={{ display: "block", width: 22, height: 2, background: V.bright, borderRadius: 1, transition: "all .3s", transform: mobileOpen ? "rotate(-45deg) translateY(-3.5px)" : "none" }} />
+          </button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 28, fontFamily: V.body }}>
-          <a href="#services" className="nav-link">Услуги</a>
-          <a href="#process" className="nav-link">Процесс</a>
-          <a href="#cases" className="nav-link">Кейсы</a>
-          <a href="#contact" className="nav-cta" style={{ fontFamily: V.heading }}>СВЯЗАТЬСЯ</a>
+      </nav>
+      {/* mobile menu overlay */}
+      {mobileOpen && (
+        <div style={{
+          position: "fixed", top: scrolled ? 64 : 102, left: 0, right: 0, bottom: 0, zIndex: 99,
+          background: "rgba(250,248,245,0.98)", backdropFilter: "blur(20px)",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 32,
+          fontFamily: V.body,
+        }}>
+          {[
+            { href: "#services", label: "Услуги" },
+            { href: "#process", label: "Процесс" },
+            { href: "#cases", label: "Кейсы" },
+            { href: "#contact", label: "Связаться" },
+          ].map((item) => (
+            <a key={item.href} href={item.href} onClick={() => setMobileOpen(false)} style={{
+              fontFamily: V.heading, fontSize: "1.4rem", fontWeight: 700,
+              color: V.bright, textDecoration: "none", letterSpacing: "-0.02em",
+              transition: "color .3s",
+            }}>{item.label}</a>
+          ))}
         </div>
-      </div>
-    </nav>
+      )}
+    </>
   );
 }
 
@@ -712,7 +764,7 @@ function Hero() {
           </div>
 
           {/* RIGHT — visual cards */}
-          <div style={{ position: "relative", minHeight: 480, paddingTop: 60 }}>
+          <div className="hero-right" style={{ position: "relative", minHeight: 480, paddingTop: 60 }}>
             {/* network/automation animation background */}
             <NetworkCanvas />
             {/* floating case cards */}
@@ -883,7 +935,7 @@ function MainServices() {
           </Reveal>
 
           {/* RIGHT — 4 directions grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="dir-inner-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {directions.map((d, i) => (
               <Reveal key={i} delay={250 + i * 80} type="scale" duration={0.7}>
                 <div className="dir-card" style={{
@@ -1225,16 +1277,16 @@ function Contact() {
                   <div style={{ fontSize: "0.82rem", color: V.dim, marginBottom: 24 }}>Заполните форму — мы вернёмся к вам.</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                     <div>
-                      <label style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Имя</label>
-                      <input className="form-input" style={{ fontFamily: V.body }} placeholder="Как вас зовут" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                      <label htmlFor="form-name" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Имя</label>
+                      <input id="form-name" className="form-input" style={{ fontFamily: V.body }} placeholder="Как вас зовут" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
                     </div>
                     <div>
-                      <label style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Контакт</label>
-                      <input className="form-input" style={{ fontFamily: V.body }} placeholder="Телефон или email" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
+                      <label htmlFor="form-contact" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Контакт</label>
+                      <input id="form-contact" className="form-input" style={{ fontFamily: V.body }} placeholder="Телефон или email" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
                     </div>
                     <div>
-                      <label style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>О проекте</label>
-                      <textarea className="form-input" style={{ fontFamily: V.body, minHeight: 80, resize: "vertical" }} placeholder="Расскажите кратко" value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
+                      <label htmlFor="form-message" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>О проекте</label>
+                      <textarea id="form-message" className="form-input" style={{ fontFamily: V.body, minHeight: 80, resize: "vertical" }} placeholder="Расскажите кратко" value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
                     </div>
                     <button type="submit" disabled={sending} className="btn-submit" style={{ fontFamily: V.body }}>
                       {sending ? "Отправляем..." : "Отправить заявку →"}
@@ -1273,7 +1325,7 @@ export default function Page() {
       <style dangerouslySetInnerHTML={{ __html: globalCSS }} />
       <div style={{ background: V.bg, color: V.text, minHeight: "100vh", fontFamily: V.body, overflowX: "hidden" }}>
         {/* Dev banner — static, scrolls away */}
-        <div style={{
+        <div className="dev-banner" style={{
           position: "relative", zIndex: 101,
           background: V.accent, color: "#fff", textAlign: "center",
           padding: "10px 20px", fontSize: "0.78rem", fontWeight: 600,

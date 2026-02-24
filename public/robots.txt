@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /ai-core
+
+Sitemap: https://bankai.agency/sitemap.xml
