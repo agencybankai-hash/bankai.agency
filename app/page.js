@@ -91,6 +91,10 @@ html{scroll-behavior:smooth}
 .main-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:default}
 .main-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.08)}
 
+/* direction cards */
+.dir-card{transition:all .35s cubic-bezier(.16,1,.3,1)!important}
+.dir-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.12)!important}
+
 /* contact links */
 .contact-link{display:flex;align-items:center;gap:14px;text-decoration:none;transition:all .3s;cursor:pointer}
 .contact-link:hover{transform:translateX(6px)}
@@ -138,6 +142,7 @@ html{scroll-behavior:smooth}
   .contact-grid{grid-template-columns:1fr!important}
   .case-inner{grid-template-columns:1fr!important}
   .stat-grid{grid-template-columns:1fr 1fr!important}
+  .services-split{grid-template-columns:1fr!important}
 }
 @media(max-width:480px){
   .grid-4{grid-template-columns:1fr!important}
@@ -242,18 +247,27 @@ function Counter({ value, suffix = "", duration = 1800 }) {
 }
 
 /* ───── data ───── */
-const mainServices = [
+/* full-cycle partner block + 4 directions */
+const directions = [
   {
-    title: "AI-Ядро бизнеса", sub: "Внедрение AI-систем для принятия решений",
-    desc: "Строим операционную систему вашего бизнеса на базе ИИ. AI-агенты берут на себя рутину, аналитику и часть решений — вы получаете масштабируемый бизнес без раздутого штата.",
-    feats: ["AI-агенты для автоматизации", "Система принятия решений", "Интеграция с CRM и рекламой", "Прогнозирование и алерты"],
-    flagship: true, link: "/ai-core",
+    icon: "📈", title: "Маркетинг",
+    desc: "Google Ads, SEO, Meta, контент, email-маркетинг, аналитика. Полная воронка от первого касания до повторной продажи.",
+    tags: ["Google Ads", "SEO", "Meta Ads", "Email", "Контент", "Аналитика"],
   },
   {
-    title: "Маркетинг полного цикла", sub: "С нуля или для действующего бизнеса",
-    desc: "Весь маркетинг под ключ: от стратегии и позиционирования до лидогенерации и аналитики. Строим систему, которая приносит выручку, а не просто трафик.",
-    feats: ["Стратегия и позиционирование", "Воронки продаж", "Контент и креативы", "Сквозная аналитика ROI"],
-    flagship: false, link: null,
+    icon: "⚡", title: "Автоматизация",
+    desc: "AI-агенты, CRM-системы, чат-боты, автоматические воронки. Убираем ручной труд — ускоряем рост.",
+    tags: ["AI-агенты", "HubSpot", "CRM", "Чат-боты", "Воронки"],
+  },
+  {
+    icon: "🎨", title: "Дизайн и разработка",
+    desc: "UI/UX, сайты, лендинги, фирменный стиль, упаковка. От Figma до продакшена на любом стеке.",
+    tags: ["UI/UX", "Next.js", "Figma", "Брендинг", "Упаковка"],
+  },
+  {
+    icon: "🧠", title: "Консалтинг",
+    desc: "Аудит маркетинга, стратегия роста, финансовое моделирование, unit-экономика. Видим картину целиком.",
+    tags: ["Аудит", "Стратегия", "Unit-экономика", "Масштабирование"],
   },
 ];
 
@@ -513,60 +527,115 @@ function MainServices() {
   return (
     <section id="services" style={{ padding: "120px 0 80px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <Reveal type="fade"><Label num="01" text="Ключевые направления" /></Reveal>
+        <Reveal type="fade"><Label num="01" text="Как мы работаем" /></Reveal>
         <Reveal delay={100}>
           <h2 className="section-heading" style={{
             fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900,
-            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
-          }}>Два ядра нашей экспертизы</h2>
+            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 800, marginBottom: 56,
+          }}>Полный цикл или точечные решения</h2>
         </Reveal>
 
-        <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {mainServices.map((s, i) => (
-            <Reveal key={i} delay={180 + i * 120} type={i === 0 ? "left" : "right"} duration={0.9}>
-              <div className="main-card" style={{
-                background: V.card,
-                border: `1px solid ${s.flagship ? "rgba(160,28,45,0.08)" : V.border}`,
-                borderRadius: V.radius, padding: "44px 36px",
-                position: "relative", overflow: "hidden",
-                height: "100%", display: "flex", flexDirection: "column",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
-              }}>
-                {s.flagship && <div style={{
-                  position: "absolute", top: 0, left: "15%", right: "15%", height: 1,
-                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.12), transparent)`,
-                }} />}
+        <div className="services-split" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 20, alignItems: "stretch" }}>
+          {/* LEFT — Full-cycle partner */}
+          <Reveal delay={180} type="left" duration={0.9}>
+            <div className="main-card" style={{
+              background: V.card,
+              border: `1px solid rgba(160,28,45,0.1)`,
+              borderRadius: V.radius, padding: "48px 40px",
+              position: "relative", overflow: "hidden",
+              height: "100%", display: "flex", flexDirection: "column",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.04)",
+            }}>
+              {/* accent top line */}
+              <div style={{
+                position: "absolute", top: 0, left: "10%", right: "10%", height: 2,
+                background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.2), transparent)`,
+              }} />
 
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-                  <span style={{ fontFamily: V.heading, fontSize: "2.4rem", fontWeight: 900, color: "rgba(0,0,0,0.05)", lineHeight: 1 }}>0{i + 1}</span>
-                  {s.flagship && (
-                    <span style={{
-                      padding: "3px 8px", background: V.accentDim, borderRadius: 4,
-                      fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.12em",
-                    }}>FLAGSHIP</span>
-                  )}
-                </div>
-
-                <h3 style={{ fontFamily: V.heading, fontSize: "1.35rem", fontWeight: 800, color: V.bright, marginBottom: 6, letterSpacing: "-0.03em" }}>{s.title}</h3>
-                <div style={{ fontSize: "0.75rem", color: V.dim, fontWeight: 600, marginBottom: 18 }}>{s.sub}</div>
-                <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.7, marginBottom: 28 }}>{s.desc}</p>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", marginBottom: 32, marginTop: "auto" }}>
-                  {s.feats.map((f, j) => (
-                    <div key={j} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ width: 3, height: 3, borderRadius: "50%", background: s.flagship ? V.accent : V.muted, flexShrink: 0 }} />
-                      <span style={{ fontSize: "0.76rem", color: V.dim }}>{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <a href={s.link || "#contact"} className={`card-link ${s.flagship ? "accent" : "dim"}`}>
-                  {s.link ? "ПОДРОБНЕЕ" : "ОБСУДИТЬ"} <span>→</span>
-                </a>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
+                <span style={{
+                  padding: "5px 12px", background: V.accentDim, borderRadius: 6,
+                  fontSize: "0.6rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em",
+                }}>ПАРТНЁР</span>
+                <span style={{
+                  padding: "5px 12px", background: "rgba(0,0,0,0.03)", borderRadius: 6,
+                  fontSize: "0.6rem", fontWeight: 600, color: V.dim, letterSpacing: "0.06em",
+                }}>REVENUE SHARE</span>
               </div>
-            </Reveal>
-          ))}
+
+              <h3 style={{ fontFamily: V.heading, fontSize: "clamp(1.5rem, 2.5vw, 2rem)", fontWeight: 900, color: V.bright, marginBottom: 10, letterSpacing: "-0.03em", lineHeight: 1.1 }}>
+                Полный цикл<br/>под ключ
+              </h3>
+              <div style={{ fontSize: "0.8rem", color: V.accent, fontWeight: 700, marginBottom: 20, letterSpacing: "0.02em" }}>
+                Цель — рост вашей выручки. Мы на проценте.
+              </div>
+              <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.75, marginBottom: 32, maxWidth: 480 }}>
+                Подключаемся как внешний digital-партнёр и берём на себя весь маркетинг, автоматизацию, дизайн и разработку. Работаем на процент от оборота — зарабатываем только когда растёте вы. Прокачиваем бизнес по всем фронтам: от лидогенерации до AI-автоматизации.
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 36, marginTop: "auto" }}>
+                {[
+                  "Единая стратегия роста оборота",
+                  "Маркетинг + автоматизация + дизайн + разработка",
+                  "Revenue share — наши интересы совпадают",
+                  "Полное погружение в ваш бизнес",
+                  "Прозрачная аналитика и отчётность",
+                ].map((f, j) => (
+                  <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: V.accent, flexShrink: 0, marginTop: 7 }} />
+                    <span style={{ fontSize: "0.82rem", color: V.dim, lineHeight: 1.5 }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              <a href="#contact" className="card-link accent" style={{ fontSize: "0.82rem" }}>
+                ОБСУДИТЬ ПАРТНЁРСТВО <span>→</span>
+              </a>
+            </div>
+          </Reveal>
+
+          {/* RIGHT — 4 directions grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {directions.map((d, i) => (
+              <Reveal key={i} delay={250 + i * 80} type="scale" duration={0.7}>
+                <div className="dir-card" style={{
+                  background: V.card,
+                  border: `1px solid ${V.border}`,
+                  borderRadius: V.radius, padding: "28px 24px",
+                  height: "100%", display: "flex", flexDirection: "column",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
+                  transition: "all .35s cubic-bezier(.16,1,.3,1)",
+                  cursor: "default",
+                }}>
+                  <div style={{ fontSize: "1.6rem", marginBottom: 16, lineHeight: 1 }}>{d.icon}</div>
+                  <h4 style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 800, color: V.bright, marginBottom: 8, letterSpacing: "-0.02em" }}>{d.title}</h4>
+                  <p style={{ fontSize: "0.78rem", color: V.text, lineHeight: 1.65, marginBottom: 16, flex: 1 }}>{d.desc}</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {d.tags.map((tag, j) => (
+                      <span key={j} style={{
+                        padding: "3px 8px", borderRadius: 4, fontSize: "0.58rem", fontWeight: 600,
+                        background: "rgba(0,0,0,0.03)", color: V.dim, letterSpacing: "0.02em",
+                      }}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
+
+        {/* sub-text */}
+        <Reveal delay={500} type="fade">
+          <div style={{
+            display: "flex", alignItems: "center", gap: 20, marginTop: 40, padding: "20px 28px",
+            background: "rgba(0,0,0,0.015)", borderRadius: V.radiusSm, border: `1px solid ${V.divider}`,
+          }}>
+            <div style={{ width: 3, height: 40, borderRadius: 2, background: V.accent, flexShrink: 0 }} />
+            <p style={{ fontSize: "0.82rem", color: V.dim, lineHeight: 1.65, margin: 0 }}>
+              <strong style={{ color: V.bright, fontWeight: 700 }}>Полный цикл</strong> — когда нужен сильный digital-партнёр на долгосрок. <strong style={{ color: V.bright, fontWeight: 700 }}>Отдельное направление</strong> — когда нужна конкретная экспертиза: запустить рекламу, построить CRM, обновить сайт или провести аудит.
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
