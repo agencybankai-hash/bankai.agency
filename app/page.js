@@ -30,12 +30,13 @@ const globalCSS = `
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap');
 
 /* scroll animations */
-@keyframes revealUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
-@keyframes revealDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
-@keyframes revealLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
-@keyframes revealRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
-@keyframes revealScale{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
-@keyframes revealFade{from{opacity:0}to{opacity:1}}
+@keyframes revealUp{from{opacity:0;filter:blur(8px);transform:translateY(60px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes revealDown{from{opacity:0;filter:blur(6px);transform:translateY(-40px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes revealLeft{from{opacity:0;filter:blur(6px);transform:translateX(-60px)}to{opacity:1;filter:blur(0);transform:translateX(0)}}
+@keyframes revealRight{from{opacity:0;filter:blur(6px);transform:translateX(60px)}to{opacity:1;filter:blur(0);transform:translateX(0)}}
+@keyframes revealScale{from{opacity:0;filter:blur(8px);transform:scale(0.88)}to{opacity:1;filter:blur(0);transform:scale(1)}}
+@keyframes revealFade{from{opacity:0;filter:blur(6px)}to{opacity:1;filter:blur(0)}}
+@keyframes revealChar{from{opacity:0;filter:blur(12px);transform:translateY(20px) scale(0.9)}to{opacity:1;filter:blur(0);transform:translateY(0) scale(1)}}
 @keyframes pulse2{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:0}}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes float1{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(1deg)}}
@@ -188,6 +189,41 @@ function Reveal({ children, style: extra, delay = 0, type = "up", duration = 0.8
       animation: visible ? `${animMap[type] || "revealUp"} ${duration}s cubic-bezier(.16,1,.3,1) ${delay}ms both` : "none",
       ...extra,
     }} {...props}>{children}</Tag>
+  );
+}
+
+/* ───── heading with word-by-word reveal ───── */
+function RevealHeading({ children, delay = 0, style: extra, className, tag: Tag = "h2" }) {
+  const [ref, visible] = useInView({ threshold: 0.15 });
+  const text = typeof children === "string" ? children : "";
+  if (!text) return <Tag ref={ref} className={className} style={extra}>{children}</Tag>;
+  const words = text.split(" ");
+  return (
+    <Tag ref={ref} className={className} style={extra}>
+      {words.map((word, i) => (
+        <span key={i} style={{
+          display: "inline-block", marginRight: "0.25em",
+          opacity: visible ? 1 : 0,
+          filter: visible ? "blur(0)" : "blur(10px)",
+          transform: visible ? "translateY(0)" : "translateY(25px)",
+          transition: `all 0.7s cubic-bezier(.16,1,.3,1) ${delay + i * 60}ms`,
+        }}>{word}</span>
+      ))}
+    </Tag>
+  );
+}
+
+/* ───── paragraph with line reveal ───── */
+function RevealParagraph({ children, delay = 0, style: extra }) {
+  const [ref, visible] = useInView({ threshold: 0.15 });
+  return (
+    <p ref={ref} style={{
+      ...extra,
+      opacity: visible ? 1 : 0,
+      filter: visible ? "blur(0)" : "blur(6px)",
+      transform: visible ? "translateY(0)" : "translateY(30px)",
+      transition: `all 0.9s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+    }}>{children}</p>
   );
 }
 
@@ -630,12 +666,10 @@ function MainServices() {
     <section id="services" style={{ padding: "120px 0 80px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
         <Reveal type="fade"><Label num="01" text="Как мы работаем" /></Reveal>
-        <Reveal delay={100}>
-          <h2 className="section-heading" style={{
-            fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900,
-            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 800, marginBottom: 56,
-          }}>Полный цикл или точечные решения</h2>
-        </Reveal>
+        <RevealHeading delay={100} className="section-heading" style={{
+          fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900,
+          lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 800, marginBottom: 56,
+        }}>Полный цикл или точечные решения</RevealHeading>
 
         <div className="services-split" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 20, alignItems: "stretch" }}>
           {/* LEFT — Full-cycle partner */}
@@ -749,12 +783,10 @@ function ServicesGrid() {
     <section style={{ padding: "80px 0 120px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
         <Reveal type="fade"><Label num="02" text="Все услуги" /></Reveal>
-        <Reveal delay={80}>
-          <h2 className="section-heading" style={{
-            fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 600, marginBottom: 48,
-          }}>Каждый канал — как отдельный продукт</h2>
-        </Reveal>
+        <RevealHeading delay={80} className="section-heading" style={{
+          fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+          lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 600, marginBottom: 48,
+        }}>Каждый канал — как отдельный продукт</RevealHeading>
 
         <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
           {services.map((s, i) => (
@@ -780,12 +812,10 @@ function Process() {
     <section id="process" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
         <Reveal type="fade"><Label num="03" text="Процесс" /></Reveal>
-        <Reveal delay={80}>
-          <h2 className="section-heading" style={{
-            fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 600, marginBottom: 56,
-          }}>Как мы работаем</h2>
-        </Reveal>
+        <RevealHeading delay={80} className="section-heading" style={{
+          fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+          lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 600, marginBottom: 56,
+        }}>Как мы работаем</RevealHeading>
 
         <div className="process-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
           {steps.map((s, i) => (
@@ -812,12 +842,10 @@ function Cases() {
     <section id="cases" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
         <Reveal type="fade"><Label num="04" text="Кейсы" /></Reveal>
-        <Reveal delay={80}>
-          <h2 className="section-heading" style={{
-            fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-            lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
-          }}>Результаты говорят за нас</h2>
-        </Reveal>
+        <RevealHeading delay={80} className="section-heading" style={{
+          fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+          lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
+        }}>Результаты говорят за нас</RevealHeading>
 
         <div className="cases-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           {cases.map((c, i) => (
@@ -911,40 +939,65 @@ function Cases() {
   );
 }
 
+/* ═══════════════════════ SCROLL-PROGRESS TEXT REVEAL ═══════════════════════ */
+function useScrollProgress(ref, offset = 0.15) {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * (1 - offset);
+      const end = vh * offset;
+      const raw = 1 - (rect.top - end) / (start - end);
+      setProgress(Math.max(0, Math.min(1, raw)));
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+  }, [ref, offset]);
+  return progress;
+}
+
 /* ═══════════════════════ STATEMENT ═══════════════════════ */
 function Statement() {
-  const [ref, visible] = useInView({ threshold: 0.3 });
+  const sectionRef = useRef(null);
+  const progress = useScrollProgress(sectionRef, 0.2);
   const dimText = "Мы не просто запускаем рекламу. ";
   const brightText = "Мы строим системы, где AI, данные и маркетинг работают как единый механизм";
   const endText = " — и приносят измеримый результат.";
+  const allWords = [
+    ...dimText.split(" ").map(w => ({ word: w, color: V.muted })),
+    ...brightText.split(" ").map(w => ({ word: w, color: V.bright })),
+    ...endText.split(" ").filter(Boolean).map(w => ({ word: w, color: V.muted })),
+  ];
+  const totalWords = allWords.length;
+
   return (
-    <section style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
+    <section ref={sectionRef} style={{ padding: "140px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <h2 ref={ref} style={{
+        <h2 style={{
           fontFamily: V.heading, fontSize: "clamp(1.5rem, 3vw, 2.3rem)",
-          fontWeight: 800, lineHeight: 1.35, letterSpacing: "-0.03em", maxWidth: 850,
+          fontWeight: 800, lineHeight: 1.4, letterSpacing: "-0.03em", maxWidth: 850,
         }}>
-          {dimText.split(" ").map((word, i) => (
-            <span key={`d${i}`} style={{
-              color: V.muted, display: "inline-block", marginRight: "0.3em",
-              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
-              transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${i * 50}ms`,
-            }}>{word}</span>
-          ))}
-          {brightText.split(" ").map((word, i) => (
-            <span key={`b${i}`} style={{
-              color: V.bright, display: "inline-block", marginRight: "0.3em",
-              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
-              transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + i) * 50}ms`,
-            }}>{word}</span>
-          ))}
-          {endText.split(" ").filter(Boolean).map((word, i) => (
-            <span key={`e${i}`} style={{
-              color: V.muted, display: "inline-block", marginRight: "0.3em",
-              opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
-              transition: `all 0.5s cubic-bezier(.16,1,.3,1) ${(dimText.split(" ").length + brightText.split(" ").length + i) * 50}ms`,
-            }}>{word}</span>
-          ))}
+          {allWords.map((item, i) => {
+            const wordProgress = Math.max(0, Math.min(1, (progress * totalWords - i * 0.65) / 1));
+            const opacity = Math.max(0.08, wordProgress);
+            const blur = Math.max(0, (1 - wordProgress) * 10);
+            const y = Math.max(0, (1 - wordProgress) * 18);
+            return (
+              <span key={i} style={{
+                color: item.color,
+                display: "inline-block", marginRight: "0.3em",
+                opacity,
+                filter: `blur(${blur}px)`,
+                transform: `translateY(${y}px)`,
+                transition: "all 0.15s ease-out",
+              }}>{item.word}</span>
+            );
+          })}
         </h2>
       </div>
     </section>
@@ -978,17 +1031,13 @@ function Contact() {
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "start" }}>
           <div>
             <Reveal type="fade"><Label num="05" text="Контакты" /></Reveal>
-            <Reveal delay={80} type="left">
-              <h2 className="section-heading" style={{
-                fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-                lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, marginBottom: 20,
-              }}>Обсудим ваш проект?</h2>
-            </Reveal>
-            <Reveal delay={160} type="fade">
-              <p style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.7, marginBottom: 44, maxWidth: 380 }}>
-                Оставьте заявку — мы свяжемся в течение 24 часов.
-              </p>
-            </Reveal>
+            <RevealHeading delay={80} className="section-heading" style={{
+              fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+              lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, marginBottom: 20,
+            }}>Обсудим ваш проект?</RevealHeading>
+            <RevealParagraph delay={160} style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.7, marginBottom: 44, maxWidth: 380 }}>
+              Оставьте заявку — мы свяжемся в течение 24 часов.
+            </RevealParagraph>
             <Reveal delay={240} type="left">
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                 {[
