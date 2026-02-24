@@ -625,11 +625,15 @@ function RotatingWord() {
   const words = ["выручку", "клиентов", "систему", "результат"];
   const [idx, setIdx] = useState(0);
   useEffect(() => { const t = setInterval(() => setIdx(p => (p + 1) % words.length), 2800); return () => clearInterval(t); }, []);
+  // Find the longest word to set container width
+  const longest = words.reduce((a, b) => a.length > b.length ? a : b);
   return (
-    <span style={{ display: "inline-block", position: "relative", height: "1.1em", overflow: "hidden", verticalAlign: "bottom", width: "auto" }}>
+    <span style={{ display: "inline-block", position: "relative", height: "1.1em", overflow: "hidden", verticalAlign: "bottom" }}>
+      {/* invisible spacer — widest word sets the width */}
+      <span style={{ display: "block", visibility: "hidden", height: 0, overflow: "hidden" }}>{longest}</span>
       {words.map((w, i) => (
         <span key={w} style={{
-          display: "block", position: i === 0 ? "relative" : "absolute", top: 0, left: 0,
+          display: "block", position: "absolute", top: 0, left: 0, whiteSpace: "nowrap",
           color: V.accent,
           transition: "all .5s cubic-bezier(.16,1,.3,1)",
           transform: i === idx ? "translateY(0)" : i === (idx - 1 + words.length) % words.length ? "translateY(-110%)" : "translateY(110%)",
