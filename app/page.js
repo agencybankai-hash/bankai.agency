@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import { cases } from "./cases/data";
 
 /* ───── design tokens (creamy-white light theme) ───── */
 const V = {
@@ -111,22 +113,13 @@ html{scroll-behavior:smooth}
 .form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
 .form-input::placeholder{color:#B0AAA3}
 
-/* case card */
-.case-card{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:pointer}
-.case-card:hover{border-color:rgba(0,0,0,0.12)!important;box-shadow:0 16px 48px rgba(0,0,0,0.06)}
-.case-card:hover .case-cta{opacity:1;transform:translateX(0)}
-
-/* case modal */
-.case-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
-.case-overlay-bg{position:absolute;inset:0;background:rgba(250,248,245,0.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.case-modal{position:relative;width:100%;max-width:780px;max-height:85vh;overflow-y:auto;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:16px;box-shadow:0 32px 80px rgba(0,0,0,0.1);scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.08) transparent}
-.case-modal::-webkit-scrollbar{width:4px}
-.case-modal::-webkit-scrollbar-track{background:transparent}
-.case-modal::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:2px}
-.case-close{position:sticky;top:0;right:0;z-index:10;display:flex;justify-content:flex-end;padding:16px 20px 0}
-.case-close-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.9);color:#8A857F;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:1.1rem;backdrop-filter:blur(8px)}
-.case-close-btn:hover{color:#1A1714;border-color:rgba(0,0,0,0.18);background:#fff}
-@media(max-width:768px){.case-modal{max-height:90vh;margin:8px}.case-modal-metrics{flex-direction:column!important;gap:20px!important}}
+/* case card — Altalogy style */
+.case-card-new{transition:all .45s cubic-bezier(.16,1,.3,1);cursor:pointer}
+.case-card-new:hover{border-color:rgba(0,0,0,0.12)!important;box-shadow:0 20px 60px rgba(0,0,0,0.08);transform:translateY(-4px)}
+.case-card-new:hover .case-img-wrap{transform:scale(1)}
+.case-card-new .case-img-wrap{transition:all .6s cubic-bezier(.16,1,.3,1)}
+.case-card-new:hover .case-arrow span{transform:translateX(4px)}
+.case-card-link{display:block;text-decoration:none!important}
 
 /* footer */
 .footer-logo:hover .footer-dot{opacity:1!important;color:#C8354A!important}
@@ -140,7 +133,7 @@ html{scroll-behavior:smooth}
   .section-heading{font-size:1.8rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
-  .case-inner{grid-template-columns:1fr!important}
+  .case-img-wrap{height:240px!important}
   .stat-grid{grid-template-columns:1fr 1fr!important}
   .services-split{grid-template-columns:1fr!important}
 }
@@ -704,172 +697,45 @@ function Process() {
   );
 }
 
-/* ═══════════════════════ CASES ═══════════════════════ */
-const cases = [
-  {
-    client: "Object First → Veeam", tag: "SaaS · DATA PROTECTION · EXIT", result: "EXIT", resultLabel: "acquired by Veeam",
-    metrics: [{ v: "2+ года", l: "контракт" },{ v: "$100K+", l: "бюджет проекта" },{ v: "Veeam", l: "приобретена" }],
-    desc: "Стартап в сфере ransomware-proof backup storage. Мы были единственной внешней командой на дизайне и разработке на протяжении 2+ лет. Компания была приобретена Veeam — мировым лидером рынка data protection.",
-    scope: ["UI/UX Design", "Figma", "HubSpot CMS", "Веб-разработка", "Landing Pages", "Investor Decks", "One-Pagers", "Marketing Materials"],
-    detail: {
-      challenge: "Object First — стартап из Бостона, создающий ransomware-proof backup storage appliance (Ootbi). Продукт на стыке cybersecurity и data protection. Внутренней дизайн-команды нет, но нужна была полная дизайн- и веб-инфраструктура: брендинг, маркетинговый сайт, продуктовые страницы, материалы для инвесторов и партнёров. Мы стали единственным внешним партнёром по дизайну и фронтенд-разработке.",
-      solution: [
-        { title: "UI/UX дизайн и бренд-система", text: "Разработали полную дизайн-систему в Figma: компоненты, типографика, цветовая палитра, иконки. Создавали продуктовые лендинги, feature pages, сравнительные таблицы с конкурентами, презентации для инвесторов, partner one-pagers, case study templates и все маркетинговые материалы." },
-        { title: "Веб-разработка на HubSpot CMS", text: "Построили маркетинговый сайт с нуля на HubSpot CMS: кастомные модули, blog templates, gated content pages, интеграция с HubSpot CRM для lead capture. Регулярные обновления под каждый продуктовый релиз, A/B тесты лендингов, оптимизация Core Web Vitals." },
-        { title: "Embedded-команда на 2+ года", text: "Работали как выделенная команда: 100–120 часов в месяц, ежедневные стендапы, полное погружение в продукт и roadmap. Часовая модель ($50/час) при стабильной загрузке позволила масштабироваться под задачи — от тихих недель до интенсивных спринтов перед launch events." },
-        { title: "Результат: EXIT → Veeam", text: "Object First была приобретена Veeam — мировым лидером в сфере backup и data protection с оценкой $15B+. Качество дизайна, маркетинговых материалов и веб-присутствия сыграло прямую роль в позиционировании компании перед сделкой." },
-      ],
-      results: [{ v: "EXIT", l: "приобретена Veeam ($15B+)" },{ v: "2+ лет", l: "непрерывный контракт" },{ v: "100–120ч/мес", l: "стабильная загрузка" },{ v: "$100K+", l: "общий бюджет проекта" }],
-    },
-  },
-  {
-    client: "AK Cabinet Craft", tag: "MANUFACTURING · B2C · REVENUE SHARE", result: "3%", resultLabel: "revenue share",
-    metrics: [{ v: "Чикаго", l: "рынок" },{ v: "3%", l: "от выручки" },{ v: "Full-cycle", l: "с нуля" }],
-    desc: "Revenue-share партнёрство с производителем кастомных кухонь и шкафов в Чикаго. Построили весь маркетинг с нуля — от Google Ads и SEO до офлайн-каналов и CRM. Работаем за 3% от выручки вместо фиксированного ретейнера.",
-    scope: ["Google Ads", "Local Services Ads", "SEO", "Google Business Profile", "HubSpot CRM", "Email Sequences", "Контент-маркетинг", "Postcards", "Партнёрства с дизайнерами"],
-    detail: {
-      challenge: "AK Cabinet Craft — семейный производитель кастомных кухонь и шкафов в Чикаго. Средний чек $15K–$40K. До нас клиенты приходили только по сарафану и рефералам от подрядчиков. Онлайн-присутствия ноль: нет рекламы, нет SEO, нет CRM. Нужна была полная маркетинговая инфраструктура — но бюджета на крупный ретейнер не было. Мы предложили revenue share модель.",
-      solution: [
-        { title: "Revenue Share модель (3%)", text: "Вместо фиксированного ретейнера — 3% от закрытых сделок. Мы инвестируем своё время, экспертизу и рекламный бюджет; зарабатываем только когда клиент зарабатывает. Полное совпадение интересов — мы заинтересованы не в лидах, а в закрытых продажах." },
-        { title: "Google Ads + Local Services Ads", text: "Запустили Search-кампании и LSA, нацеленные на homeowners в Чикаго и пригородах с высоким доходом. Ключевые запросы: custom kitchen cabinets, cabinet refacing, kitchen remodel Chicago. Постоянная оптимизация по стоимости лида и квалификации заявок — отсекаем нецелевые обращения." },
-        { title: "SEO + Google Business Profile", text: "Полная оптимизация GBP: регулярные посты, ответы на отзывы, фотографии реальных проектов до/после. SEO: технический аудит, оптимизация мета-тегов, создание location pages под Chicago suburbs, блог с kitchen renovation guides. Цель — доминировать в Local Pack." },
-        { title: "HubSpot CRM + Email + Offline", text: "Внедрили HubSpot: pipeline по этапам (lead → estimate → signed → completed), автоматические follow-up sequences, lead scoring. Email-маркетинг: nurture-серия для тех, кто запросил estimate но не подписал. Offline: direct mail postcards по целевым zip-кодам, партнёрства с interior designers и general contractors." },
-      ],
-      results: [{ v: "3%", l: "revenue share вместо ретейнера" },{ v: "Full-cycle", l: "маркетинг полного цикла с нуля" },{ v: "HubSpot", l: "CRM + pipeline + автоматизация" },{ v: "Online + Offline", l: "Ads + SEO + GBP + Email + Direct Mail" }],
-    },
-  },
-  {
-    client: "SOS Moving → AI Moving", tag: "LOGISTICS · AI SaaS · PERFORMANCE", result: "$14.6M", resultLabel: "в продажах",
-    metrics: [{ v: "10,235", l: "заказов" },{ v: "$400K+", l: "рекламный бюджет" },{ v: "AI SaaS", l: "продукт" }],
-    desc: "Два этапа: performance-маркетинг, который принёс $14.6M в продажах и 10,235 заказов для мувинговой компании. Затем — трансформация накопленной экспертизы в AI SaaS-продукт для всей индустрии переездов.",
-    scope: ["Google Ads", "Performance Max", "SEO", "Schema Markup", "GA4", "CallRail", "HubSpot CRM", "Lead Scoring", "AI Development", "SaaS"],
-    detail: {
-      challenge: "SOS Moving — мувинговая компания в конкурентном рынке. Проблемы: нет маркетинговой системы, высокая стоимость лида, нет трекинга звонков, CRM ведётся в таблицах. Цель первого этапа — построить прибыльную машину лидогенерации. Цель второго — превратить накопленный опыт и данные в отдельный AI SaaS-продукт для всей индустрии.",
-      solution: [
-        { title: "Google Ads: Search + PMax", text: "Запустили и масштабировали Search и Performance Max кампании. $400K+ рекламного бюджета под управлением. Разделение по типам переезда (local, long-distance, commercial), гео-таргетинг, негативные ключевые слова. Постоянная оптимизация ставок и креативов — снижение CPA при росте объёма заказов." },
-        { title: "SEO + контент-стратегия", text: "Полный технический аудит: исправление crawl errors, canonical tags, page speed. Новая архитектура сайта: service pages по типам переезда, location pages по городам. Schema markup (LocalBusiness, FAQ, Review). Контент-стратегия: moving guides, cost calculators, checklists — контент на каждый этап воронки." },
-        { title: "Сквозная аналитика и CRM", text: "Интеграция GA4 + CallRail + HubSpot в единую систему. Каждый звонок записывается, привязывается к keyword и campaign. HubSpot: кастомный pipeline, автоматические follow-up sequences, lead scoring по размеру переезда и срочности. Клиент видит реальный ROI по каждому каналу в реальном времени." },
-        { title: "AI Moving — SaaS-продукт", text: "На основе 10K+ обработанных заказов и накопленных данных создали AI Moving — AI-платформу для мувинговых компаний. Автоматическая оценка стоимости по фото, оптимизация маршрутов, AI-чатбот для квалификации лидов, predictive analytics по загрузке. Из клиентского проекта — в самостоятельный продукт." },
-      ],
-      results: [{ v: "$14.6M", l: "общий объём продаж клиента" },{ v: "10,235", l: "выполненных заказов" },{ v: "$400K+", l: "рекламный бюджет под управлением" },{ v: "AI SaaS", l: "собственный продукт из экспертизы" }],
-    },
-  },
-  {
-    client: "R.O.C.S.", tag: "FMCG · ENTERPRISE · BRAND DESIGN", result: "2+ года", resultLabel: "партнёрство",
-    metrics: [{ v: "Enterprise", l: "масштаб" },{ v: "3 бренда", l: "R.O.C.S. / Splat / BioMio" },{ v: "360°", l: "дизайн" }],
-    desc: "Дизайн-партнёрство с одним из крупнейших FMCG-холдингов России (Splat Global). Поддержка трёх брендов с разным позиционированием: R.O.C.S., Splat, BioMio — от упаковки и key visuals до digital-кампаний и ритейл-материалов.",
-    scope: ["Brand Design", "Key Visual", "Упаковка", "POS-материалы", "Digital-кампании", "SMM-контент", "Промо-лендинги", "Ритейл-оформление"],
-    detail: {
-      challenge: "R.O.C.S. — часть группы компаний Splat Global, один из крупнейших FMCG-холдингов России. Три бренда с принципиально разным позиционированием: R.O.C.S. (премиум oral care, высокая наценка), Splat (масс-маркет, широкая дистрибуция), BioMio (эко-сегмент, осознанное потребление). Нужна была внешняя дизайн-команда, способная работать на enterprise-уровне: быстрые сроки, корпоративные согласования, множество стейкхолдеров, работа по brand guidelines каждого бренда.",
-      solution: [
-        { title: "Brand Design для 3 брендов", text: "Работали параллельно с R.O.C.S., Splat и BioMio. Разрабатывали key visuals для сезонных кампаний, адаптации под разные каналы и форматы. Каждый бренд — свой tone of voice, своя цветовая палитра, свои правила. Переключение между брендами в рамках одного дня." },
-        { title: "Упаковка и ритейл", text: "Дизайн упаковки для новых SKU, обновление существующих линеек. POS-материалы: шелфтокеры, воблеры, стенды. Оформление полок для федеральных сетей (Магнит, Пятёрочка, Перекрёсток). Адаптация под требования международных рынков — разные языки, разные регуляции." },
-        { title: "Digital-кампании и контент", text: "Креативы для performance-рекламы (ВК, Яндекс, Google), SMM-контент для трёх аккаунтов параллельно, промо-лендинги под акции и новинки. Быстрый цикл: от брифа до финального материала за 2–5 дней. Баннеры, сторис, reels, email-шаблоны." },
-        { title: "Enterprise-процессы", text: "Встроились в корпоративную структуру: регулярные созвоны, работа через корпоративный таск-трекер, согласования с brand-менеджерами и product-менеджерами. Строгое следование brand guidelines каждого бренда. Стабильное партнёрство 2+ года без перерывов." },
-      ],
-      results: [{ v: "3 бренда", l: "R.O.C.S. / Splat / BioMio" },{ v: "2+ лет", l: "непрерывное партнёрство" },{ v: "360°", l: "от упаковки до digital" },{ v: "Enterprise", l: "корпоративный масштаб и процессы" }],
-    },
-  },
-];
-
-/* ───── case modal ───── */
-function CaseModal({ data, onClose }) {
-  const overlayRef = useRef(null);
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    requestAnimationFrame(() => setShow(true));
-    const onKey = (e) => { if (e.key === "Escape") handleClose(); };
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
-  }, []);
-
-  const handleClose = () => {
-    setShow(false);
-    setTimeout(onClose, 350);
-  };
-
-  if (!data) return null;
-  const d = data.detail;
-
+/* ═══════════════════════ CASES (Altalogy-style with images) ═══════════════════════ */
+function CaseImage({ c, style }) {
   return (
-    <div className="case-overlay" ref={overlayRef} onClick={(e) => { if (e.target === overlayRef.current || e.target.classList.contains("case-overlay-bg")) handleClose(); }}>
-      <div className="case-overlay-bg" style={{
-        opacity: show ? 1 : 0, transition: "opacity .35s ease",
+    <div style={{
+      width: "100%", height: "100%", position: "relative", overflow: "hidden",
+      background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
+      borderRadius: "inherit",
+      ...style,
+    }}>
+      {/* decorative orbs */}
+      <div style={{
+        position: "absolute", top: "10%", right: "8%", width: "45%", height: "45%", borderRadius: "50%",
+        background: `radial-gradient(circle, ${c.accent}22, transparent 70%)`,
       }} />
-      <div className="case-modal" style={{
-        opacity: show ? 1 : 0,
-        transform: show ? "translateY(0) scale(1)" : "translateY(30px) scale(0.97)",
-        transition: "all .4s cubic-bezier(.16,1,.3,1)",
+      <div style={{
+        position: "absolute", bottom: "15%", left: "5%", width: "30%", height: "30%", borderRadius: "50%",
+        background: `radial-gradient(circle, ${c.accent}18, transparent 70%)`,
+      }} />
+      {/* grid overlay */}
+      <div style={{
+        position: "absolute", inset: 0, opacity: 0.04,
+        backgroundImage: `linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)`,
+        backgroundSize: "50px 50px",
+      }} />
+      {/* result badge */}
+      <div style={{
+        position: "absolute", bottom: 24, right: 24,
+        background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)",
+        borderRadius: 10, padding: "12px 20px", textAlign: "center",
+        border: "1px solid rgba(255,255,255,0.12)",
       }}>
-        <div className="case-close">
-          <button className="case-close-btn" onClick={handleClose} aria-label="Закрыть">✕</button>
-        </div>
-
-        <div style={{ padding: "8px 40px 48px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-            <span style={{ padding: "4px 10px", background: V.accentDim, borderRadius: 4, fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em" }}>{data.tag}</span>
-          </div>
-
-          <h2 style={{ fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 8 }}>{data.client}</h2>
-          <p style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.65, marginBottom: 36, maxWidth: 600 }}>{data.desc}</p>
-
-          <div className="case-modal-metrics" style={{
-            display: "flex", gap: 32, marginBottom: 40, padding: "24px 28px",
-            background: "rgba(0,0,0,0.015)", border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
-          }}>
-            {d.results.map((r, i) => (
-              <div key={i} style={{ flex: 1 }}>
-                <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 3 }}>{r.v}</div>
-                <div style={{ fontSize: "0.65rem", color: V.muted }}>{r.l}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginBottom: 36 }}>
-            <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12 }}>ЗАДАЧА</div>
-            <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.7, maxWidth: 640 }}>{d.challenge}</p>
-          </div>
-
-          <div style={{ marginBottom: 36 }}>
-            <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 20 }}>ЧТО МЫ СДЕЛАЛИ</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {d.solution.map((s, i) => (
-                <div key={i} style={{ padding: "20px 24px", background: "rgba(0,0,0,0.015)", border: `1px solid ${V.border}`, borderRadius: V.radiusSm }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                    <span style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800, color: "rgba(160,28,45,0.35)", minWidth: 20 }}>0{i + 1}</span>
-                    <h4 style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.02em", margin: 0 }}>{s.title}</h4>
-                  </div>
-                  <p style={{ fontSize: "0.82rem", color: V.dim, lineHeight: 1.6, margin: 0, paddingLeft: 32 }}>{s.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 12 }}>УСЛУГИ</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {data.scope.map((s, j) => (
-                <span key={j} style={{ padding: "5px 12px", borderRadius: 100, background: "rgba(0,0,0,0.03)", border: `1px solid ${V.border}`, fontSize: "0.7rem", color: V.dim, fontWeight: 500 }}>{s}</span>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginTop: 40, paddingTop: 28, borderTop: `1px solid ${V.divider}` }}>
-            <a href="#contact" onClick={handleClose} className="btn-primary" style={{ fontFamily: V.body, display: "inline-block" }}>
-              Обсудить похожий проект →
-            </a>
-          </div>
-        </div>
+        <div style={{ fontFamily: V.heading, fontSize: "1.4rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
+        <div style={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.55)", fontWeight: 600, marginTop: 3 }}>{c.resultLabel}</div>
       </div>
     </div>
   );
 }
 
 function Cases() {
-  const [activeCase, setActiveCase] = useState(null);
-
   return (
     <section id="cases" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
       <div style={cx}>
@@ -881,61 +747,63 @@ function Cases() {
           }}>Результаты говорят за нас</h2>
         </Reveal>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {cases.map((c, i) => (
             <Reveal key={i} delay={120 + i * 100} type="up" duration={0.85}>
-              <div className="case-card" onClick={() => setActiveCase(c)} style={{
-                background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
-                padding: "40px 36px", position: "relative", overflow: "hidden",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
-              }}>
-                {i === 0 && <div style={{
-                  position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
-                  background: `linear-gradient(90deg, transparent, rgba(160,28,45,0.12), transparent)`,
-                }} />}
-
-                <div className="case-inner" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                      <span style={{ padding: "4px 10px", background: V.accentDim, borderRadius: 4, fontSize: "0.55rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em" }}>{c.tag}</span>
-                    </div>
-                    <h3 style={{ fontFamily: V.heading, fontSize: "1.5rem", fontWeight: 900, color: V.bright, letterSpacing: "-0.03em", marginBottom: 12 }}>{c.client}</h3>
-                    <p style={{ fontSize: "0.85rem", color: V.dim, lineHeight: 1.65, marginBottom: 20, maxWidth: 420 }}>{c.desc}</p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-                      {c.scope.map((s, j) => (
-                        <span key={j} style={{ padding: "4px 10px", borderRadius: 100, background: "rgba(0,0,0,0.03)", border: `1px solid ${V.border}`, fontSize: "0.65rem", color: V.dim, fontWeight: 500 }}>{s}</span>
-                      ))}
-                    </div>
-                    <span className="case-cta" style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      fontWeight: 600, fontSize: "0.75rem", color: V.accentLit,
-                      letterSpacing: "0.03em", opacity: 0.6,
-                      transform: "translateX(-4px)", transition: "all .35s cubic-bezier(.16,1,.3,1)",
-                    }}>ПОДРОБНЕЕ <span>→</span></span>
+              <Link href={`/cases/${c.slug}`} className="case-card-link" style={{ textDecoration: "none", display: "block" }}>
+                <div className="case-card-new" style={{
+                  background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius,
+                  overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
+                }}>
+                  {/* image */}
+                  <div className="case-img-wrap" style={{ height: 340, overflow: "hidden" }}>
+                    <CaseImage c={c} />
                   </div>
 
-                  <div>
-                    <div style={{ marginBottom: 28 }}>
-                      <div style={{ fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, color: V.bright, letterSpacing: "-0.04em", lineHeight: 1 }}>{c.result}</div>
-                      <div style={{ fontSize: "0.75rem", color: V.muted, fontWeight: 600, marginTop: 4 }}>{c.resultLabel}</div>
-                    </div>
-                    <div style={{ display: "flex", gap: 28 }}>
-                      {c.metrics.map((m, j) => (
-                        <div key={j} style={{ minWidth: 0 }}>
-                          <div style={{ fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800, color: V.text, letterSpacing: "-0.02em", marginBottom: 2 }}>{m.v}</div>
-                          <div style={{ fontSize: "0.65rem", color: V.muted }}>{m.l}</div>
-                        </div>
+                  {/* content */}
+                  <div style={{ padding: "32px 36px 36px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                      {c.tag.split(" · ").map((t, j) => (
+                        <span key={j} style={{
+                          padding: "4px 10px", borderRadius: 4, fontSize: "0.55rem", fontWeight: 700,
+                          background: V.accentDim, color: V.accent, letterSpacing: "0.08em",
+                        }}>{t}</span>
                       ))}
+                    </div>
+
+                    <h3 style={{
+                      fontFamily: V.heading, fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", fontWeight: 900,
+                      color: V.bright, letterSpacing: "-0.03em", marginBottom: 10, lineHeight: 1.15,
+                    }}>{c.client}</h3>
+
+                    <p style={{
+                      fontSize: "0.88rem", color: V.dim, lineHeight: 1.7,
+                      marginBottom: 24, maxWidth: 600,
+                    }}>{c.desc}</p>
+
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", gap: 28 }}>
+                        {c.metrics.map((m, j) => (
+                          <div key={j}>
+                            <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.02em", marginBottom: 2 }}>{m.v}</div>
+                            <div style={{ fontSize: "0.62rem", color: V.muted }}>{m.l}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <span className="case-arrow" style={{
+                        display: "inline-flex", alignItems: "center", gap: 8,
+                        fontWeight: 600, fontSize: "0.78rem", color: V.accent,
+                        letterSpacing: "0.03em", transition: "all .35s",
+                      }}>Подробнее <span style={{ fontSize: "1.1rem", transition: "transform .35s" }}>→</span></span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </Reveal>
           ))}
         </div>
       </div>
-
-      {activeCase && <CaseModal data={activeCase} onClose={() => setActiveCase(null)} />}
     </section>
   );
 }
