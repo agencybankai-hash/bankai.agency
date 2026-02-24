@@ -117,6 +117,9 @@ html{scroll-behavior:smooth}
 .btn-submit:hover:not(:disabled){background:linear-gradient(135deg,#8a1725,#B02A3E);transform:translateY(-2px);box-shadow:0 10px 36px rgba(160,28,45,0.5)}
 .btn-submit:disabled{opacity:0.5;cursor:not-allowed}
 
+/* configurator chips */
+.cfg-chip:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+
 /* input focus */
 .form-input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.08);border-radius:10px;color:#1A1714;font-size:0.88rem;outline:none;transition:all .3s}
 .form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
@@ -157,6 +160,7 @@ html{scroll-behavior:smooth}
   .section-heading{font-size:1.5rem!important}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
+  .contact-card-wrap{padding:36px 24px!important}
   .cases-masonry{grid-template-columns:1fr!important}
   .cases-masonry>div:last-child{padding-top:0!important}
   .case-card-new{height:300px!important}
@@ -1442,11 +1446,93 @@ function Statement() {
   );
 }
 
+/* ═══════════════════════ CONTACT BG ANIMATION ═══════════════════════ */
+function ContactBg() {
+  const ref = useRef(null);
+  const raf = useRef(null);
+  const t = useRef(0);
+
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d");
+    let w, h, dpr;
+
+    const orbs = Array.from({ length: 6 }, (_, i) => ({
+      x: 0.15 + Math.random() * 0.7,
+      y: 0.15 + Math.random() * 0.7,
+      r: 120 + Math.random() * 180,
+      phase: (Math.PI * 2 / 6) * i,
+      speed: 0.15 + Math.random() * 0.2,
+      hue: 355 + Math.random() * 12,
+      sat: 35 + Math.random() * 20,
+      light: 75 + Math.random() * 15,
+      alpha: 0.04 + Math.random() * 0.04,
+    }));
+
+    const resize = () => {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      const rect = c.parentElement.getBoundingClientRect();
+      w = rect.width; h = rect.height;
+      c.width = w * dpr; c.height = h * dpr;
+      c.style.width = w + "px"; c.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize(); addEventListener("resize", resize);
+
+    const draw = () => {
+      t.current += 0.003;
+      const T = t.current;
+      ctx.clearRect(0, 0, w, h);
+
+      for (const o of orbs) {
+        const cx2 = (o.x + Math.sin(T * o.speed + o.phase) * 0.08) * w;
+        const cy2 = (o.y + Math.cos(T * o.speed * 0.7 + o.phase) * 0.06) * h;
+        const r = o.r + Math.sin(T * 0.5 + o.phase) * 30;
+        const grd = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, r);
+        grd.addColorStop(0, `hsla(${o.hue}, ${o.sat}%, ${o.light}%, ${o.alpha})`);
+        grd.addColorStop(0.5, `hsla(${o.hue}, ${o.sat - 10}%, ${o.light + 5}%, ${o.alpha * 0.5})`);
+        grd.addColorStop(1, `hsla(${o.hue}, ${o.sat}%, ${o.light}%, 0)`);
+        ctx.beginPath();
+        ctx.arc(cx2, cy2, r, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+      }
+
+      raf.current = requestAnimationFrame(draw);
+    };
+    raf.current = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf.current); removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden", borderRadius: 24 }}>
+      <canvas ref={ref} style={{ display: "block", width: "100%", height: "100%" }} />
+    </div>
+  );
+}
+
 /* ═══════════════════════ CONTACT ═══════════════════════ */
 function Contact() {
-  const [form, setForm] = useState({ name: "", contact: "", message: "" });
+  const serviceOptions = [
+    "Google Ads / PPC", "SEO", "Meta / Instagram Ads", "CRM и автоматизация",
+    "Дизайн и разработка сайта", "AI-агенты / Чат-боты", "Контент и SMM", "Аудит маркетинга",
+  ];
+  const revenueOptions = ["До $10K/мес", "$10K–$50K/мес", "$50K–$200K/мес", "$200K+/мес", "Стартап / Пока нет выручки"];
+
+  const [form, setForm] = useState({
+    name: "", contact: "", niche: "", revenue: "", link: "", message: "", services: [],
+  });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+
+  const toggleService = (s) => {
+    setForm(prev => ({
+      ...prev,
+      services: prev.services.includes(s)
+        ? prev.services.filter(x => x !== s)
+        : [...prev.services, s],
+    }));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -1456,80 +1542,143 @@ function Contact() {
       await fetch("https://formsubmit.co/ajax/agency.bankai@gmail.com", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ name: form.name, contact: form.contact, message: form.message || "—", _subject: `Заявка от ${form.name}` }),
+        body: JSON.stringify({
+          name: form.name,
+          contact: form.contact,
+          niche: form.niche || "—",
+          revenue: form.revenue || "—",
+          services: form.services.join(", ") || "—",
+          link: form.link || "—",
+          message: form.message || "—",
+          _subject: `Заявка от ${form.name} | ${form.niche || "без ниши"}`,
+        }),
       });
       setSent(true);
     } catch { setSent(true); }
     setSending(false);
   };
 
+  const labelStyle = { fontSize: "0.62rem", color: V.muted, marginBottom: 6, display: "block", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 600 };
+
   return (
     <section id="contact" style={{ padding: "120px 0 140px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "start" }}>
-          <div>
-            <Reveal type="fade"><Label num="05" text="Контакты" /></Reveal>
-            <RevealHeading delay={80} className="section-heading" style={{
-              fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-              lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, marginBottom: 20,
-            }}>Обсудим ваш проект?</RevealHeading>
-            <RevealParagraph delay={160} style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.7, marginBottom: 44, maxWidth: 380 }}>
-              Оставьте заявку — мы свяжемся в течение 24 часов.
-            </RevealParagraph>
-            <Reveal delay={240} type="left">
-              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                {[
-                  { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com" },
-                  { label: "Telegram", value: "@may_work", href: "https://t.me/may_work" },
-                ].map((c, i) => (
-                  <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
-                    <div className="contact-icon" style={{
-                      width: 36, height: 36, borderRadius: 8,
-                      background: "rgba(0,0,0,0.02)", border: `1px solid ${V.border}`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: "0.6rem", fontFamily: V.heading, fontWeight: 700, color: V.muted,
-                    }}>{c.label[0]}</div>
-                    <div>
-                      <div style={{ fontSize: "0.65rem", color: V.muted, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 1 }}>{c.label}</div>
-                      <div style={{ color: V.bright, fontWeight: 600, fontSize: "0.85rem" }}>{c.value}</div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-
-          <Reveal delay={150} type="right" duration={0.9}>
-            <div style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radius, padding: "36px 32px", boxShadow: "0 2px 12px rgba(0,0,0,0.03)" }}>
-              {sent ? (
-                <div style={{ textAlign: "center", padding: "44px 0" }}>
-                  <div style={{ fontFamily: V.heading, fontSize: "1.3rem", fontWeight: 800, color: V.bright, marginBottom: 10 }}>Заявка отправлена</div>
-                  <p style={{ color: V.dim, fontSize: "0.88rem" }}>Мы свяжемся с вами в ближайшее время.</p>
-                </div>
-              ) : (
-                <form onSubmit={submit}>
-                  <div style={{ fontSize: "0.82rem", color: V.dim, marginBottom: 24 }}>Заполните форму — мы свяжемся с вами.</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    <div>
-                      <label htmlFor="form-name" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Имя</label>
-                      <input id="form-name" className="form-input" style={{ fontFamily: V.body }} placeholder="Как вас зовут" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-                    </div>
-                    <div>
-                      <label htmlFor="form-contact" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Контакт</label>
-                      <input id="form-contact" className="form-input" style={{ fontFamily: V.body }} placeholder="Телефон или email" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
-                    </div>
-                    <div>
-                      <label htmlFor="form-message" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>О проекте</label>
-                      <textarea id="form-message" className="form-input" style={{ fontFamily: V.body, minHeight: 80, resize: "vertical" }} placeholder="Расскажите кратко" value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
-                    </div>
-                    <button type="submit" disabled={sending} className="btn-submit" style={{ fontFamily: V.body }}>
-                      {sending ? "Отправляем..." : "Отправить заявку →"}
-                    </button>
+        {/* animated card wrapper */}
+        <div style={{ position: "relative", borderRadius: 24, padding: "64px 56px", overflow: "hidden", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(20px)", border: `1px solid ${V.border}`, boxShadow: "0 8px 48px rgba(0,0,0,0.06)" }} className="contact-card-wrap">
+          <ContactBg />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 56, alignItems: "start" }}>
+              {/* LEFT — info */}
+              <div>
+                <Reveal type="fade"><Label num="05" text="Контакты" /></Reveal>
+                <RevealHeading delay={80} className="section-heading" style={{
+                  fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+                  lineHeight: 1.1, letterSpacing: "-0.04em", color: V.bright, marginBottom: 16,
+                }}>Расскажите о вашем проекте</RevealHeading>
+                <RevealParagraph delay={160} style={{ fontSize: "0.92rem", color: V.dim, lineHeight: 1.7, marginBottom: 44, maxWidth: 380 }}>
+                  Заполните бриф — мы изучим ваш бизнес и предложим решение в течение 48 часов.
+                </RevealParagraph>
+                <Reveal delay={240} type="left">
+                  <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                    {[
+                      { label: "Email", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com" },
+                      { label: "Telegram", value: "@may_work", href: "https://t.me/may_work" },
+                    ].map((c, i) => (
+                      <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
+                        <div className="contact-icon" style={{
+                          width: 36, height: 36, borderRadius: 8,
+                          background: "rgba(0,0,0,0.02)", border: `1px solid ${V.border}`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: "0.6rem", fontFamily: V.heading, fontWeight: 700, color: V.muted,
+                        }}>{c.label[0]}</div>
+                        <div>
+                          <div style={{ fontSize: "0.65rem", color: V.muted, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 1 }}>{c.label}</div>
+                          <div style={{ color: V.bright, fontWeight: 600, fontSize: "0.85rem" }}>{c.value}</div>
+                        </div>
+                      </a>
+                    ))}
                   </div>
-                </form>
-              )}
+                </Reveal>
+              </div>
+
+              {/* RIGHT — configurator form */}
+              <Reveal delay={150} type="right" duration={0.9}>
+                <div style={{ background: "rgba(255,255,255,0.85)", border: `1px solid ${V.border}`, borderRadius: V.radius, padding: "32px 28px", boxShadow: "0 2px 16px rgba(0,0,0,0.04)" }}>
+                  {sent ? (
+                    <div style={{ textAlign: "center", padding: "44px 0" }}>
+                      <div style={{ fontSize: "2rem", marginBottom: 12 }}>🚀</div>
+                      <div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>Бриф получен!</div>
+                      <p style={{ color: V.dim, fontSize: "0.85rem", lineHeight: 1.6 }}>Мы изучим ваш проект и свяжемся<br />в течение 48 часов.</p>
+                    </div>
+                  ) : (
+                    <form onSubmit={submit}>
+                      {/* Step 1: What do you need? */}
+                      <div style={{ marginBottom: 24 }}>
+                        <label style={labelStyle}>Что вас интересует?</label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                          {serviceOptions.map((s) => {
+                            const active = form.services.includes(s);
+                            return (
+                              <button key={s} type="button" onClick={() => toggleService(s)} className="cfg-chip" style={{
+                                padding: "7px 14px", borderRadius: 8, fontSize: "0.74rem", fontWeight: 600,
+                                fontFamily: V.body, cursor: "pointer", transition: "all .25s cubic-bezier(.16,1,.3,1)",
+                                background: active ? V.accent : "rgba(0,0,0,0.03)",
+                                color: active ? "#fff" : V.text,
+                                border: `1px solid ${active ? V.accent : "rgba(0,0,0,0.08)"}`,
+                              }}>{s}</button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Step 2: Name + Contact */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                        <div>
+                          <label htmlFor="cfg-name" style={labelStyle}>Имя</label>
+                          <input id="cfg-name" className="form-input" style={{ fontFamily: V.body }} placeholder="Как вас зовут" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                        </div>
+                        <div>
+                          <label htmlFor="cfg-contact" style={labelStyle}>Телефон или email</label>
+                          <input id="cfg-contact" className="form-input" style={{ fontFamily: V.body }} placeholder="Как связаться" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
+                        </div>
+                      </div>
+
+                      {/* Step 3: Niche + Revenue */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                        <div>
+                          <label htmlFor="cfg-niche" style={labelStyle}>Ниша / индустрия</label>
+                          <input id="cfg-niche" className="form-input" style={{ fontFamily: V.body }} placeholder="Напр: e-commerce, SaaS" value={form.niche} onChange={e => setForm({ ...form, niche: e.target.value })} />
+                        </div>
+                        <div>
+                          <label htmlFor="cfg-revenue" style={labelStyle}>Текущий оборот</label>
+                          <select id="cfg-revenue" className="form-input" style={{ fontFamily: V.body, cursor: "pointer", color: form.revenue ? V.bright : V.muted }} value={form.revenue} onChange={e => setForm({ ...form, revenue: e.target.value })}>
+                            <option value="" disabled>Выберите</option>
+                            {revenueOptions.map(r => <option key={r} value={r}>{r}</option>)}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Step 4: Link */}
+                      <div style={{ marginBottom: 16 }}>
+                        <label htmlFor="cfg-link" style={labelStyle}>Ссылка на сайт или соцсети</label>
+                        <input id="cfg-link" className="form-input" style={{ fontFamily: V.body }} placeholder="https://..." value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} />
+                      </div>
+
+                      {/* Step 5: Message */}
+                      <div style={{ marginBottom: 20 }}>
+                        <label htmlFor="cfg-msg" style={labelStyle}>Что хотите рассказать ещё?</label>
+                        <textarea id="cfg-msg" className="form-input" style={{ fontFamily: V.body, minHeight: 70, resize: "vertical" }} placeholder="Задачи, сроки, бюджет, ожидания..." value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
+                      </div>
+
+                      <button type="submit" disabled={sending} className="btn-submit" style={{ fontFamily: V.body }}>
+                        {sending ? "Отправляем..." : "Отправить бриф →"}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </Reveal>
             </div>
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>
