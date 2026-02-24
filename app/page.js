@@ -352,21 +352,21 @@ function SvcIcon({ name, size = 28 }) {
 }
 
 const services = [
-  { t: "Google Ads", d: "Search, Performance Max, YouTube — настройка и масштабирование.", icon: "google" },
-  { t: "Meta Ads", d: "Facebook + Instagram с фокусом на конверсии.", icon: "meta" },
-  { t: "SEO", d: "Технический SEO, контент-стратегия, линкбилдинг.", icon: "seo" },
-  { t: "Web Dev", d: "Next.js, React — быстрые сайты и лендинги.", icon: "web" },
-  { t: "CRM", d: "HubSpot, Salesforce — настройка и автоматизация.", icon: "crm" },
-  { t: "Analytics", d: "GA4, Looker Studio, сквозная аналитика.", icon: "analytics" },
-  { t: "Content", d: "Блоги, рассылки, SMM, видео — контент, что продаёт.", icon: "content" },
-  { t: "Branding", d: "Логотипы, UI/UX, фирменный стиль, креативы.", icon: "branding" },
+  { t: "Google Ads", d: "Search, PMax, YouTube — от запуска до снижения CPA на 40%.", icon: "google" },
+  { t: "Meta Ads", d: "Facebook + Instagram: таргетинг, ретаргетинг, Lookalike-аудитории.", icon: "meta" },
+  { t: "SEO", d: "Технический аудит, контент-стратегия, линкбилдинг, рост органики.", icon: "seo" },
+  { t: "Web Dev", d: "Next.js, React — сайты с конверсией выше среднего по рынку.", icon: "web" },
+  { t: "CRM", d: "HubSpot, Salesforce — воронки, scoring, автоматические follow-up.", icon: "crm" },
+  { t: "Analytics", d: "GA4, Looker Studio — сквозная аналитика от клика до сделки.", icon: "analytics" },
+  { t: "Content", d: "Блоги, рассылки, SMM, видео — контент, который генерирует лиды.", icon: "content" },
+  { t: "Branding", d: "Логотипы, UI/UX, фирменный стиль, дизайн-системы.", icon: "branding" },
 ];
 
 const steps = [
   { n: "01", t: "Аудит", d: "Анализируем текущие процессы и находим точки роста." },
   { n: "02", t: "Стратегия", d: "Проектируем систему под ваши цели и бюджет." },
   { n: "03", t: "Внедрение", d: "Интегрируем решения в бизнес-процессы." },
-  { n: "04", t: "Масштаб", d: "Оптимизируем и растим результаты." },
+  { n: "04", t: "Масштаб", d: "Анализируем данные, находим точки роста и масштабируем то, что работает." },
 ];
 
 /* ═══════════════════════ GRADIENT ARC (light theme) ═══════════════════════ */
@@ -882,7 +882,7 @@ function Hero() {
 
             <Reveal delay={300} type="fade" duration={1}>
               <p style={{ fontSize: "1.02rem", color: V.dim, maxWidth: 440, lineHeight: 1.75, marginBottom: 40 }}>
-                Маркетинг, автоматизация, дизайн и разработка — единая digital-команда для вашего бизнеса. На проценте от оборота.
+                Маркетинг, автоматизация, дизайн и разработка — единая digital-команда, которая растёт вместе с вашим бизнесом.
               </p>
             </Reveal>
 
@@ -931,7 +931,7 @@ function Hero() {
                   <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>SaaS · Data Protection</span>
                 </div>
                 <div style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 800, color: "#fff", marginBottom: 6 }}>Object First → Veeam</div>
-                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.5, marginBottom: 16 }}>Единственная внешняя дизайн-команда. 2+ года → приобретена Veeam.</div>
+                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.5, marginBottom: 16 }}>Единственная внешняя дизайн-команда. 2+ года → клиент приобретён Veeam.</div>
                 <div style={{ display: "flex", gap: 20 }}>
                   <div><div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 900, color: "#e94560" }}>EXIT</div><div style={{ fontSize: "0.5rem", color: "rgba(255,255,255,0.3)" }}>acquired</div></div>
                   <div><div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 900, color: "#fff" }}>2+</div><div style={{ fontSize: "0.5rem", color: "rgba(255,255,255,0.3)" }}>лет</div></div>
@@ -974,8 +974,8 @@ function Hero() {
                 <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, marginBottom: 4 }}>AK Cabinet Craft</div>
                 <div style={{ fontSize: "0.68rem", color: V.dim, lineHeight: 1.5, marginBottom: 12 }}>Full-cycle маркетинг за 3% от выручки. Чикаго.</div>
                 <div style={{ display: "flex", gap: 16 }}>
-                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.accent }}>3%</div><div style={{ fontSize: "0.48rem", color: V.muted }}>rev share</div></div>
-                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.bright }}>Full</div><div style={{ fontSize: "0.48rem", color: V.muted }}>cycle</div></div>
+                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.accent }}>3%</div><div style={{ fontSize: "0.48rem", color: V.muted }}>от выручки</div></div>
+                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.bright }}>Full</div><div style={{ fontSize: "0.48rem", color: V.muted }}>цикл</div></div>
                 </div>
               </div>
             </Reveal>
@@ -1020,7 +1020,7 @@ function MainServices() {
   return (
     <section id="services" style={{ padding: "120px 0 80px", position: "relative", zIndex: 1 }}>
       <div style={cx}>
-        <Reveal type="fade"><Label num="01" text="Как мы работаем" /></Reveal>
+        <Reveal type="fade"><Label num="01" text="Направления" /></Reveal>
         <RevealHeading delay={100} className="section-heading" style={{
           fontFamily: V.heading, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", fontWeight: 900,
           lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 800, marginBottom: 56,
@@ -1321,7 +1321,7 @@ function Statement() {
   const sectionRef = useRef(null);
   const progress = useScrollProgress(sectionRef, 0.2);
   const dimText = "Мы не просто запускаем рекламу. ";
-  const brightText = "Мы строим системы, где AI, данные и маркетинг работают как единый механизм";
+  const brightText = "Мы создаём экосистему, где AI, данные и маркетинг работают как единый механизм";
   const endText = " — и приносят измеримый результат.";
   const allWords = [
     ...dimText.split(" ").map(w => ({ word: w, color: V.muted })),
@@ -1425,7 +1425,7 @@ function Contact() {
                 </div>
               ) : (
                 <form onSubmit={submit}>
-                  <div style={{ fontSize: "0.82rem", color: V.dim, marginBottom: 24 }}>Заполните форму — мы вернёмся к вам.</div>
+                  <div style={{ fontSize: "0.82rem", color: V.dim, marginBottom: 24 }}>Заполните форму — мы свяжемся с вами.</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                     <div>
                       <label htmlFor="form-name" style={{ fontSize: "0.65rem", color: V.muted, marginBottom: 5, display: "block", letterSpacing: "0.06em", textTransform: "uppercase" }}>Имя</label>
