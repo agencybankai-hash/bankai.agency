@@ -446,18 +446,18 @@ function GradientArc() {
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const h = () => setScrolled(scrollY > 60);
+    const h = () => setScrolled(scrollY > 38);
     addEventListener("scroll", h, { passive: true });
     return () => removeEventListener("scroll", h);
   }, []);
   return (
     <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+      position: "fixed", top: scrolled ? 0 : 38, left: 0, right: 0, zIndex: 100,
       height: 64, display: "flex", alignItems: "center",
       background: scrolled ? "rgba(250,248,245,0.92)" : "transparent",
       backdropFilter: scrolled ? "blur(20px)" : "none",
       borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
-      transition: "background .5s cubic-bezier(.16,1,.3,1), backdrop-filter .5s, border-bottom .5s",
+      transition: "all .5s cubic-bezier(.16,1,.3,1)",
     }}>
       <div style={{ ...cx, width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", color: V.bright, letterSpacing: "-0.04em", flexShrink: 0 }}>
