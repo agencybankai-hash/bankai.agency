@@ -43,6 +43,7 @@ const globalCSS = `
 @keyframes float2{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-10px) rotate(-1.5deg)}}
 @keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes scrollLine{0%{transform:translateY(-100%)}50%{transform:translateY(100%)}100%{transform:translateY(-100%)}}
 @keyframes slideWord{0%{opacity:0;transform:translateY(100%)}10%{opacity:1;transform:translateY(0)}30%{opacity:1;transform:translateY(0)}40%{opacity:0;transform:translateY(-100%)}100%{opacity:0;transform:translateY(-100%)}}
 .hero-float-1{animation:float1 6s ease-in-out infinite}
 .hero-float-2{animation:float2 7s ease-in-out infinite .5s}
@@ -208,6 +209,16 @@ function useInView(opts = {}) {
     return () => obs.disconnect();
   }, [threshold, rootMargin]);
   return [ref, visible];
+}
+
+function useScrollY() {
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    const h = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+  return scrollY;
 }
 
 function Reveal({ children, style: extra, delay = 0, type = "up", duration = 0.8, tag: Tag = "div", ...props }) {
@@ -448,13 +459,17 @@ function Nav({ t, locale }) {
 function NetworkCanvas() {
   const canvasRef = useRef(null);
   const raf = useRef(null);
-  const t = useRef(0);
+  const tRef = useRef(0);
+  const scrollRef = useRef(0);
 
   useEffect(() => {
     const c = canvasRef.current;
     if (!c) return;
     const ctx = c.getContext("2d");
     let w, h, dpr;
+
+    const handleScroll = () => { scrollRef.current = window.scrollY; };
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     const resize = () => {
       dpr = devicePixelRatio;
@@ -467,28 +482,34 @@ function NetworkCanvas() {
     resize();
 
     const particles = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 14; i++) {
       particles.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        r: Math.random() * 1.5 + 1,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 2 + 0.8,
+        phase: Math.random() * Math.PI * 2,
       });
     }
 
     const draw = () => {
-      ctx.fillStyle = "rgba(250,248,245,0)";
-      ctx.fillRect(0, 0, w, h);
-      t.current += 0.005;
+      ctx.clearRect(0, 0, w, h);
+      tRef.current += 0.004;
+      const T = tRef.current;
+      const scrollFactor = Math.min(scrollRef.current / 600, 1);
 
       particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > w) p.vx *= -1;
-        if (p.y < 0 || p.y > h) p.vy *= -1;
+        // Add scroll-driven drift
+        p.x += p.vx + Math.sin(T + p.phase) * 0.15;
+        p.y += p.vy + scrollFactor * 0.3;
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
 
-        ctx.fillStyle = `rgba(160,28,45,${0.15 + Math.sin(t.current + i) * 0.08})`;
+        const alpha = (0.2 + Math.sin(T + i) * 0.1) * (1 - scrollFactor * 0.5);
+        ctx.fillStyle = `rgba(160,28,45,${alpha})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
@@ -498,8 +519,9 @@ function NetworkCanvas() {
           const dx = p2.x - p.x;
           const dy = p2.y - p.y;
           const d = Math.sqrt(dx * dx + dy * dy);
-          if (d < 200) {
-            ctx.strokeStyle = `rgba(160,28,45,${0.1 * (1 - d / 200)})`;
+          const maxDist = 180 - scrollFactor * 60;
+          if (d < maxDist) {
+            ctx.strokeStyle = `rgba(160,28,45,${0.08 * (1 - d / maxDist) * (1 - scrollFactor * 0.5)})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -517,6 +539,7 @@ function NetworkCanvas() {
     return () => {
       cancelAnimationFrame(raf.current);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -544,12 +567,42 @@ function RotatingWord({ words }) {
 }
 
 function Hero({ t, locale }) {
+  const scrollY = useScrollY();
+  const vh = typeof window !== "undefined" ? window.innerHeight : 900;
+  const scrollRatio = Math.min(scrollY / vh, 1);
+
+  // Parallax speeds for different layers
+  const textY = scrollY * 0.4;
+  const textOpacity = Math.max(0, 1 - scrollRatio * 1.5);
+  const cardsY = scrollY * 0.15;
+  const cardsOpacity = Math.max(0, 1 - scrollRatio * 1.2);
+  const bgScale = 1 + scrollRatio * 0.1;
+  const statsOpacity = Math.max(0, 1 - scrollRatio * 2);
+
   return (
     <section style={{ padding: "0", position: "relative", overflow: "hidden", minHeight: "100vh", display: "flex", alignItems: "center" }}>
-      <DigitalGrid />
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${bgScale})`, transformOrigin: "center center", transition: "none" }}>
+        <DigitalGrid />
+      </div>
+
+      {/* Large ambient gradient orb */}
+      <div style={{
+        position: "absolute", top: "10%", right: "-5%", width: "60vw", height: "60vw", maxWidth: 800, maxHeight: 800,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(160,28,45,0.06) 0%, rgba(160,28,45,0.02) 40%, transparent 70%)",
+        filter: "blur(40px)",
+        transform: `translateY(${scrollY * 0.08}px) scale(${1 + Math.sin(Date.now() * 0.001) * 0.02})`,
+        pointerEvents: "none", zIndex: 0,
+      }} />
+
       <div style={{ ...cx, zIndex: 1, position: "relative", width: "100%", paddingTop: 120, paddingBottom: 60 }}>
         <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr", gap: 48, alignItems: "center" }}>
-          <div>
+          {/* Text layer - moves faster on scroll */}
+          <div style={{
+            transform: `translateY(-${textY}px)`,
+            opacity: textOpacity,
+            willChange: "transform, opacity",
+          }}>
             <Reveal type="fade" duration={1.2}>
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px",
@@ -592,6 +645,7 @@ function Hero({ t, locale }) {
               <div className="stat-grid" style={{
                 display: "grid", gridTemplateColumns: "repeat(3, auto)", gap: 48,
                 paddingTop: 28, borderTop: `1px solid ${V.divider}`, maxWidth: 420,
+                opacity: statsOpacity,
               }}>
                 {t.hero.stats.map((stat, i) => (
                   <div key={i}>
@@ -605,7 +659,13 @@ function Hero({ t, locale }) {
             </Reveal>
           </div>
 
-          <div className="hero-right" style={{ position: "relative", minHeight: 480, paddingTop: 60 }}>
+          {/* Cards layer - moves slower on scroll, creating depth */}
+          <div className="hero-right" style={{
+            position: "relative", minHeight: 480, paddingTop: 60,
+            transform: `translateY(-${cardsY}px)`,
+            opacity: cardsOpacity,
+            willChange: "transform, opacity",
+          }}>
             <NetworkCanvas />
             <Reveal delay={400} type="scale" duration={1}>
               <div className="hero-float-1 hero-visual-card" style={{
@@ -674,12 +734,48 @@ function Hero({ t, locale }) {
           </div>
         </div>
       </div>
+
+      {/* Scroll indicator */}
+      <div style={{
+        position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+        opacity: Math.max(0, 1 - scrollRatio * 4),
+        transition: "opacity 0.3s",
+      }}>
+        <div style={{ fontSize: "0.6rem", color: V.muted, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase" }}>scroll</div>
+        <div style={{
+          width: 1, height: 28, position: "relative", overflow: "hidden",
+        }}>
+          <div style={{
+            position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+            background: `linear-gradient(to bottom, ${V.accent}, transparent)`,
+            animation: "scrollLine 2s ease-in-out infinite",
+          }} />
+        </div>
+      </div>
     </section>
   );
 }
 
 function Marquee({ t }) {
   const [ref, visible] = useInView({ threshold: 0.3 });
+  const sectionRef = useRef(null);
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const vh = window.innerHeight;
+      if (rect.top < vh && rect.bottom > 0) {
+        const progress = (vh - rect.top) / (vh + rect.height);
+        setOffset(progress * 300);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const words = t.marquee;
   const row = words.map((w, i) => (
     <span key={i} style={{
@@ -691,10 +787,10 @@ function Marquee({ t }) {
     </span>
   ));
   return (
-    <section style={{ padding: "60px 0", overflow: "hidden", background: V.bg, position: "relative", zIndex: 1 }}>
+    <section ref={sectionRef} style={{ padding: "60px 0", overflow: "hidden", background: V.bg, position: "relative", zIndex: 1 }}>
       <div ref={ref} style={{
         display: "flex", opacity: visible ? 1 : 0.4, transition: "opacity 1s ease",
-        animation: visible ? "marquee 20s linear infinite" : "none",
+        transform: `translateX(-${offset}px)`,
       }}>
         {row}
         {row}
@@ -1312,7 +1408,7 @@ export default function Page() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: globalCSS }} />
-      <div style={{ background: V.bg, color: V.text, minHeight: "100vh", fontFamily: V.body, overflowX: "hidden" }}>
+      <div style={{ background: V.bg, color: V.text, minHeight: "100vh", fontFamily: V.body, overflowX: "hidden", position: "relative" }}>
         <div className="dev-banner" style={{
           position: "relative", zIndex: 101,
           background: V.accent, color: "#fff", textAlign: "center",
