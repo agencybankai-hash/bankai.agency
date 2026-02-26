@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getDictionary } from "../i18n";
@@ -769,7 +769,7 @@ function Marquee({ t }) {
       const vh = window.innerHeight;
       if (rect.top < vh && rect.bottom > 0) {
         const progress = (vh - rect.top) / (vh + rect.height);
-        setOffset(progress * 300);
+        setOffset(progress * 200);
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -777,20 +777,48 @@ function Marquee({ t }) {
   }, []);
 
   const words = t.marquee;
-  const row = words.map((w, i) => (
-    <span key={i} style={{
-      display: "inline-block", whiteSpace: "nowrap", marginRight: 60,
-      fontFamily: V.heading, fontSize: "clamp(1rem, 2.5vw, 2.2rem)",
-      fontWeight: 900, letterSpacing: "-0.03em", color: V.bright,
-    }}>
-      {w}
-    </span>
-  ));
+  const renderItem = (w, i) => {
+    const isOutline = i % 3 === 1;
+    return (
+      <React.Fragment key={`${i}-${w}`}>
+        <span style={{
+          display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
+          fontFamily: V.heading, fontSize: "clamp(0.85rem, 2vw, 1.6rem)",
+          fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase",
+          color: isOutline ? "transparent" : V.bright,
+          WebkitTextStroke: isOutline ? `1.2px ${V.bright}` : "none",
+          opacity: isOutline ? 0.45 : 0.85,
+          transition: "opacity 0.5s ease",
+        }}>
+          {w}
+        </span>
+        <span style={{
+          display: "inline-flex", alignItems: "center", margin: "0 36px",
+          flexShrink: 0,
+        }}>
+          <span style={{
+            width: 5, height: 5, borderRadius: "50%",
+            background: V.accent, opacity: 0.3,
+          }} />
+        </span>
+      </React.Fragment>
+    );
+  };
+  const row = words.map(renderItem);
   return (
-    <section ref={sectionRef} style={{ padding: "60px 0", overflow: "hidden", background: V.bg, position: "relative", zIndex: 1 }}>
+    <section ref={sectionRef} style={{ padding: "48px 0", overflow: "hidden", background: V.bg, position: "relative", zIndex: 1 }}>
+      {/* Edge fade overlays */}
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 120, background: `linear-gradient(to right, ${V.bg}, transparent)`, zIndex: 2, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 120, background: `linear-gradient(to left, ${V.bg}, transparent)`, zIndex: 2, pointerEvents: "none" }} />
+      {/* Top subtle line */}
+      <div style={{ position: "absolute", top: 0, left: "10%", right: "10%", height: 1, background: `linear-gradient(90deg, transparent, ${V.divider}, transparent)` }} />
+      {/* Bottom subtle line */}
+      <div style={{ position: "absolute", bottom: 0, left: "10%", right: "10%", height: 1, background: `linear-gradient(90deg, transparent, ${V.divider}, transparent)` }} />
       <div ref={ref} style={{
-        display: "flex", opacity: visible ? 1 : 0.4, transition: "opacity 1s ease",
+        display: "flex", alignItems: "center",
+        opacity: visible ? 1 : 0.3, transition: "opacity 1.2s ease",
         transform: `translateX(-${offset}px)`,
+        willChange: "transform",
       }}>
         {row}
         {row}
