@@ -1253,8 +1253,8 @@ function Contact({ t }) {
                 <Reveal delay={240} type="left">
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                     {[
-                      { label: t.contact.emailLabel, value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
-                      { label: t.contact.telegramLabel, value: "@may_work", href: "https://t.me/may_work", icon: "https://cdn.simpleicons.org/telegram/26A5E4" },
+                      { label: "EMAIL", value: "agency.bankai@gmail.com", href: "mailto:agency.bankai@gmail.com", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
+                      { label: "TELEGRAM", value: "@may_work", href: "https://t.me/may_work", icon: "https://cdn.simpleicons.org/telegram/26A5E4" },
                     ].map((c, i) => (
                       <a key={i} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener" className="contact-link">
                         <div className="contact-icon" style={{
@@ -1280,12 +1280,12 @@ function Contact({ t }) {
                     <div style={{ textAlign: "center", padding: "44px 0" }}>
                       <div style={{ fontSize: "2rem", marginBottom: 12 }}>🚀</div>
                       <div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 800, color: V.bright, marginBottom: 8 }}>{t.contact.successTitle}</div>
-                      <p style={{ color: V.dim, fontSize: "0.85rem", lineHeight: 1.6 }}>{t.contact.successMessage}</p>
+                      <p style={{ color: V.dim, fontSize: "0.85rem", lineHeight: 1.6 }}>{t.contact.successText}</p>
                     </div>
                   ) : (
                     <form onSubmit={submit}>
                       <div style={{ marginBottom: 24 }}>
-                        <label style={labelStyle}>{t.contact.whatInterests}</label>
+                        <label style={labelStyle}>{t.contact.labelInterest}</label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                           {serviceOptions.map((s) => {
                             const active = form.services.includes(s);
@@ -1304,41 +1304,41 @@ function Contact({ t }) {
 
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
                         <div>
-                          <label htmlFor="cfg-name" style={labelStyle}>{t.contact.nameLabel}</label>
-                          <input id="cfg-name" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.namePlaceholder} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                          <label htmlFor="cfg-name" style={labelStyle}>{t.contact.labelName}</label>
+                          <input id="cfg-name" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.placeholderName} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
                         </div>
                         <div>
-                          <label htmlFor="cfg-contact" style={labelStyle}>{t.contact.contactLabel}</label>
-                          <input id="cfg-contact" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.contactPlaceholder} value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
+                          <label htmlFor="cfg-contact" style={labelStyle}>{t.contact.labelContact}</label>
+                          <input id="cfg-contact" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.placeholderContact} value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} required />
                         </div>
                       </div>
 
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
                         <div>
-                          <label htmlFor="cfg-niche" style={labelStyle}>{t.contact.nicheLabel}</label>
-                          <input id="cfg-niche" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.nichePlaceholder} value={form.niche} onChange={e => setForm({ ...form, niche: e.target.value })} />
+                          <label htmlFor="cfg-niche" style={labelStyle}>{t.contact.labelNiche}</label>
+                          <input id="cfg-niche" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.placeholderNiche} value={form.niche} onChange={e => setForm({ ...form, niche: e.target.value })} />
                         </div>
                         <div>
-                          <label htmlFor="cfg-revenue" style={labelStyle}>{t.contact.revenueLabel}</label>
+                          <label htmlFor="cfg-revenue" style={labelStyle}>{t.contact.labelRevenue}</label>
                           <select id="cfg-revenue" className="form-input" style={{ fontFamily: V.body, cursor: "pointer", color: form.revenue ? V.bright : V.muted }} value={form.revenue} onChange={e => setForm({ ...form, revenue: e.target.value })}>
-                            <option value="" disabled>{t.contact.revenueSelect}</option>
+                            <option value="" disabled>{t.contact.placeholderRevenue}</option>
                             {revenueOptions.map(r => <option key={r} value={r}>{r}</option>)}
                           </select>
                         </div>
                       </div>
 
                       <div style={{ marginBottom: 16 }}>
-                        <label htmlFor="cfg-link" style={labelStyle}>{t.contact.linkLabel}</label>
-                        <input id="cfg-link" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.linkPlaceholder} value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} />
+                        <label htmlFor="cfg-link" style={labelStyle}>{t.contact.labelLink}</label>
+                        <input id="cfg-link" className="form-input" style={{ fontFamily: V.body }} placeholder={t.contact.placeholderLink} value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} />
                       </div>
 
                       <div style={{ marginBottom: 24 }}>
-                        <label htmlFor="cfg-message" style={labelStyle}>{t.contact.messageLabel}</label>
-                        <textarea id="cfg-message" className="form-input" style={{ fontFamily: V.body, minHeight: 80, resize: "vertical" }} placeholder={t.contact.messagePlaceholder} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
+                        <label htmlFor="cfg-message" style={labelStyle}>{t.contact.labelMessage}</label>
+                        <textarea id="cfg-message" className="form-input" style={{ fontFamily: V.body, minHeight: 80, resize: "vertical" }} placeholder={t.contact.placeholderMessage} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
                       </div>
 
                       <button type="submit" className="btn-submit" disabled={sending}>
-                        {sending ? t.contact.sendingButton : t.contact.sendButton}
+                        {sending ? t.contact.sending : t.contact.submit}
                       </button>
                     </form>
                   )}
@@ -1366,18 +1366,14 @@ function Footer({ t }) {
               BANKAI<span style={{ color: "#E94560", margin: "0 0.01em" }}>.</span>AGENCY
             </div>
             <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginBottom: 20 }}>
-              {t.footer.about}
+              {t.footer.tagline}
             </p>
           </div>
 
           <div>
-            <h4 style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, color: "rgba(255,255,255,0.6)" }}>{t.footer.menuTitle}</h4>
+            <h4 style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, color: "rgba(255,255,255,0.6)" }}>{t.footer.navTitle}</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { href: "#services", label: t.footer.services },
-                { href: "#process", label: t.footer.process },
-                { href: "#cases", label: t.footer.cases },
-              ].map((item) => (
+              {t.footer.navItems.map((item) => (
                 <a key={item.href} href={item.href} className="footer-nav-link" style={{
                   color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", textDecoration: "none", transition: "color .3s",
                 }}>
@@ -1388,7 +1384,7 @@ function Footer({ t }) {
           </div>
 
           <div>
-            <h4 style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, color: "rgba(255,255,255,0.6)" }}>{t.footer.connectTitle}</h4>
+            <h4 style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, color: "rgba(255,255,255,0.6)" }}>{t.footer.contactTitle}</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <a href="mailto:agency.bankai@gmail.com" className="footer-nav-link" style={{
                 color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", textDecoration: "none", transition: "color .3s",
@@ -1409,7 +1405,7 @@ function Footer({ t }) {
 
         <div className="footer-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.2)" }}>
-            © {new Date().getFullYear()} Bankai Agency. {t.footer.rights}
+            © {new Date().getFullYear()} Bankai Agency. {t.footer.copyright}
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             {["AI", "ADS", "CRM", "SEO"].map((tag, i) => (
