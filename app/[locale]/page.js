@@ -44,6 +44,9 @@ const globalCSS = `
 @keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes scrollLine{0%{transform:translateY(-100%)}50%{transform:translateY(100%)}100%{transform:translateY(-100%)}}
+@keyframes typingDot{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-chip:hover{background:rgba(160,28,45,0.06)!important;border-color:rgba(160,28,45,0.15)!important;color:#A01C2D!important}
+.chat-input-wrap:focus-within{border-color:rgba(160,28,45,0.25)!important;background:rgba(255,255,255,0.8)!important;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
 @keyframes slideWord{0%{opacity:0;transform:translateY(100%)}10%{opacity:1;transform:translateY(0)}30%{opacity:1;transform:translateY(0)}40%{opacity:0;transform:translateY(-100%)}100%{opacity:0;transform:translateY(-100%)}}
 .hero-float-1{animation:float1 6s ease-in-out infinite}
 .hero-float-2{animation:float2 7s ease-in-out infinite .5s}
@@ -175,8 +178,7 @@ html{scroll-behavior:smooth}
   .stat-grid{grid-template-columns:repeat(3,1fr)!important;gap:16px!important}
   .services-split{grid-template-columns:1fr!important}
   .hero-grid{grid-template-columns:1fr!important;gap:32px!important}
-  .hero-right{min-height:320px!important;padding-top:20px!important}
-  .hero-right .hero-visual-card{position:relative!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;width:100%!important;max-width:320px!important;margin-bottom:12px!important}
+  .hero-right{min-height:auto!important;padding-top:0!important}
   .dir-inner-grid{grid-template-columns:1fr!important}
   .nav-links{display:none!important}
   .nav-burger{display:flex!important}
@@ -566,6 +568,226 @@ function RotatingWord({ words }) {
   );
 }
 
+/* ═══════════════════════ AI CHAT ═══════════════════════ */
+function AiChat({ t, locale }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const chips = t.chat?.chips || [];
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  const send = async (text) => {
+    const msg = text || input.trim();
+    if (!msg || loading) return;
+    setInput("");
+    setExpanded(true);
+
+    const userMsg = { role: "user", content: msg };
+    const next = [...messages, userMsg];
+    setMessages(next);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: next, locale }),
+      });
+      const data = await res.json();
+      if (data.text) {
+        setMessages([...next, { role: "assistant", content: data.text }]);
+      } else {
+        setMessages([...next, { role: "assistant", content: t.chat?.errorMsg || "Произошла ошибка. Попробуйте ещё раз." }]);
+      }
+    } catch {
+      setMessages([...next, { role: "assistant", content: t.chat?.errorMsg || "Произошла ошибка. Попробуйте ещё раз." }]);
+    }
+    setLoading(false);
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  return (
+    <div style={{
+      background: "rgba(255,255,255,0.75)",
+      backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+      border: `1px solid ${V.border}`,
+      borderRadius: 20,
+      boxShadow: "0 8px 48px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+      display: "flex", flexDirection: "column",
+      overflow: "hidden",
+      transition: "all 0.5s cubic-bezier(.16,1,.3,1)",
+      height: expanded ? 520 : "auto",
+      maxHeight: 520,
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: "16px 20px", borderBottom: `1px solid ${V.divider}`,
+        display: "flex", alignItems: "center", gap: 10,
+        flexShrink: 0,
+      }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 10,
+          background: `linear-gradient(135deg, ${V.accent}, #C8354A)`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0,
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2a7 7 0 0 1 7 7c0 3-2 5.5-4 7.5L12 20l-3-3.5C7 14.5 5 12 5 9a7 7 0 0 1 7-7z" fill="rgba(255,255,255,0.2)" />
+            <circle cx="12" cy="9" r="2" fill="#fff" stroke="none" />
+          </svg>
+        </div>
+        <div>
+          <div style={{ fontFamily: V.heading, fontSize: "0.82rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.02em" }}>
+            {t.chat?.title || "Bankai AI"}
+          </div>
+          <div style={{ fontSize: "0.62rem", color: V.muted }}>
+            {t.chat?.subtitle || "Спросите о наших услугах"}
+          </div>
+        </div>
+        {expanded && messages.length > 0 && (
+          <button onClick={() => { setMessages([]); setExpanded(false); }} style={{
+            marginLeft: "auto", background: "none", border: "none", cursor: "pointer",
+            fontSize: "0.65rem", color: V.muted, padding: "4px 8px", borderRadius: 6,
+            transition: "all .2s",
+          }}
+            onMouseEnter={e => e.target.style.color = V.accent}
+            onMouseLeave={e => e.target.style.color = V.muted}
+          >
+            {t.chat?.clear || "Очистить"}
+          </button>
+        )}
+      </div>
+
+      {/* Messages */}
+      {expanded && (
+        <div ref={scrollRef} style={{
+          flex: 1, overflow: "auto", padding: "16px 20px",
+          display: "flex", flexDirection: "column", gap: 12,
+          scrollBehavior: "smooth",
+        }}>
+          {messages.length === 0 && (
+            <div style={{ padding: "20px 0", textAlign: "center" }}>
+              <div style={{ fontSize: "0.78rem", color: V.dim, lineHeight: 1.6 }}>
+                {t.chat?.welcome || "Расскажите о вашем бизнесе или задайте вопрос — я помогу подобрать решение."}
+              </div>
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div key={i} style={{
+              display: "flex",
+              justifyContent: m.role === "user" ? "flex-end" : "flex-start",
+            }}>
+              <div style={{
+                maxWidth: "82%",
+                padding: "10px 14px",
+                borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
+                background: m.role === "user"
+                  ? `linear-gradient(135deg, ${V.accent}, #C8354A)`
+                  : "rgba(0,0,0,0.04)",
+                color: m.role === "user" ? "#fff" : V.bright,
+                fontSize: "0.82rem", lineHeight: 1.55,
+                fontFamily: V.body,
+              }}>
+                {m.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div style={{ display: "flex", justifyContent: "flex-start" }}>
+              <div style={{
+                padding: "10px 14px", borderRadius: "14px 14px 14px 4px",
+                background: "rgba(0,0,0,0.04)",
+              }}>
+                <div className="typing-dots" style={{ display: "flex", gap: 4, alignItems: "center", height: 20 }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{
+                      width: 6, height: 6, borderRadius: "50%", background: V.muted,
+                      animation: `typingDot 1.4s ease-in-out ${i * 0.2}s infinite`,
+                    }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Suggestion chips (shown when not expanded) */}
+      {!expanded && chips.length > 0 && (
+        <div style={{ padding: "12px 20px 4px", display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {chips.map((chip, i) => (
+            <button key={i} onClick={() => send(chip)} style={{
+              padding: "6px 12px", borderRadius: 8, fontSize: "0.7rem", fontWeight: 500,
+              fontFamily: V.body, cursor: "pointer", transition: "all .25s cubic-bezier(.16,1,.3,1)",
+              background: "rgba(0,0,0,0.03)", color: V.dim,
+              border: `1px solid ${V.divider}`,
+              whiteSpace: "nowrap",
+            }}
+              className="chat-chip"
+            >{chip}</button>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <div style={{
+        padding: expanded ? "12px 16px 16px" : "8px 16px 16px",
+        flexShrink: 0,
+      }}>
+        <form onSubmit={(e) => { e.preventDefault(); send(); }} style={{
+          display: "flex", gap: 8, alignItems: "center",
+          background: "rgba(0,0,0,0.03)",
+          border: `1px solid ${V.divider}`,
+          borderRadius: 12, padding: "4px 4px 4px 14px",
+          transition: "all .3s",
+        }}
+          className="chat-input-wrap"
+        >
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={t.chat?.placeholder || "Опишите ваш бизнес или задайте вопрос..."}
+            disabled={loading}
+            style={{
+              flex: 1, border: "none", background: "none", outline: "none",
+              fontSize: "0.82rem", color: V.bright, fontFamily: V.body,
+              padding: "8px 0",
+            }}
+          />
+          <button type="submit" disabled={loading || !input.trim()} style={{
+            width: 36, height: 36, borderRadius: 10, border: "none",
+            background: input.trim() ? `linear-gradient(135deg, ${V.accent}, #C8354A)` : "rgba(0,0,0,0.06)",
+            cursor: input.trim() ? "pointer" : "default",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "all .3s cubic-bezier(.16,1,.3,1)",
+            flexShrink: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim() ? "#fff" : V.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </form>
+        {!expanded && (
+          <div style={{ fontSize: "0.58rem", color: V.muted, textAlign: "center", marginTop: 8, opacity: 0.7 }}>
+            {t.chat?.hint || "AI-ассистент · отвечает за 5 сек · знает всё о наших услугах"}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Hero({ t, locale }) {
   const scrollY = useScrollY();
   const vh = typeof window !== "undefined" ? window.innerHeight : 900;
@@ -659,78 +881,16 @@ function Hero({ t, locale }) {
             </Reveal>
           </div>
 
-          {/* Cards layer - moves slower on scroll, creating depth */}
+          {/* AI Chat — right side */}
           <div className="hero-right" style={{
-            position: "relative", minHeight: 480, paddingTop: 60,
             transform: `translateY(-${cardsY}px)`,
             opacity: cardsOpacity,
             willChange: "transform, opacity",
+            position: "relative", zIndex: 2,
           }}>
-            <NetworkCanvas />
             <Reveal delay={400} type="scale" duration={1}>
-              <div className="hero-float-1 hero-visual-card" style={{
-                position: "absolute", top: 20, right: 0, width: 280, zIndex: 1,
-                background: "linear-gradient(135deg, #1a1a1a, #2d2d2d)",
-                borderRadius: 16, padding: "28px 24px", boxShadow: "0 12px 40px rgba(0,0,0,0.35)",
-                cursor: "default",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <span style={{ padding: "3px 8px", background: "rgba(233,69,96,0.15)", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700, color: "#e94560", letterSpacing: "0.1em" }}>{t.hero.card1.tag}</span>
-                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>SaaS · Data Protection</span>
-                </div>
-                <div style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 800, color: "#fff", marginBottom: 6 }}>Object First → Veeam</div>
-                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.5, marginBottom: 16 }}>{t.hero.card1.desc}</div>
-                <div style={{ display: "flex", gap: 20 }}>
-                  <div><div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 900, color: "#e94560" }}>EXIT</div><div style={{ fontSize: "0.5rem", color: "rgba(255,255,255,0.3)" }}>acquired</div></div>
-                  <div><div style={{ fontFamily: V.heading, fontSize: "1.2rem", fontWeight: 900, color: "#fff" }}>2+</div><div style={{ fontSize: "0.5rem", color: "rgba(255,255,255,0.3)" }}>{t.hero.card1.years}</div></div>
-                </div>
-              </div>
+              <AiChat t={t} locale={locale} />
             </Reveal>
-
-            <Reveal delay={550} type="scale" duration={1}>
-              <div className="hero-float-2 hero-visual-card" style={{
-                position: "absolute", top: 200, left: 10, width: 260, zIndex: 1,
-                background: "linear-gradient(135deg, #111111, #262626)",
-                borderRadius: 16, padding: "24px 22px", boxShadow: "0 12px 40px rgba(0,0,0,0.35)",
-                cursor: "default",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                  <span style={{ padding: "3px 8px", background: "rgba(79,172,254,0.12)", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700, color: "#4facfe", letterSpacing: "0.1em" }}>$14.6M</span>
-                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>Performance + AI</span>
-                </div>
-                <div style={{ fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800, color: "#fff", marginBottom: 6 }}>SOS Moving → AI Moving</div>
-                <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", lineHeight: 1.5, marginBottom: 14 }}>{t.hero.card2.desc}</div>
-                <div style={{ display: "flex", gap: 16 }}>
-                  {[{ v: t.hero.card2.orders, l: t.hero.card2.orders },{ v: t.hero.card2.budget, l: t.hero.card2.budget }].map((m, j) => (
-                    <div key={j}><div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: "#4facfe" }}>{m.v}</div><div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.3)" }}>{m.l}</div></div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal delay={700} type="scale" duration={1}>
-              <div className="hero-float-3 hero-visual-card" style={{
-                position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)", width: 240, zIndex: 1,
-                background: V.card,
-                border: `1px solid ${V.border}`,
-                borderRadius: 16, padding: "22px 20px", boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
-                cursor: "default",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                  <span style={{ padding: "3px 8px", background: "rgba(160,28,45,0.06)", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700, color: V.accent, letterSpacing: "0.1em" }}>REVENUE SHARE</span>
-                </div>
-                <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, marginBottom: 4 }}>AK Cabinet Craft</div>
-                <div style={{ fontSize: "0.68rem", color: V.dim, lineHeight: 1.5, marginBottom: 12 }}>{t.hero.card3.desc}</div>
-                <div style={{ display: "flex", gap: 16 }}>
-                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.accent }}>3%</div><div style={{ fontSize: "0.48rem", color: V.muted }}>{t.hero.card3.revenue}</div></div>
-                  <div><div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.bright }}>Full</div><div style={{ fontSize: "0.48rem", color: V.muted }}>{t.hero.card3.cycle}</div></div>
-                </div>
-              </div>
-            </Reveal>
-
-            <div style={{ position: "absolute", top: 160, right: 280, width: 8, height: 8, borderRadius: "50%", background: V.accentLit, opacity: 0.3, animation: "float1 4s ease-in-out infinite" }} />
-            <div style={{ position: "absolute", bottom: 100, left: 0, width: 6, height: 6, borderRadius: "50%", background: V.accent, opacity: 0.2, animation: "float2 5s ease-in-out infinite" }} />
-            <div style={{ position: "absolute", top: 60, left: 100, width: 4, height: 4, borderRadius: "50%", background: V.muted, opacity: 0.3, animation: "float3 6s ease-in-out infinite" }} />
           </div>
         </div>
       </div>

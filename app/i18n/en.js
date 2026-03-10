@@ -55,6 +55,23 @@ export const en = {
     },
   },
 
+  /* ai chat */
+  chat: {
+    title: "Bankai AI",
+    subtitle: "Ask about our services",
+    placeholder: "Describe your business or ask a question...",
+    hint: "AI assistant · responds in 5 sec · knows everything about our services",
+    welcome: "Hi! Tell me about your business or ask a question — I'll help find the right solution.",
+    clear: "Clear",
+    errorMsg: "Something went wrong. Please try again.",
+    chips: [
+      "How much do your services cost?",
+      "I have an online store",
+      "I need Google Ads setup",
+      "How does revenue share work?",
+    ],
+  },
+
   /* marquee */
   marquee: ["AI AUTOMATION", "GOOGLE ADS", "SEO", "CRM", "ANALYTICS", "PERFORMANCE", "LEAD GEN", "CONTENT", "BRANDING", "WEB DEV"],
 
