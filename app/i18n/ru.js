@@ -197,8 +197,11 @@ export const ru = {
 
   /* footer */
   footer: {
+    ctaHeading: "Готовы расти?",
+    ctaButton: "Обсудить проект",
     tagline: "Digital-партнёр на процент от выручки. Маркетинг, автоматизация, дизайн, разработка.",
     navTitle: "Навигация",
+    stackTitle: "Стек",
     navItems: [
       { label: "Направления", href: "#services" },
       { label: "Услуги", href: "#services" },

@@ -127,7 +127,12 @@ html{scroll-behavior:smooth}
 .cfg-chip:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
 
 /* footer */
-.footer-nav-link:hover{color:rgba(255,255,255,0.85)!important}
+.footer-nav-link:hover{color:rgba(255,255,255,0.9)!important}
+.footer-nav-link:hover .footer-link-line{width:16px!important}
+.footer-nav-link:hover .footer-icon-box{background:rgba(255,255,255,0.1)!important;border-color:rgba(255,255,255,0.15)!important}
+.footer-cta-btn:hover{transform:translateY(-3px)!important;box-shadow:0 8px 48px rgba(160,28,45,0.5),0 0 120px rgba(160,28,45,0.2)!important}
+.footer-cta-btn:hover .footer-cta-arrow{transform:translateX(4px)}
+.footer-tag:hover{background:rgba(200,53,74,0.1)!important;border-color:rgba(200,53,74,0.2)!important;color:rgba(200,53,74,0.7)!important}
 
 /* input focus */
 .form-input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.08);border-radius:10px;color:#1A1714;font-size:0.88rem;outline:none;transition:all .3s}
@@ -170,7 +175,7 @@ html{scroll-behavior:smooth}
   .process-grid{grid-template-columns:1fr 1fr!important}
   .contact-grid{grid-template-columns:1fr!important}
   .contact-card-wrap{padding:36px 24px!important}
-  .footer-top{grid-template-columns:1fr!important;gap:32px!important}
+  .footer-top{grid-template-columns:1fr 1fr!important;gap:32px!important}
   .footer-bottom{flex-direction:column!important;gap:16px!important;align-items:flex-start!important}
   .cases-masonry{grid-template-columns:1fr!important}
   .cases-masonry>div:last-child{padding-top:0!important}
@@ -1512,73 +1517,264 @@ function Contact({ t }) {
   );
 }
 
-function Footer({ t }) {
+function FooterCanvas() {
+  const ref = useRef(null);
+  const raf = useRef(null);
+
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d");
+    let w, h, dpr, T = 0;
+
+    const dots = Array.from({ length: 40 }, () => ({
+      x: Math.random(), y: Math.random(),
+      vx: (Math.random() - 0.5) * 0.0004,
+      vy: (Math.random() - 0.5) * 0.0004,
+      r: Math.random() * 1.5 + 0.5,
+      phase: Math.random() * Math.PI * 2,
+    }));
+
+    const resize = () => {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      const rect = c.parentElement.getBoundingClientRect();
+      w = rect.width; h = rect.height;
+      c.width = w * dpr; c.height = h * dpr;
+      c.style.width = w + "px"; c.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize(); addEventListener("resize", resize);
+
+    const draw = () => {
+      T += 0.003;
+      ctx.clearRect(0, 0, w, h);
+      dots.forEach((d, i) => {
+        d.x += d.vx; d.y += d.vy;
+        if (d.x < 0 || d.x > 1) d.vx *= -1;
+        if (d.y < 0 || d.y > 1) d.vy *= -1;
+        const px = d.x * w, py = d.y * h;
+        const alpha = 0.12 + Math.sin(T * 2 + d.phase) * 0.06;
+        ctx.fillStyle = `rgba(200,53,74,${alpha})`;
+        ctx.beginPath(); ctx.arc(px, py, d.r, 0, Math.PI * 2); ctx.fill();
+        for (let j = i + 1; j < dots.length; j++) {
+          const d2 = dots[j];
+          const dx = (d2.x - d.x) * w, dy = (d2.y - d.y) * h;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.strokeStyle = `rgba(200,53,74,${0.04 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(d2.x * w, d2.y * h); ctx.stroke();
+          }
+        }
+      });
+      raf.current = requestAnimationFrame(draw);
+    };
+    raf.current = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf.current); removeEventListener("resize", resize); };
+  }, []);
+
+  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;
+}
+
+function Footer({ t, locale }) {
+  const footerRef = useRef(null);
+  const progress = useScrollProgress(footerRef, 0.1);
+  const marqueeWords = "BANKAI";
+
   return (
-    <Reveal tag="footer" type="up" duration={1.2} style={{ background: V.bright, color: "#fff", padding: "80px 0 40px", position: "relative", zIndex: 1 }}>
-      <div style={cx}>
-        <div className="footer-top" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 56, marginBottom: 60 }}>
+    <footer ref={footerRef} style={{
+      background: "#0A0A0A", color: "#fff", position: "relative", zIndex: 1, overflow: "hidden",
+    }}>
+      <FooterCanvas />
+
+      {/* Giant typography marquee background */}
+      <div style={{
+        overflow: "hidden", padding: "80px 0 0", position: "relative",
+      }}>
+        <div style={{
+          fontFamily: V.heading, fontSize: "clamp(5rem, 14vw, 12rem)",
+          fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.85,
+          color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.06)",
+          whiteSpace: "nowrap", userSelect: "none",
+          transform: `translateX(${-progress * 120}px)`,
+          transition: "transform 0.1s linear",
+        }}>
+          {Array(5).fill(null).map((_, i) => (
+            <span key={i} style={{ marginRight: "0.3em" }}>
+              {marqueeWords}<span style={{ WebkitTextStroke: "1px rgba(200,53,74,0.12)" }}>.</span>AGENCY{" "}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Main CTA area */}
+      <div style={{ ...cx, position: "relative", zIndex: 2 }}>
+        <div style={{
+          textAlign: "center", padding: "40px 0 80px",
+        }}>
+          <Reveal type="fade" duration={1}>
+            <div style={{
+              fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3.2rem)",
+              fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1,
+              color: "#fff", marginBottom: 20,
+            }}>
+              {t.footer.ctaHeading || "Готовы расти?"}
+            </div>
+          </Reveal>
+          <Reveal delay={100} type="fade">
+            <p style={{ fontSize: "0.92rem", color: "rgba(255,255,255,0.45)", maxWidth: 500, margin: "0 auto 36px", lineHeight: 1.65 }}>
+              {t.footer.tagline}
+            </p>
+          </Reveal>
+          <Reveal delay={200} type="up">
+            <a href="#contact" className="footer-cta-btn" style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              padding: "16px 40px", borderRadius: 100,
+              background: "linear-gradient(135deg, #A01C2D, #C8354A)",
+              color: "#fff", fontFamily: V.heading, fontWeight: 700, fontSize: "0.9rem",
+              letterSpacing: "0.02em", textDecoration: "none",
+              boxShadow: "0 4px 32px rgba(160,28,45,0.4), 0 0 80px rgba(160,28,45,0.15)",
+              transition: "all .4s cubic-bezier(.16,1,.3,1)",
+            }}>
+              {t.footer.ctaButton || "Обсудить проект"} <span style={{ fontSize: "1.1em", transition: "transform .3s" }} className="footer-cta-arrow">→</span>
+            </a>
+          </Reveal>
+        </div>
+
+        {/* Shimmer divider */}
+        <div style={{
+          height: 1, margin: "0 0 56px",
+          background: "linear-gradient(90deg, transparent 0%, rgba(200,53,74,0.3) 30%, rgba(200,53,74,0.5) 50%, rgba(200,53,74,0.3) 70%, transparent 100%)",
+          position: "relative",
+        }}>
+          <div style={{
+            position: "absolute", top: -1, left: 0, right: 0, height: 3,
+            background: "linear-gradient(90deg, transparent, rgba(200,53,74,0.6), transparent)",
+            filter: "blur(3px)",
+          }} />
+        </div>
+
+        {/* Info columns */}
+        <div className="footer-top" style={{
+          display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr 1fr", gap: 40, marginBottom: 56,
+        }}>
+          {/* Brand */}
           <div>
-            <div style={{ fontFamily: V.heading, fontWeight: 900, fontSize: "1.05rem", marginBottom: 24, letterSpacing: "-0.04em", display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="24" height="24" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+            <div style={{
+              fontFamily: V.heading, fontWeight: 900, fontSize: "1.15rem", marginBottom: 16,
+              letterSpacing: "-0.04em", display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <svg width="28" height="28" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
                 <rect width="256" height="256" rx="42.6667" fill="#DF5440"/>
                 <path d="M87.0069 78.4321L172.234 53.5611L172.234 53.5611C196.129 46.5881 208.077 43.1017 210.843 48.0941C213.609 53.0866 204.317 61.367 185.734 77.9279L153.845 106.347C146.512 112.882 142.846 116.15 143.738 119.537C144.63 122.925 149.443 123.966 159.07 126.049C170.467 128.514 176.165 129.747 177.353 133.831C178.542 137.916 174.405 142.001 166.132 150.173L128.971 186.878C114.297 201.372 106.96 208.619 102.485 206.586C101.963 206.348 101.47 206.048 101.02 205.693C97.1598 202.65 100.234 192.806 106.382 173.118C108.3 166.976 109.259 163.905 107.908 161.695C107.739 161.418 107.546 161.156 107.333 160.912C105.626 158.963 102.409 158.963 95.9739 158.963H91.6315C76.3852 158.963 68.7621 158.963 64.4942 154.069C60.2262 149.174 61.2642 141.622 63.34 126.518L66.7154 101.958C67.9389 93.0553 68.5507 88.604 71.309 85.4061C74.0673 82.2081 78.3805 80.9494 87.0069 78.4321Z" fill="white"/>
               </svg>
-              BANKAI<span style={{ color: "#E94560", margin: "0 0.01em" }}>.</span>AGENCY
+              BANKAI<span style={{ color: "#E94560" }}>.</span>AGENCY
             </div>
-            <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginBottom: 20 }}>
+            <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.65, maxWidth: 280 }}>
               {t.footer.tagline}
             </p>
           </div>
 
+          {/* Nav */}
           <div>
-            <h4 style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, color: "rgba(255,255,255,0.6)" }}>{t.footer.navTitle}</h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <h4 style={{
+              fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
+              letterSpacing: "0.15em", textTransform: "uppercase",
+              marginBottom: 20, color: "rgba(255,255,255,0.25)",
+            }}>{t.footer.navTitle}</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {t.footer.navItems.map((item) => (
                 <a key={item.href} href={item.href} className="footer-nav-link" style={{
-                  color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", textDecoration: "none", transition: "color .3s",
+                  color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", textDecoration: "none",
+                  transition: "all .3s", display: "inline-flex", alignItems: "center", gap: 6,
                 }}>
+                  <span style={{
+                    width: 0, height: 1, background: V.accent,
+                    display: "inline-block", transition: "width .3s cubic-bezier(.16,1,.3,1)",
+                  }} className="footer-link-line" />
                   {item.label}
                 </a>
               ))}
             </div>
           </div>
 
+          {/* Contact */}
           <div>
-            <h4 style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, color: "rgba(255,255,255,0.6)" }}>{t.footer.contactTitle}</h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <h4 style={{
+              fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
+              letterSpacing: "0.15em", textTransform: "uppercase",
+              marginBottom: 20, color: "rgba(255,255,255,0.25)",
+            }}>{t.footer.contactTitle}</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <a href="mailto:agency.bankai@gmail.com" className="footer-nav-link" style={{
-                color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", textDecoration: "none", transition: "color .3s",
+                color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
+                transition: "all .3s", display: "flex", alignItems: "center", gap: 10,
               }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 8,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all .3s", flexShrink: 0,
+                }} className="footer-icon-box">
+                  <img src="https://cdn.simpleicons.org/gmail/EA4335" alt="Gmail" width="14" height="14" loading="lazy" />
+                </div>
                 agency.bankai@gmail.com
               </a>
               <a href="https://t.me/may_work" target="_blank" rel="noopener" className="footer-nav-link" style={{
-                color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none", transition: "color .3s", fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
+                color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", textDecoration: "none",
+                transition: "all .3s", display: "flex", alignItems: "center", gap: 10,
               }}>
-                <img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="Telegram" width="16" height="16" style={{ objectFit: "contain", opacity: 0.7 }} loading="lazy" />
+                <div style={{
+                  width: 32, height: 32, borderRadius: 8,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all .3s", flexShrink: 0,
+                }} className="footer-icon-box">
+                  <img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="Telegram" width="14" height="14" loading="lazy" />
+                </div>
                 @may_work
               </a>
             </div>
           </div>
+
+          {/* Tags */}
+          <div>
+            <h4 style={{
+              fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 700,
+              letterSpacing: "0.15em", textTransform: "uppercase",
+              marginBottom: 20, color: "rgba(255,255,255,0.25)",
+            }}>{t.footer.stackTitle || "Stack"}</h4>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {["AI", "Google Ads", "SEO", "CRM", "Meta Ads", "Analytics", "Web Dev", "Branding"].map((tag, i) => (
+                <span key={i} className="footer-tag" style={{
+                  padding: "5px 12px", borderRadius: 6, fontSize: "0.62rem", fontWeight: 600,
+                  background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  letterSpacing: "0.04em",
+                  transition: "all .3s",
+                }}>{tag}</span>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 28 }} />
+        {/* Bottom bar */}
+        <div style={{ height: 1, background: "rgba(255,255,255,0.05)", marginBottom: 24 }} />
 
-        <div className="footer-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.2)" }}>
+        <div className="footer-bottom" style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          paddingBottom: 32,
+        }}>
+          <div style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.18)", letterSpacing: "0.02em" }}>
             © {new Date().getFullYear()} Bankai Agency. {t.footer.copyright}
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            {["AI", "ADS", "CRM", "SEO"].map((tag, i) => (
-              <span key={i} style={{
-                padding: "3px 8px", borderRadius: 4, fontSize: "0.5rem", fontWeight: 700,
-                background: "rgba(160,28,45,0.1)", color: "rgba(200,53,74,0.5)",
-                letterSpacing: "0.1em",
-              }}>{tag}</span>
-            ))}
+          <div style={{
+            fontSize: "0.6rem", color: "rgba(255,255,255,0.12)", letterSpacing: "0.04em",
+          }}>
+            {locale === "ru" ? "Сделано с" : "Built with"} <span style={{ color: "#C8354A", fontSize: "0.7rem" }}>♥</span> {locale === "ru" ? "и AI" : "& AI"}
           </div>
         </div>
       </div>
-    </Reveal>
+    </footer>
   );
 }
 
@@ -1615,7 +1811,7 @@ export default function Page() {
         <Statement t={t} />
         <Divider />
         <Contact t={t} />
-        <Footer t={t} />
+        <Footer t={t} locale={locale} />
       </div>
     </>
   );

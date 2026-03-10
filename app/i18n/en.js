@@ -196,8 +196,11 @@ export const en = {
 
   /* footer */
   footer: {
+    ctaHeading: "Ready to grow?",
+    ctaButton: "Let's talk",
     tagline: "Digital partner on a revenue share. Marketing, automation, design, development.",
     navTitle: "Navigation",
+    stackTitle: "Stack",
     navItems: [
       { label: "Service Lines", href: "#services" },
       { label: "Services", href: "#services" },
