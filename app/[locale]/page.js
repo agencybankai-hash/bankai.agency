@@ -5,26 +5,26 @@ import { useParams } from "next/navigation";
 import { getDictionary } from "../i18n";
 import { getCases } from "./cases/data";
 
-/* ───── design tokens (creamy-white light theme) ───── */
+/* ───── design tokens (clean white, Inter-based, vc.ru editorial) ───── */
 const V = {
-  bg: "#FAF8F5",
-  card: "#FFFFFF",
-  cardHover: "#F5F2EE",
-  text: "#6B6560",
-  dim: "#8A857F",
-  muted: "#B0AAA3",
-  bright: "#1A1714",
+  bg: "#ffffff",
+  card: "#ffffff",
+  cardHover: "#fafafa",
+  text: "#333333",
+  dim: "#666666",
+  muted: "#999999",
+  bright: "#111111",
   accent: "#A01C2D",
   accentLit: "#C8354A",
   accentDim: "rgba(160,28,45,0.06)",
   accentGlow: "rgba(160,28,45,0.12)",
-  border: "rgba(0,0,0,0.07)",
-  borderHover: "rgba(0,0,0,0.14)",
-  divider: "rgba(0,0,0,0.06)",
-  radius: 16,
-  radiusSm: 10,
-  heading: "'Unbounded', sans-serif",
-  body: "'Manrope', -apple-system, sans-serif",
+  border: "#e8e8e8",
+  borderHover: "#d0d0d0",
+  divider: "#eeeeee",
+  radius: 12,
+  radiusSm: 8,
+  heading: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 };
 
 /* ───── global CSS with hover/focus classes ───── */
@@ -59,25 +59,25 @@ const globalCSS = `
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:2px}
-::selection{background:rgba(160,28,45,0.15);color:#1A1714}
+::selection{background:rgba(160,28,45,0.15);color:#111111}
 html{scroll-behavior:smooth}
 
 /* ═══ HOVER & FOCUS CLASSES ═══ */
 
 /* nav links */
-.nav-link{color:#8A857F;font-size:0.8rem;text-decoration:none;font-weight:500;letter-spacing:0.02em;transition:color .3s}
-.nav-link:hover{color:#1A1714}
+.nav-link{color:#666666;font-size:0.8rem;text-decoration:none;font-weight:500;letter-spacing:0.02em;transition:color .3s}
+.nav-link:hover{color:#111111}
 
 /* nav cta */
-.nav-cta{border:1px solid rgba(0,0,0,0.14);color:#1A1714;padding:8px 20px;border-radius:100px;font-weight:600;font-size:0.75rem;text-decoration:none;letter-spacing:0.04em;transition:all .3s;cursor:pointer;background:transparent}
+.nav-cta{border:1px solid rgba(0,0,0,0.14);color:#111111;padding:8px 20px;border-radius:100px;font-weight:600;font-size:0.75rem;text-decoration:none;letter-spacing:0.04em;transition:all .3s;cursor:pointer;background:transparent}
 .nav-cta:hover{background:#A01C2D;border-color:#A01C2D;color:#fff}
 
 /* primary cta (hero) */
-.btn-primary{border:1px solid rgba(0,0,0,0.12);color:#1A1714;padding:14px 36px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1)}
+.btn-primary{border:1px solid rgba(0,0,0,0.12);color:#111111;padding:14px 36px;border-radius:100px;background:rgba(0,0,0,0.03);font-weight:600;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1)}
 .btn-primary:hover{background:#A01C2D;border-color:#A01C2D;color:#fff;transform:translateY(-2px);box-shadow:0 8px 32px rgba(160,28,45,0.2)}
 
 /* ghost cta */
-.btn-ghost{color:#8A857F;padding:14px 36px;border-radius:100px;font-weight:500;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .3s;border:none;background:none}
+.btn-ghost{color:#666666;padding:14px 36px;border-radius:100px;font-weight:500;font-size:0.85rem;text-decoration:none;cursor:pointer;transition:all .3s;border:none;background:none}
 .btn-ghost:hover{color:#A01C2D}
 .btn-ghost:hover .arrow{transform:translateX(4px)}
 .btn-ghost .arrow{display:inline-block;transition:transform .3s}
@@ -87,12 +87,12 @@ html{scroll-behavior:smooth}
 .card-link:hover{gap:10px}
 .card-link.accent{color:#C8354A}
 .card-link.accent:hover{color:#A01C2D}
-.card-link.dim{color:#8A857F}
-.card-link.dim:hover{color:#1A1714}
+.card-link.dim{color:#666666}
+.card-link.dim:hover{color:#111111}
 
 /* service grid card */
 .svc-card{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:24px 20px;transition:all .35s cubic-bezier(.16,1,.3,1);cursor:default}
-.svc-card:hover{background:#FDFCFA;border-color:rgba(0,0,0,0.12);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06)}
+.svc-card:hover{background:#fafafa;border-color:rgba(0,0,0,0.12);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06)}
 .svc-card:hover .svc-icon{opacity:1;transform:scale(1.1)}
 .svc-icon{opacity:0.6;transition:all .35s;transform:scale(1)}
 
@@ -135,9 +135,9 @@ html{scroll-behavior:smooth}
 .footer-tag:hover{background:rgba(200,53,74,0.1)!important;border-color:rgba(200,53,74,0.2)!important;color:rgba(200,53,74,0.7)!important}
 
 /* input focus */
-.form-input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.08);border-radius:10px;color:#1A1714;font-size:0.88rem;outline:none;transition:all .3s}
+.form-input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.08);border-radius:10px;color:#111111;font-size:0.88rem;outline:none;transition:all .3s}
 .form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
-.form-input::placeholder{color:#B0AAA3}
+.form-input::placeholder{color:#999999}
 
 /* case card — image-only, overlay on hover */
 .case-card-new{position:relative;overflow:hidden;border-radius:16px;cursor:pointer;transition:all .5s cubic-bezier(.16,1,.3,1)}
@@ -365,7 +365,7 @@ function DigitalGrid() {
     const color1 = "rgba(160,28,45,0.08)";
     const color2 = "rgba(160,28,45,0.04)";
     const draw = () => {
-      ctx.fillStyle = "#FAF8F5";
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, c.offsetWidth, c.offsetHeight);
       const cols = Math.ceil(c.offsetWidth / cellSize);
       const rows = Math.ceil(c.offsetHeight / cellSize);
@@ -399,7 +399,7 @@ function Nav({ t, locale }) {
       <nav role="navigation" aria-label="Main navigation" style={{
         position: "fixed", top: scrolled ? 0 : 38, left: 0, right: 0, zIndex: 100,
         height: 64, display: "flex", alignItems: "center",
-        background: scrolled || mobileOpen ? "rgba(250,248,245,0.96)" : "transparent",
+        background: scrolled || mobileOpen ? "rgba(255,255,255,0.96)" : "transparent",
         backdropFilter: scrolled || mobileOpen ? "blur(20px)" : "none",
         borderBottom: scrolled ? `1px solid ${V.border}` : "1px solid transparent",
         transition: "all .5s cubic-bezier(.16,1,.3,1)",
@@ -436,7 +436,7 @@ function Nav({ t, locale }) {
       {mobileOpen && (
         <div style={{
           position: "fixed", top: scrolled ? 64 : 102, left: 0, right: 0, bottom: 0, zIndex: 99,
-          background: "rgba(250,248,245,0.98)", backdropFilter: "blur(20px)",
+          background: "rgba(255,255,255,0.98)", backdropFilter: "blur(20px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 32,
           fontFamily: V.body,
         }}>

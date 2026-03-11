@@ -4,12 +4,12 @@ import Link from "next/link";
 
 /* ───── design tokens ───── */
 const V = {
-  bg: "#FAF8F5",
-  text: "#1A1714",
+  bg: "#ffffff",
+  text: "#111111",
   accent: "#A01C2D",
   accentLit: "#C8354A",
-  heading: "'Unbounded', sans-serif",
-  body: "'Manrope', -apple-system, sans-serif",
+  heading: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   dark: "#0A0A0A",
   darkBg: "#0F0F0F",
 };
