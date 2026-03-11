@@ -1296,6 +1296,29 @@ function Process({ t }) {
   );
 }
 
+/* ── Lazy video: only loads & plays when visible ── */
+function LazyVideo({ src, style }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.src = src;
+          el.load();
+          el.play().catch(() => {});
+          io.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [src]);
+  return <video ref={ref} muted loop playsInline preload="auto" style={style} />;
+}
+
 function CaseCardChipsa({ c, locale, delay, isHero }) {
   const h = isHero ? 560 : 440;
   return (
@@ -1305,8 +1328,7 @@ function CaseCardChipsa({ c, locale, delay, isHero }) {
           {/* gradient bg or video */}
           {c.video ? (
             <div className="case-bg-ch" style={{ position: "absolute", inset: 0 }}>
-              <video
-                autoPlay muted loop playsInline preload="auto"
+              <LazyVideo
                 src={c.video}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
               />

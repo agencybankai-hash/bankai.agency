@@ -3,6 +3,29 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getCases, V } from "../data";
+
+/* ── Lazy video: only loads & plays when visible ── */
+function LazyVideo({ src, style }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.src = src;
+          el.load();
+          el.play().catch(() => {});
+          io.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [src]);
+  return <video ref={ref} muted loop playsInline preload="auto" style={style} />;
+}
 import { getDictionary } from "../../../i18n";
 
 /* ── Fonts ── */
@@ -202,8 +225,7 @@ export default function CasePage() {
           {/* Video background if available */}
           {c.video && (
             <>
-              <video
-                autoPlay muted loop playsInline preload="auto"
+              <LazyVideo
                 src={c.video}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
               />
