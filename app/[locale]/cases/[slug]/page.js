@@ -199,8 +199,22 @@ export default function CasePage() {
           background: `linear-gradient(160deg, ${c.color1}, ${c.color2}, ${c.color3})`,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         }}>
-          <div style={{ position: "absolute", top: "5%", right: "10%", width: "50%", height: "50%", borderRadius: "50%", background: `radial-gradient(circle, ${ac}18, transparent 60%)` }} />
-          <div style={{ position: "absolute", bottom: "10%", left: "5%", width: "40%", height: "40%", borderRadius: "50%", background: `radial-gradient(circle, ${ac}12, transparent 65%)` }} />
+          {/* Video background if available */}
+          {c.video && (
+            <>
+              <video
+                autoPlay muted loop playsInline
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
+              >
+                <source src={c.video} type="video/mp4" />
+              </video>
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, rgba(0,0,0,0.55), rgba(0,0,0,0.3))", zIndex: 1 }} />
+            </>
+          )}
+          {!c.video && <>
+            <div style={{ position: "absolute", top: "5%", right: "10%", width: "50%", height: "50%", borderRadius: "50%", background: `radial-gradient(circle, ${ac}18, transparent 60%)` }} />
+            <div style={{ position: "absolute", bottom: "10%", left: "5%", width: "40%", height: "40%", borderRadius: "50%", background: `radial-gradient(circle, ${ac}12, transparent 65%)` }} />
+          </>}
 
           {/* Top nav */}
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, padding: "28px 40px", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 5 }}>

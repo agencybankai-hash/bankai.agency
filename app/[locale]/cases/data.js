@@ -67,6 +67,7 @@ const casesRu = [
     tag: "MANUFACTURING · B2C · REVENUE SHARE",
     result: "3%",
     resultLabel: "revenue share",
+    video: "/ak-cabinet-showcase.mp4",
     color1: "#2d2d2d", color2: "#4a3728", color3: "#6b4423", accent: "#c8935f",
     metrics: [
       { v: "3%", l: "от выручки вместо ретейнера" },
@@ -230,6 +231,7 @@ const casesEn = [
     tag: "MANUFACTURING · B2C · REVENUE SHARE",
     result: "3%",
     resultLabel: "revenue share",
+    video: "/ak-cabinet-showcase.mp4",
     color1: "#2d2d2d", color2: "#4a3728", color3: "#6b4423", accent: "#c8935f",
     metrics: [
       { v: "3%", l: "of revenue instead of retainer" },

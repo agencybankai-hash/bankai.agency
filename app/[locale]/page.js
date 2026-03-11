@@ -1302,16 +1302,29 @@ function CaseCardChipsa({ c, locale, delay, isHero }) {
     <Reveal delay={delay} type="up" duration={0.8}>
       <Link href={`/${locale}/cases/${c.slug}`} className="case-card-link">
         <div className={`case-card-ch ${isHero ? "case-hero-ch" : ""}`} style={{ height: h, borderRadius: 20, position: "relative", overflow: "hidden" }}>
-          {/* gradient bg */}
-          <div className="case-bg-ch" style={{
-            position: "absolute", inset: 0,
-            background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
-          }}>
-            <div style={{ position: "absolute", top: "8%", right: "6%", width: "55%", height: "55%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}30, transparent 60%)` }} />
-            <div style={{ position: "absolute", bottom: "10%", left: "4%", width: "40%", height: "40%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}20, transparent 65%)` }} />
-            {isHero && <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "70%", height: "70%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}15, transparent 50%)` }} />}
-            <div style={{ position: "absolute", inset: 0, opacity: 0.03, backgroundImage: `linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
-          </div>
+          {/* gradient bg or video */}
+          {c.video ? (
+            <div className="case-bg-ch" style={{ position: "absolute", inset: 0 }}>
+              <video
+                autoPlay muted loop playsInline
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+              >
+                <source src={c.video} type="video/mp4" />
+              </video>
+              {/* dark overlay for readability */}
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25))" }} />
+            </div>
+          ) : (
+            <div className="case-bg-ch" style={{
+              position: "absolute", inset: 0,
+              background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
+            }}>
+              <div style={{ position: "absolute", top: "8%", right: "6%", width: "55%", height: "55%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}30, transparent 60%)` }} />
+              <div style={{ position: "absolute", bottom: "10%", left: "4%", width: "40%", height: "40%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}20, transparent 65%)` }} />
+              {isHero && <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "70%", height: "70%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}15, transparent 50%)` }} />}
+              <div style={{ position: "absolute", inset: 0, opacity: 0.03, backgroundImage: `linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
+            </div>
+          )}
 
           {/* top: client name */}
           <div style={{ position: "absolute", top: isHero ? 36 : 28, left: isHero ? 40 : 28, zIndex: 3 }}>
