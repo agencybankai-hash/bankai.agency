@@ -22,6 +22,7 @@ const T = {
   border: "#e5e5e5",
   bg: "#fff",
   bgSoft: "#f2f2f2",
+  stepNum: "#e0e0e0",
   accent: V.accent,
   accentSoft: "rgba(160,28,45,0.07)",
   r: 16,
@@ -72,7 +73,7 @@ const css = `
 
 /* step */
 .ch-step{margin-bottom:80px}
-.ch-step-num{font-family:${F.head};font-size:64px;font-weight:700;color:${T.bgSoft};line-height:1;margin-bottom:12px;letter-spacing:-0.04em}
+.ch-step-num{font-family:${F.head};font-size:64px;font-weight:700;color:${T.stepNum};line-height:1;margin-bottom:12px;letter-spacing:-0.04em}
 
 /* scope tag */
 .ch-scope{padding:8px 18px;border-radius:100px;font-size:13px;font-weight:500;background:${T.bgSoft};color:${T.secondary};font-family:${F.body};transition:all .2s;border:1px solid transparent}
@@ -211,20 +212,20 @@ export default function CasePage() {
               maxWidth: 760, margin: "0 auto 48px",
             }}>{c.desc}</p>
 
-            {/* Meta badges */}
+            {/* Meta info */}
             {(d.timeline || d.model) && (
-              <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 10, marginBottom: 48 }}>
+              <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 24, marginBottom: 48 }}>
                 {d.timeline && (
-                  <span style={{
-                    padding: "8px 18px", borderRadius: 100, fontSize: 14, fontWeight: 600,
-                    background: T.accentSoft, color: T.accent, fontFamily: F.body,
-                  }}>{d.timeline}</span>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: T.muted, marginBottom: 6, fontFamily: F.head }}>{locale === "ru" ? "Срок" : "Timeline"}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: T.accent, fontFamily: F.body }}>{d.timeline}</div>
+                  </div>
                 )}
                 {d.model && (
-                  <span style={{
-                    padding: "8px 18px", borderRadius: 100, fontSize: 14, fontWeight: 500,
-                    background: T.bgSoft, color: T.secondary, fontFamily: F.body,
-                  }}>{d.model}</span>
+                  <div style={{ textAlign: "center", maxWidth: 360 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: T.muted, marginBottom: 6, fontFamily: F.head }}>{locale === "ru" ? "Модель" : "Model"}</div>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: T.secondary, fontFamily: F.body, lineHeight: 1.5 }}>{d.model}</div>
+                  </div>
                 )}
               </div>
             )}
@@ -261,7 +262,7 @@ export default function CasePage() {
         {/* ═══ BEFORE / AFTER ═══ */}
         {c.beforeAfter && (
           <>
-            <Space h={120} />
+            <Space h={80} />
             <div className="ch-content-block">
               <SectionTitle>{locale === "ru" ? "Трансформация" : "Transformation"}</SectionTitle>
               <div className="ch-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 32 }}>
@@ -294,13 +295,13 @@ export default function CasePage() {
         </div>
 
         {/* ═══ CHALLENGE ═══ */}
-        <Space h={120} />
+        <Space h={80} />
         <div className="ch-content-block">
           <SectionTitle>{locale === "ru" ? "Задача" : "Challenge"}</SectionTitle>
           <p style={{
-            fontFamily: F.body, fontSize: "clamp(17px, 2vw, 22px)",
-            color: T.secondary, lineHeight: 1.75, textAlign: "center",
-            maxWidth: 720, margin: "0 auto",
+            fontFamily: F.body, fontSize: "clamp(17px, 2vw, 20px)",
+            color: T.secondary, lineHeight: 1.8, textAlign: "left",
+            maxWidth: 760, margin: "0 auto",
           }}>{d.challenge}</p>
         </div>
 
@@ -311,7 +312,7 @@ export default function CasePage() {
         </div>
 
         {/* ═══ PROCESS ═══ */}
-        <Space h={120} />
+        <Space h={80} />
         <div className="ch-content-block">
           <SectionTitle>{locale === "ru" ? "Что мы сделали" : "What we did"}</SectionTitle>
 
@@ -351,23 +352,24 @@ export default function CasePage() {
         </div>
 
         {/* ═══ RESULTS ═══ */}
-        <Space h={120} />
+        <Space h={80} />
         <div className="ch-content-block">
           <SectionTitle>{locale === "ru" ? "Результаты" : "Results"}</SectionTitle>
 
           <div className="ch-results-grid" style={{
-            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            display: "grid", gridTemplateColumns: `repeat(${Math.min(d.results.length, 3)}, 1fr)`,
             gap: 16, marginTop: 40, marginBottom: 48,
           }}>
             {d.results.map((r, i) => (
               <div key={i} className="ch-mc" style={{
-                padding: "36px 24px", borderRadius: T.r, textAlign: "center", background: T.bgSoft,
+                padding: "36px 20px", borderRadius: T.r, textAlign: "center", background: T.bgSoft,
               }}>
                 <div style={{
-                  fontFamily: F.head, fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 700,
-                  color: T.accent, letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 10,
+                  fontFamily: F.head, fontSize: "clamp(24px, 3.5vw, 36px)", fontWeight: 700,
+                  color: T.accent, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 10,
+                  whiteSpace: "nowrap",
                 }}>{r.v}</div>
-                <div style={{ fontSize: 14, color: T.muted, fontWeight: 500, lineHeight: 1.4, fontFamily: F.body }}>{r.l}</div>
+                <div style={{ fontSize: 13, color: T.muted, fontWeight: 500, lineHeight: 1.4, fontFamily: F.body }}>{r.l}</div>
               </div>
             ))}
           </div>
@@ -384,13 +386,13 @@ export default function CasePage() {
         </div>
 
         {/* ═══ REVIEW ═══ */}
-        <Space h={120} />
-        <div className="ch-content-block" style={{ textAlign: "center" }}>
+        <Space h={80} />
+        <div className="ch-content-block">
           <SectionTitle>{locale === "ru" ? "Отзыв" : "Review"}</SectionTitle>
 
           <div style={{
             padding: "48px 40px", borderRadius: T.r, background: T.bgSoft,
-            position: "relative", maxWidth: 680, margin: "0 auto",
+            position: "relative",
           }}>
             <div style={{
               position: "absolute", top: 16, left: 32,
@@ -424,7 +426,7 @@ export default function CasePage() {
         </div>
 
         {/* ═══ CTA ═══ */}
-        <Space h={120} />
+        <Space h={80} />
         <div style={{
           margin: "0 32px", borderRadius: 24,
           background: T.black, textAlign: "center",
