@@ -78,8 +78,8 @@ const css = `
 .mc:hover{box-shadow:0 4px 24px rgba(0,0,0,0.06)}
 
 /* step */
-.step-row{position:relative;padding-left:48px;margin-bottom:56px}
-.step-num{position:absolute;left:0;top:2px;font-size:13px;font-weight:700;color:${T.muted};width:36px;text-align:right;font-variant-numeric:tabular-nums}
+.step-row{position:relative;margin-bottom:56px}
+.step-num{font-size:13px;font-weight:700;color:${T.muted};font-variant-numeric:tabular-nums;margin-bottom:8px}
 .step-images{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
 
 /* scope tag */
@@ -108,8 +108,6 @@ const css = `
   .case-hero-inner{padding:0 20px!important}
   .case-hero h1{font-size:28px!important}
   .two-col{grid-template-columns:1fr!important}
-  .step-row{padding-left:0!important}
-  .step-num{position:static!important;width:auto!important;text-align:left!important;margin-bottom:8px}
 }
 @media(max-width:480px){
   .results-grid{grid-template-columns:1fr!important}
