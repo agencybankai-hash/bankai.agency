@@ -91,10 +91,10 @@ html{scroll-behavior:smooth}
 .card-link.dim:hover{color:#111111}
 
 /* service grid card */
-.svc-card{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:24px 20px;transition:all .35s cubic-bezier(.16,1,.3,1);cursor:default}
-.svc-card:hover{background:#fafafa;border-color:rgba(0,0,0,0.12);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06)}
-.svc-card:hover .svc-icon{opacity:1;transform:scale(1.1)}
-.svc-icon{opacity:0.6;transition:all .35s;transform:scale(1)}
+.svc-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:28px 24px;transition:all .3s cubic-bezier(.16,1,.3,1);cursor:default}
+.svc-card:hover{background:#fafafa;border-color:#d0d0d0;transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06)}
+.svc-card:hover .svc-icon{opacity:1;transform:scale(1.08)}
+.svc-icon{opacity:0.85;transition:all .3s;transform:scale(1)}
 
 /* process step */
 .process-step{padding:32px 24px;position:relative;transition:all .4s cubic-bezier(.16,1,.3,1);cursor:default;border-radius:8px}
@@ -338,15 +338,84 @@ function Counter({ value, suffix = "", duration = 1800 }) {
   return <span ref={ref}>{display}{suffix}</span>;
 }
 
-function SvcIcon({ name, size = 28 }) {
-  const s = { width: size, height: size, flexShrink: 0, objectFit: "contain" };
-  const logos = {
-    google: "https://cdn.simpleicons.org/googleads",
-    meta: "https://cdn.simpleicons.org/meta",
-    hubspot: "https://cdn.simpleicons.org/hubspot",
-    figma: "https://cdn.simpleicons.org/figma",
+function SvcIcon({ name, size = 32 }) {
+  const s = { width: size, height: size, flexShrink: 0 };
+  const svgProps = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" };
+
+  const icons = {
+    google: (
+      <svg {...svgProps} viewBox="0 0 24 24">
+        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" fill="#4285F4" fillOpacity="0.1" stroke="#4285F4"/>
+        <path d="M17.5 12.3h-5.3v1.8h3c-.3 1.5-1.6 2.5-3 2.5-1.8 0-3.3-1.5-3.3-3.3S10.4 10 12.2 10c.8 0 1.5.3 2.1.8l1.3-1.3C14.6 8.6 13.5 8.2 12.2 8.2 9.4 8.2 7 10.5 7 13.3s2.4 5.2 5.2 5.2c2.7 0 5.2-1.9 5.2-5.2 0-.4 0-.7-.1-1z" fill="#4285F4"/>
+      </svg>
+    ),
+    meta: (
+      <svg {...svgProps} viewBox="0 0 24 24">
+        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" fill="#0081FB" fillOpacity="0.1" stroke="#0081FB"/>
+        <path d="M7.5 15.5c0-1.2.5-2.7 1.2-4 .9-1.6 2-2.7 3-2.7.7 0 1.2.5 1.8 1.5l.5.9.5-.9c.6-1 1.1-1.5 1.8-1.5 1 0 2.1 1.1 3 2.7.7 1.3 1.2 2.8 1.2 4 0 1.4-.8 2.2-2 2.2-.9 0-1.4-.3-2.3-1.3l-.7-.8c-.3-.3-.5-.5-.8-.5s-.5.2-.8.5l-.7.8c-.9 1-1.4 1.3-2.3 1.3-1.2 0-2-.8-2-2.2z" fill="#0081FB"/>
+      </svg>
+    ),
+    seo: (
+      <svg {...svgProps} stroke="#16a34a">
+        <circle cx="11" cy="11" r="7" fill="#16a34a" fillOpacity="0.1"/>
+        <path d="m21 21-4.35-4.35"/>
+        <path d="M11 8v6M8 11h6"/>
+      </svg>
+    ),
+    web: (
+      <svg {...svgProps} stroke="#7c3aed">
+        <rect x="3" y="3" width="18" height="18" rx="3" fill="#7c3aed" fillOpacity="0.1"/>
+        <path d="M3 9h18M9 9v12"/>
+        <circle cx="6" cy="6" r="0.8" fill="#7c3aed" stroke="none"/>
+        <circle cx="8.5" cy="6" r="0.8" fill="#7c3aed" stroke="none"/>
+      </svg>
+    ),
+    crm: (
+      <svg {...svgProps} stroke="#f97316">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" fill="#f97316" fillOpacity="0.1"/>
+        <circle cx="9" cy="7" r="4" fill="#f97316" fillOpacity="0.1"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    ),
+    analytics: (
+      <svg {...svgProps} stroke="#0ea5e9">
+        <rect x="3" y="3" width="18" height="18" rx="3" fill="#0ea5e9" fillOpacity="0.1"/>
+        <path d="M7 17V13M12 17V7M17 17v-4"/>
+      </svg>
+    ),
+    content: (
+      <svg {...svgProps} stroke="#ec4899">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" fill="#ec4899" fillOpacity="0.1"/>
+      </svg>
+    ),
+    branding: (
+      <svg {...svgProps} stroke="#a855f7">
+        <circle cx="13.5" cy="6.5" r="2.5" fill="#a855f7" fillOpacity="0.1"/>
+        <circle cx="6.5" cy="13.5" r="2.5" fill="#a855f7" fillOpacity="0.15"/>
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+      </svg>
+    ),
+    hubspot: (
+      <svg {...svgProps} viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" fill="#ff7a59" fillOpacity="0.1" stroke="#ff7a59"/>
+        <circle cx="12" cy="10.5" r="3" fill="none" stroke="#ff7a59" strokeWidth="1.8"/>
+        <path d="M12 13.5v3M15.5 18l-2-1.5M8.5 18l2-1.5M12 7.5V6" stroke="#ff7a59" strokeWidth="1.5"/>
+        <circle cx="12" cy="5" r="1" fill="#ff7a59" stroke="none"/>
+      </svg>
+    ),
+    figma: (
+      <svg {...svgProps} viewBox="0 0 24 24">
+        <rect x="8" y="2" width="4" height="6" rx="2" fill="#F24E1E" stroke="none"/>
+        <rect x="12" y="2" width="4" height="6" rx="2" fill="#FF7262" stroke="none"/>
+        <rect x="8" y="8" width="4" height="6" rx="2" fill="#A259FF" stroke="none"/>
+        <rect x="12" y="8" width="4" height="6" rx="2" fill="#1ABCFE" stroke="none"/>
+        <rect x="8" y="14" width="4" height="6" rx="2" fill="#0ACF83" stroke="none"/>
+      </svg>
+    ),
   };
-  return logos[name] ? <img src={logos[name]} alt={name} style={s} loading="lazy" /> : <span style={s}>{name}</span>;
+
+  return <div style={s} className="svc-icon">{icons[name] || <span style={{ fontSize: size * 0.8, display: "block", lineHeight: 1 }}>{name}</span>}</div>;
 }
 
 function DigitalGrid() {
@@ -1114,11 +1183,11 @@ function ServicesGrid({ t }) {
           {t.servicesGrid.items.map((item, i) => (
             <Reveal key={i} delay={150 + i * 60} type="up" duration={0.7}>
               <div className="svc-card">
-                <div style={{ marginBottom: 16 }}>
-                  <SvcIcon name={item.icon} size={32} />
+                <div style={{ marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "center", width: 48, height: 48, borderRadius: 12, background: "#fafafa" }}>
+                  <SvcIcon name={item.icon} size={28} />
                 </div>
-                <h4 style={{ fontFamily: V.heading, fontSize: "0.9rem", fontWeight: 800, color: V.bright, marginBottom: 8, letterSpacing: "-0.02em" }}>{item.t}</h4>
-                <p style={{ fontSize: "0.78rem", color: V.dim, lineHeight: 1.65 }}>{item.d}</p>
+                <h4 style={{ fontFamily: V.heading, fontSize: 16, fontWeight: 700, color: V.bright, marginBottom: 8, letterSpacing: "-0.01em" }}>{item.t}</h4>
+                <p style={{ fontSize: 14, color: V.dim, lineHeight: 1.65 }}>{item.d}</p>
               </div>
             </Reveal>
           ))}
