@@ -5,105 +5,114 @@ import Link from "next/link";
 import { getCases, V } from "../data";
 import { getDictionary } from "../../../i18n";
 
-/* ── Placeholder component ── */
+/* ── Local design tokens — Inter-based, vc.ru editorial ── */
+const T = {
+  font: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  black: "#111",
+  dark: "#1a1a1a",
+  body: "#333",
+  secondary: "#666",
+  muted: "#999",
+  light: "#ccc",
+  border: "#e8e8e8",
+  borderLight: "#f0f0f0",
+  bg: "#fff",
+  bgSoft: "#fafafa",
+  accent: V.accent,
+  accentSoft: "rgba(160,28,45,0.07)",
+  r: 12,
+};
+
+/* ── Placeholder ── */
 const Placeholder = ({ text, ratio = "16/9" }) => {
   const [a, b] = ratio.split("/").map(Number);
-  const pb = (b / a) * 100;
   return (
-    <div style={{ position: "relative", width: "100%", paddingBottom: `${pb}%`, marginBottom: 24 }}>
+    <div style={{
+      position: "relative", width: "100%", paddingBottom: `${(b / a) * 100}%`,
+      marginBottom: 32,
+    }}>
       <div style={{
-        position: "absolute", inset: 0,
-        border: `2px dashed rgba(0,0,0,0.10)`, borderRadius: V.radiusSm,
-        background: "rgba(0,0,0,0.015)",
+        position: "absolute", inset: 0, borderRadius: T.r,
+        border: `1.5px dashed ${T.border}`, background: T.bgSoft,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        gap: 10, padding: 24,
+        gap: 8, padding: 32,
       }}>
-        <div style={{ fontSize: "2rem", opacity: 0.4 }}>📷</div>
-        <div style={{ fontSize: "0.78rem", color: V.dim, textAlign: "center", lineHeight: 1.55, maxWidth: "80%" }}>{text}</div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={T.light} strokeWidth="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="m21 15-5-5L5 21" />
+        </svg>
+        <div style={{ fontSize: 13, color: T.muted, textAlign: "center", lineHeight: 1.5, maxWidth: "75%" }}>{text}</div>
       </div>
     </div>
   );
 };
 
-/* ── Section heading with large number accent ── */
-const SectionHeading = ({ num, title, sub }) => (
-  <div style={{ marginBottom: 48, position: "relative" }}>
-    {/* Giant background number */}
-    <div style={{
-      fontFamily: V.heading, fontSize: "clamp(5rem, 12vw, 8rem)", fontWeight: 900,
-      color: "rgba(0,0,0,0.025)", lineHeight: 0.8, position: "absolute",
-      top: -20, left: -8, pointerEvents: "none", userSelect: "none",
-    }}>{num}</div>
-    <div style={{ position: "relative", zIndex: 1 }}>
-      <div style={{
-        fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-        letterSpacing: "0.18em", textTransform: "uppercase", color: V.accent, marginBottom: 12,
-      }}>{num} — {title}</div>
-      {sub && (
-        <h2 style={{
-          fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-          color: V.bright, letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0,
-        }}>{sub}</h2>
-      )}
-    </div>
-  </div>
-);
-
 /* ── CSS ── */
 const css = `
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap');
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:${V.bg}}
-.case-back{display:inline-flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:600;color:${V.dim};text-decoration:none;transition:all .3s;letter-spacing:0.02em}
-.case-back:hover{color:${V.accent};gap:12px}
-.cta-btn{border:none;padding:16px 40px;border-radius:100px;background:${V.accent};color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1);text-decoration:none;display:inline-block;font-family:${V.body}}
-.cta-btn:hover{background:${V.accentLit};transform:translateY(-2px);box-shadow:0 8px 32px rgba(160,28,45,0.25)}
-.scope-tag{transition:all .3s}
-.scope-tag:hover{background:${V.accentDim}!important;border-color:rgba(160,28,45,0.15)!important;color:${V.accent}!important}
-.metric-card{transition:all .3s cubic-bezier(.16,1,.3,1)}
-.metric-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.06)}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{box-sizing:border-box}html{scroll-behavior:smooth}
 
-/* sidebar nav */
+.case-back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:${T.muted};text-decoration:none;transition:color .2s}
+.case-back:hover{color:${T.accent}}
+.case-back svg{transition:transform .2s}
+.case-back:hover svg{transform:translateX(-3px)}
+
+/* sidebar */
 .side-nav{position:relative;align-self:start}
-.side-nav.stuck{position:sticky;top:40px}
-.side-nav-item{display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:all .3s;font-family:${V.body}}
-.side-nav-item:hover .snav-label{color:${V.bright}}
-.snav-dot{width:6px;height:6px;border-radius:50%;background:${V.divider};transition:all .4s cubic-bezier(.16,1,.3,1);flex-shrink:0}
-.snav-dot.active{width:8px;height:8px;background:${V.accent};box-shadow:0 0 12px rgba(160,28,45,0.3)}
-.snav-label{font-size:0.8rem;font-weight:600;color:${V.muted};transition:all .3s;line-height:1.3;letter-spacing:0.01em}
-.snav-label.active{color:${V.bright};font-weight:800}
-.snav-line{width:1px;height:100%;background:${V.divider};margin-left:3px}
+.side-nav.stuck{position:sticky;top:32px}
+.side-nav-item{display:flex;align-items:center;gap:12px;padding:8px 0;cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:all .2s;font-family:${T.font}}
+.side-nav-item:hover .snav-label{color:${T.dark}}
+.snav-dot{width:5px;height:5px;border-radius:50%;background:${T.border};transition:all .3s;flex-shrink:0}
+.snav-dot.active{width:6px;height:6px;background:${T.accent};box-shadow:0 0 0 3px ${T.accentSoft}}
+.snav-label{font-size:14px;font-weight:500;color:${T.muted};transition:all .2s;line-height:1.3}
+.snav-label.active{color:${T.dark};font-weight:600}
+.snav-line-wrap{padding-left:2px}
 
-/* content sections */
-.case-section{margin-bottom:100px;scroll-margin-top:80px}
-.case-section:last-child{margin-bottom:40px}
+/* sections */
+.case-section{margin-bottom:80px;scroll-margin-top:80px}
+.case-section:last-child{margin-bottom:32px}
 
-/* step card */
-.step-card{transition:all .35s cubic-bezier(.16,1,.3,1);cursor:default}
-.step-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12)!important}
+/* metric card */
+.mc{transition:box-shadow .2s}
+.mc:hover{box-shadow:0 4px 24px rgba(0,0,0,0.06)}
 
-/* other case link */
-.oc-link{transition:all .3s}
-.oc-link:hover{border-color:rgba(0,0,0,0.14)!important;transform:translateX(4px)}
+/* step */
+.step-row{position:relative;padding-left:48px;margin-bottom:56px}
+.step-num{position:absolute;left:0;top:2px;font-size:13px;font-weight:700;color:${T.muted};width:36px;text-align:right;font-variant-numeric:tabular-nums}
+.step-images{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+
+/* scope tag */
+.stag{transition:all .2s}
+.stag:hover{background:${T.accentSoft}!important;color:${T.accent}!important;border-color:rgba(160,28,45,0.15)!important}
+
+/* other cases */
+.oc-link{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid ${T.border};border-radius:${T.r}px;text-decoration:none;transition:all .2s;background:#fff}
+.oc-link:hover{border-color:${T.light};box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+
+/* cta button */
+.cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border:none;border-radius:8px;background:${T.dark};color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;font-family:${T.font}}
+.cta-btn:hover{background:${T.black};transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.15)}
 
 @media(max-width:1024px){
   .case-layout{grid-template-columns:1fr!important}
-  .side-nav{position:relative;top:0;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px;
-    position:sticky;top:0;z-index:20;background:rgba(250,248,245,0.95);backdrop-filter:blur(8px);
-    padding:16px 0;border-bottom:1px solid ${V.divider}}
-  .side-nav-item{padding:6px 14px;border-radius:100px;border:1px solid ${V.divider};width:auto;gap:8px}
-  .side-nav-item:has(.snav-dot.active){border-color:${V.accent};background:${V.accentDim}}
+  .side-nav{position:sticky!important;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:6px;
+    padding:14px 0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+    border-bottom:1px solid ${T.border};margin-bottom:32px}
+  .side-nav-item{padding:6px 14px;border-radius:100px;border:1px solid ${T.border};width:auto;gap:6px}
+  .side-nav-item:has(.snav-dot.active){border-color:${T.accent};background:${T.accentSoft}}
   .snav-line-wrap{display:none}
-}
-@media(max-width:768px){
-  .case-hero{min-height:360px!important}
-  .case-hero h1{font-size:1.8rem!important}
-  .two-col{grid-template-columns:1fr!important}
   .step-images{grid-template-columns:1fr!important}
 }
+@media(max-width:768px){
+  .case-hero-inner{padding:0 20px!important}
+  .case-hero h1{font-size:28px!important}
+  .two-col{grid-template-columns:1fr!important}
+  .step-row{padding-left:0!important}
+  .step-num{position:static!important;width:auto!important;text-align:left!important;margin-bottom:8px}
+}
 @media(max-width:480px){
-  .case-hero{min-height:280px!important}
-  .case-hero h1{font-size:1.4rem!important}
-  .results-big{grid-template-columns:1fr!important}
+  .results-grid{grid-template-columns:1fr!important}
 }
 `;
 
@@ -114,7 +123,11 @@ export default function CasePage() {
   const cases = getCases(locale);
   const c = cases.find(x => x.slug === slug);
 
-  if (!c) return <div style={{ padding: 80, textAlign: "center", fontFamily: V.body, color: V.dim }}>{t.caseDetail?.notFound || "Not found"}</div>;
+  if (!c) return (
+    <div style={{ padding: 80, textAlign: "center", fontFamily: T.font, color: T.muted }}>
+      {t.caseDetail?.notFound || "Not found"}
+    </div>
+  );
   const d = c.detail;
 
   /* ── Scroll spy ── */
@@ -132,7 +145,6 @@ export default function CasePage() {
   const [activeSection, setActiveSection] = useState("overview");
   const [heroGone, setHeroGone] = useState(false);
 
-  /* Hero observer — detect when hero leaves viewport */
   useEffect(() => {
     const el = heroRef.current;
     if (!el) return;
@@ -150,9 +162,7 @@ export default function CasePage() {
       const el = sectionRefs.current[id];
       if (!el) return;
       const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(id);
-        },
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
         { rootMargin: "-20% 0px -60% 0px", threshold: 0 }
       );
       obs.observe(el);
@@ -168,7 +178,6 @@ export default function CasePage() {
 
   const setRef = useCallback((id) => (el) => { sectionRefs.current[id] = el; }, []);
 
-  /* ── Placeholder maps per step ── */
   const stepPlaceholders = [
     ["Скриншот структуры рекламных кампаний в Google Ads", "Дашборд с ключевыми метриками: CTR, CPC, CPA, Conversions"],
     ["Скриншот Google Business Profile с отзывами и постами", "Позиции в Google Maps / Local Pack по целевым запросам"],
@@ -176,80 +185,124 @@ export default function CasePage() {
     ["Дизайн direct mail открытки для целевых районов", "Схема партнёрской программы с дизайнерами интерьеров"],
   ];
 
+  /* ── Section heading — editorial style ── */
+  const SectionHead = ({ num, title, sub }) => (
+    <div style={{ marginBottom: 40 }}>
+      <div style={{
+        display: "flex", alignItems: "center", gap: 10, marginBottom: sub ? 12 : 0,
+      }}>
+        <span style={{
+          fontSize: 12, fontWeight: 600, color: T.accent,
+          letterSpacing: "0.06em", fontVariantNumeric: "tabular-nums",
+        }}>{num}</span>
+        <span style={{
+          width: 24, height: 1, background: T.accent, opacity: 0.3, display: "inline-block",
+        }} />
+        <span style={{
+          fontSize: 12, fontWeight: 600, color: T.secondary,
+          letterSpacing: "0.04em", textTransform: "uppercase",
+        }}>{title}</span>
+      </div>
+      {sub && (
+        <h2 style={{
+          fontFamily: T.font, fontSize: "clamp(24px, 3.5vw, 36px)", fontWeight: 800,
+          color: T.dark, letterSpacing: "-0.025em", lineHeight: 1.15, margin: 0,
+        }}>{sub}</h2>
+      )}
+    </div>
+  );
+
+  /* ── Divider ── */
+  const Divider = () => (
+    <div style={{ height: 1, background: T.border, margin: "48px 0" }} />
+  );
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      <div style={{ minHeight: "100vh", fontFamily: V.body, color: V.text }}>
+      <div style={{ minHeight: "100vh", fontFamily: T.font, color: T.body, background: T.bg }}>
+
         {/* ═══ HERO ═══ */}
         <div ref={heroRef} className="case-hero" style={{
-          width: "100%", minHeight: 480, position: "relative", overflow: "hidden",
-          background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
+          width: "100%", position: "relative", overflow: "hidden",
+          background: `linear-gradient(160deg, ${c.color1}, ${c.color2}, ${c.color3})`,
         }}>
-          <div style={{ position: "absolute", top: "15%", right: "10%", width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}22, transparent 70%)` }} />
-          <div style={{ position: "absolute", bottom: "10%", left: "5%", width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}15, transparent 70%)` }} />
-          <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
+          {/* Subtle grain */}
+          <div style={{
+            position: "absolute", inset: 0, opacity: 0.03,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }} />
 
-          {/* Back */}
-          <div style={{ position: "absolute", top: 28, left: 0, right: 0, padding: "0 max(24px, calc((100% - 1200px)/2))" }}>
-            <Link href={`/${locale}/#cases`} className="case-back" style={{ color: "rgba(255,255,255,0.7)" }}>
-              <span>←</span> {t.caseDetail?.backLink || "Назад"}
-            </Link>
-          </div>
-
-          {/* Lang */}
-          <div style={{ position: "absolute", top: 28, right: 0, padding: "0 max(24px, calc((100% - 1200px)/2))", display: "flex", gap: 4 }}>
-            {["ru", "en"].map(l => (
-              <Link key={l} href={`/${l}/cases/${slug}`} style={{
-                fontSize: "0.7rem", fontWeight: 700, textDecoration: "none", padding: "4px 8px", borderRadius: 4,
-                background: locale === l ? "rgba(255,255,255,0.2)" : "transparent",
-                color: locale === l ? "#fff" : "rgba(255,255,255,0.5)",
-              }}>{l.toUpperCase()}</Link>
-            ))}
-          </div>
-
-          {/* Result badge */}
-          <div style={{ position: "absolute", top: 68, right: 0, padding: "0 max(24px, calc((100% - 1200px)/2))" }}>
-            <div style={{
-              background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)",
-              borderRadius: 12, padding: "16px 24px", textAlign: "center",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}>
-              <div style={{ fontFamily: V.heading, fontSize: "1.8rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
-              <div style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.6)", fontWeight: 600, marginTop: 4 }}>{c.resultLabel}</div>
+          <div className="case-hero-inner" style={{
+            maxWidth: 1200, margin: "0 auto", padding: "0 32px",
+            position: "relative", minHeight: 440,
+            display: "flex", flexDirection: "column", justifyContent: "flex-end",
+            paddingBottom: 56, paddingTop: 28,
+          }}>
+            {/* Top bar */}
+            <div style={{ position: "absolute", top: 28, left: 32, right: 32, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Link href={`/${locale}/#cases`} className="case-back" style={{ color: "rgba(255,255,255,0.65)" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                {t.caseDetail?.backLink || "Все кейсы"}
+              </Link>
+              <div style={{ display: "flex", gap: 2 }}>
+                {["ru", "en"].map(l => (
+                  <Link key={l} href={`/${l}/cases/${slug}`} style={{
+                    fontSize: 12, fontWeight: 600, textDecoration: "none", padding: "4px 10px", borderRadius: 6,
+                    background: locale === l ? "rgba(255,255,255,0.18)" : "transparent",
+                    color: locale === l ? "#fff" : "rgba(255,255,255,0.45)",
+                    transition: "all .2s",
+                  }}>{l.toUpperCase()}</Link>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Hero content */}
-          <div style={{ position: "absolute", bottom: 60, left: 0, right: 0, padding: "0 max(24px, calc((100% - 1200px)/2))" }}>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+            {/* Result badge — top right */}
+            <div style={{ position: "absolute", top: 72, right: 32 }}>
+              <div style={{
+                background: "rgba(255,255,255,0.12)", backdropFilter: "blur(16px)",
+                borderRadius: 10, padding: "14px 22px", textAlign: "center",
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}>
+                <div style={{ fontFamily: T.font, fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 500, marginTop: 4 }}>{c.resultLabel}</div>
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
               {c.tag.split(" · ").map((tag, i) => (
                 <span key={i} style={{
-                  padding: "5px 12px", borderRadius: 6, fontSize: "0.58rem", fontWeight: 700,
-                  background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)",
-                  letterSpacing: "0.1em", backdropFilter: "blur(8px)",
+                  padding: "4px 10px", borderRadius: 5, fontSize: 11, fontWeight: 600,
+                  background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.75)",
+                  letterSpacing: "0.04em",
                 }}>{tag}</span>
               ))}
             </div>
+
+            {/* Title */}
             <h1 style={{
-              fontFamily: V.heading, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900,
-              color: "#fff", letterSpacing: "-0.04em", lineHeight: 1.05, margin: 0,
-              textShadow: "0 2px 40px rgba(0,0,0,0.3)",
+              fontFamily: T.font, fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 900,
+              color: "#fff", letterSpacing: "-0.035em", lineHeight: 1.08, margin: 0,
             }}>{c.client}</h1>
+
             {c.headline && (
-              <p style={{ fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)", color: "rgba(255,255,255,0.6)", marginTop: 16, maxWidth: 650, lineHeight: 1.6 }}>
-                {c.headline}
-              </p>
+              <p style={{
+                fontSize: "clamp(16px, 1.8vw, 19px)", color: "rgba(255,255,255,0.55)",
+                marginTop: 14, maxWidth: 600, lineHeight: 1.6, fontWeight: 400,
+              }}>{c.headline}</p>
             )}
           </div>
         </div>
 
-        {/* ═══ MAIN LAYOUT: sidebar + content ═══ */}
+        {/* ═══ LAYOUT ═══ */}
         <div className="case-layout" style={{
-          maxWidth: 1200, margin: "0 auto", padding: "60px 24px 120px",
-          display: "grid", gridTemplateColumns: "200px 1fr", gap: 64,
+          maxWidth: 1200, margin: "0 auto", padding: "48px 32px 100px",
+          display: "grid", gridTemplateColumns: "180px 1fr", gap: 56,
         }}>
-          {/* ── Left sidebar nav ── */}
+
+          {/* ── Sidebar ── */}
           <nav className={`side-nav${heroGone ? " stuck" : ""}`}>
             {sections.map((s, i) => (
               <div key={s.id}>
@@ -258,12 +311,12 @@ export default function CasePage() {
                   <span className={`snav-label${activeSection === s.id ? " active" : ""}`}>{s.label}</span>
                 </button>
                 {i < sections.length - 1 && (
-                  <div className="snav-line-wrap" style={{ display: "flex", justifyContent: "flex-start", paddingLeft: 3 }}>
+                  <div className="snav-line-wrap" style={{ display: "flex", paddingLeft: 2 }}>
                     <div style={{
-                      width: 1, height: 20,
-                      background: activeSection === sections[i + 1]?.id || sections.findIndex(x => x.id === activeSection) > i
-                        ? V.accent : V.divider,
-                      transition: "background .4s",
+                      width: 1, height: 16,
+                      background: sections.findIndex(x => x.id === activeSection) > i ? T.accent : T.border,
+                      transition: "background .3s",
+                      opacity: sections.findIndex(x => x.id === activeSection) > i ? 0.4 : 1,
                     }} />
                   </div>
                 )}
@@ -271,54 +324,63 @@ export default function CasePage() {
             ))}
           </nav>
 
-          {/* ── Right: continuous content ── */}
+          {/* ── Content ── */}
           <div>
 
-            {/* ═══ SECTION: OVERVIEW ═══ */}
+            {/* ═══ OVERVIEW ═══ */}
             <section ref={setRef("overview")} className="case-section" id="overview">
-              <SectionHeading num="01" title="ОБЗОР" sub={c.headline} />
+              <SectionHead num="01" title="Обзор" sub={c.headline} />
 
-              <p style={{ fontSize: "1.05rem", color: V.text, lineHeight: 1.9, maxWidth: 720, marginBottom: 44 }}>{c.desc}</p>
+              <p style={{ fontSize: 17, color: T.body, lineHeight: 1.8, maxWidth: 680, marginBottom: 36 }}>{c.desc}</p>
 
-              {/* Timeline & Model badges */}
+              {/* Meta badges */}
               {(d.timeline || d.model) && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 40 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 36 }}>
                   {d.timeline && (
-                    <span style={{ padding: "8px 16px", borderRadius: 8, background: V.accentDim, border: `1px solid rgba(160,28,45,0.1)`, fontSize: "0.75rem", fontWeight: 600, color: V.accent }}>{d.timeline}</span>
+                    <span style={{
+                      padding: "6px 14px", borderRadius: 6, fontSize: 13, fontWeight: 600,
+                      background: T.accentSoft, color: T.accent,
+                    }}>{d.timeline}</span>
                   )}
                   {d.model && (
-                    <span style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(0,0,0,0.03)", border: `1px solid ${V.border}`, fontSize: "0.75rem", fontWeight: 500, color: V.dim }}>{d.model}</span>
+                    <span style={{
+                      padding: "6px 14px", borderRadius: 6, fontSize: 13, fontWeight: 500,
+                      background: T.bgSoft, border: `1px solid ${T.border}`, color: T.secondary,
+                    }}>{d.model}</span>
                   )}
                 </div>
               )}
 
-              {/* Key metrics — bold cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 14, marginBottom: 48 }}>
+              {/* Metrics */}
+              <div style={{
+                display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: 12, marginBottom: 40,
+              }}>
                 {c.metrics.map((m, i) => (
-                  <div key={i} className="metric-card" style={{
-                    padding: "28px 28px", background: V.card, border: `1px solid ${V.divider}`, borderRadius: V.radius,
-                    position: "relative", overflow: "hidden",
+                  <div key={i} className="mc" style={{
+                    padding: "24px", background: T.bgSoft, borderRadius: T.r,
+                    border: `1px solid ${T.borderLight}`,
                   }}>
                     <div style={{
-                      position: "absolute", top: 0, left: 0, right: 0, height: 3,
-                      background: `linear-gradient(90deg, ${V.accent}, transparent)`, opacity: 0.4,
-                    }} />
-                    <div style={{ fontFamily: V.heading, fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)", fontWeight: 900, color: V.bright, marginBottom: 8, letterSpacing: "-0.04em" }}>{m.v}</div>
-                    <div style={{ fontSize: "0.76rem", color: V.dim, fontWeight: 500, lineHeight: 1.5 }}>{m.l}</div>
+                      fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800,
+                      color: T.dark, letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 6,
+                    }}>{m.v}</div>
+                    <div style={{ fontSize: 13, color: T.secondary, fontWeight: 500, lineHeight: 1.4 }}>{m.l}</div>
                   </div>
                 ))}
               </div>
 
               {/* Scope */}
-              <div style={{ marginBottom: 40 }}>
-                <div style={{ fontFamily: V.heading, fontSize: "0.58rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: V.muted, marginBottom: 12 }}>
-                  {t.caseDetail?.scope || "Скоуп"}
-                </div>
+              <div style={{ marginBottom: 36 }}>
+                <div style={{
+                  fontSize: 12, fontWeight: 600, color: T.muted, letterSpacing: "0.05em",
+                  textTransform: "uppercase", marginBottom: 10,
+                }}>{t.caseDetail?.scope || "Скоуп"}</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {c.scope.map((s, j) => (
-                    <span key={j} className="scope-tag" style={{
-                      padding: "6px 14px", borderRadius: 100, background: "rgba(0,0,0,0.03)",
-                      border: `1px solid ${V.border}`, fontSize: "0.72rem", color: V.dim, fontWeight: 500,
+                    <span key={j} className="stag" style={{
+                      padding: "5px 12px", borderRadius: 6, fontSize: 13, fontWeight: 500,
+                      background: T.bgSoft, border: `1px solid ${T.border}`, color: T.secondary,
                     }}>{s}</span>
                   ))}
                 </div>
@@ -327,66 +389,66 @@ export default function CasePage() {
               <Placeholder text="Фото реализованного проекта или скриншот сайта клиента" />
             </section>
 
-            {/* ═══ SECTION: BEFORE / AFTER ═══ */}
+            {/* ═══ BEFORE / AFTER ═══ */}
             {c.beforeAfter && (
               <section ref={setRef("before-after")} className="case-section" id="before-after">
-                <SectionHeading num="02" title="ТРАНСФОРМАЦИЯ" sub="До и после нашей работы" />
+                <SectionHead num="02" title="Трансформация" sub="До и после" />
 
-                <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 36 }}>
-                  <div style={{ padding: "36px 32px", borderRadius: V.radius, background: "rgba(0,0,0,0.02)", border: `1px solid ${V.divider}` }}>
-                    <div style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 18 }}>
-                      {t.caseDetail?.before || "До"}
-                    </div>
-                    <p style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.85, margin: 0 }}>{c.beforeAfter.before}</p>
+                <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
+                  <div style={{
+                    padding: "28px 24px", borderRadius: T.r,
+                    background: T.bgSoft, border: `1px solid ${T.borderLight}`,
+                  }}>
+                    <div style={{
+                      fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                      textTransform: "uppercase", color: T.muted, marginBottom: 14,
+                    }}>{t.caseDetail?.before || "До"}</div>
+                    <p style={{ fontSize: 15, color: T.secondary, lineHeight: 1.75, margin: 0 }}>{c.beforeAfter.before}</p>
                   </div>
-                  <div style={{ padding: "36px 32px", borderRadius: V.radius, background: V.accentDim, border: `1px solid rgba(160,28,45,0.12)`, position: "relative", overflow: "hidden" }}>
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${V.accent}, transparent)`, opacity: 0.4 }} />
-                    <div style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: V.accent, marginBottom: 18 }}>
-                      {t.caseDetail?.after || "После"}
-                    </div>
-                    <p style={{ fontSize: "0.95rem", color: V.text, lineHeight: 1.85, margin: 0 }}>{c.beforeAfter.after}</p>
+
+                  <div style={{
+                    padding: "28px 24px", borderRadius: T.r,
+                    background: T.accentSoft, borderLeft: `3px solid ${T.accent}`,
+                  }}>
+                    <div style={{
+                      fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                      textTransform: "uppercase", color: T.accent, marginBottom: 14,
+                    }}>{t.caseDetail?.after || "После"}</div>
+                    <p style={{ fontSize: 15, color: T.body, lineHeight: 1.75, margin: 0 }}>{c.beforeAfter.after}</p>
                   </div>
                 </div>
 
-                <Placeholder text="Сравнительный скриншот: состояние ДО начала работы vs текущие показатели" ratio="21/9" />
+                <Placeholder text="Сравнительный скриншот: состояние до начала работы vs текущие показатели" ratio="21/9" />
               </section>
             )}
 
-            {/* ═══ SECTION: CHALLENGE ═══ */}
+            {/* ═══ CHALLENGE ═══ */}
             <section ref={setRef("challenge")} className="case-section" id="challenge">
-              <SectionHeading num="03" title="ЗАДАЧА" sub="С чем пришёл клиент" />
-              <p style={{ fontSize: "1.08rem", color: V.text, lineHeight: 1.9, maxWidth: 720 }}>{d.challenge}</p>
+              <SectionHead num="03" title="Задача" sub="С чем пришёл клиент" />
+
+              <p style={{ fontSize: 17, color: T.body, lineHeight: 1.8, maxWidth: 680 }}>{d.challenge}</p>
 
               <div style={{ marginTop: 32 }}>
                 <Placeholder text="Общая схема маркетинговой воронки: трафик → сайт → заявка → CRM → follow-up → сделка" ratio="21/9" />
               </div>
             </section>
 
-            {/* ═══ SECTION: PROCESS ═══ */}
+            {/* ═══ PROCESS ═══ */}
             <section ref={setRef("process")} className="case-section" id="process">
-              <SectionHeading num="04" title="ПРОЦЕСС" sub="Что мы сделали" />
+              <SectionHead num="04" title="Процесс" sub="Что мы сделали" />
 
               {d.solution.map((step, idx) => (
-                <div key={idx} style={{ marginBottom: 72 }}>
-                  {/* Step header */}
-                  <div style={{ display: "flex", gap: 20, alignItems: "flex-start", marginBottom: 24 }}>
-                    <div style={{
-                      fontFamily: V.heading, fontSize: "clamp(2.5rem, 6vw, 4rem)", fontWeight: 900,
-                      color: V.accentDim, lineHeight: 0.9, flexShrink: 0, minWidth: 72,
-                    }}>
-                      {String(idx + 1).padStart(2, "0")}
-                    </div>
-                    <div style={{ flex: 1, paddingTop: 6 }}>
-                      <h3 style={{
-                        fontFamily: V.heading, fontSize: "clamp(1rem, 2vw, 1.35rem)", fontWeight: 800,
-                        color: V.bright, letterSpacing: "-0.02em", margin: "0 0 14px", lineHeight: 1.25,
-                      }}>{step.title}</h3>
-                      <p style={{ fontSize: "0.92rem", color: V.text, lineHeight: 1.85, margin: 0, maxWidth: 650 }}>{step.text}</p>
-                    </div>
-                  </div>
+                <div key={idx} className="step-row">
+                  <div className="step-num">{String(idx + 1).padStart(2, "0")}</div>
 
-                  {/* Step placeholders */}
-                  <div className="step-images" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginLeft: 92 }}>
+                  <h3 style={{
+                    fontFamily: T.font, fontSize: 20, fontWeight: 700,
+                    color: T.dark, margin: "0 0 10px", lineHeight: 1.3,
+                  }}>{step.title}</h3>
+
+                  <p style={{ fontSize: 15, color: T.body, lineHeight: 1.75, margin: 0, maxWidth: 620 }}>{step.text}</p>
+
+                  <div className="step-images">
                     {(stepPlaceholders[idx] || ["Скриншот результата", "Визуализация процесса"]).map((ph, pIdx) => (
                       <Placeholder key={pIdx} text={ph} />
                     ))}
@@ -395,25 +457,24 @@ export default function CasePage() {
               ))}
             </section>
 
-            {/* ═══ SECTION: RESULTS ═══ */}
+            {/* ═══ RESULTS ═══ */}
             <section ref={setRef("results")} className="case-section" id="results">
-              <SectionHeading num="05" title="РЕЗУЛЬТАТЫ" sub="Цифры говорят сами за себя" />
+              <SectionHead num="05" title="Результаты" sub="Цифры говорят сами" />
 
-              {/* Big numbers */}
-              <div className="results-big" style={{
-                display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 48,
+              <div className="results-grid" style={{
+                display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: 12, marginBottom: 48,
               }}>
                 {d.results.map((r, i) => (
-                  <div key={i} className="metric-card" style={{
-                    padding: "32px 28px", background: V.card, border: `1px solid ${V.divider}`,
-                    borderRadius: V.radius, textAlign: "center", position: "relative", overflow: "hidden",
+                  <div key={i} className="mc" style={{
+                    padding: "28px 24px", borderRadius: T.r, textAlign: "center",
+                    background: T.bgSoft, border: `1px solid ${T.borderLight}`,
                   }}>
                     <div style={{
-                      position: "absolute", top: 0, left: 0, right: 0, height: 3,
-                      background: `linear-gradient(90deg, ${V.accent}, transparent)`, opacity: 0.5,
-                    }} />
-                    <div style={{ fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, color: V.accent, letterSpacing: "-0.04em", marginBottom: 10, lineHeight: 1 }}>{r.v}</div>
-                    <div style={{ fontSize: "0.8rem", color: V.muted, fontWeight: 600, lineHeight: 1.5 }}>{r.l}</div>
+                      fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800,
+                      color: T.accent, letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 8,
+                    }}>{r.v}</div>
+                    <div style={{ fontSize: 13, color: T.secondary, fontWeight: 500, lineHeight: 1.4 }}>{r.l}</div>
                   </div>
                 ))}
               </div>
@@ -423,42 +484,43 @@ export default function CasePage() {
               <Placeholder text="Скриншот дашборда аналитики: Looker Studio / Google Analytics с воронкой конверсий" ratio="16/9" />
             </section>
 
-            {/* ═══ SECTION: REVIEW ═══ */}
+            {/* ═══ REVIEW ═══ */}
             <section ref={setRef("review")} className="case-section" id="review">
-              <SectionHeading num="06" title="ОТЗЫВ" sub="Что говорит клиент" />
+              <SectionHead num="06" title="Отзыв" sub="Что говорит клиент" />
 
-              {/* Quote */}
               <div style={{
-                padding: "56px 48px", background: V.accentDim, border: `1px solid rgba(160,28,45,0.08)`,
-                borderRadius: V.radius, marginBottom: 40, position: "relative",
+                padding: "40px 36px", borderRadius: T.r,
+                background: T.bgSoft, border: `1px solid ${T.borderLight}`,
+                marginBottom: 36, position: "relative",
               }}>
+                {/* Quote mark */}
                 <div style={{
-                  position: "absolute", top: 16, left: 36,
-                  fontFamily: V.heading, fontSize: "6rem", fontWeight: 900, color: V.accent, opacity: 0.10, lineHeight: 1,
-                }}>❝</div>
+                  position: "absolute", top: 20, left: 28,
+                  fontSize: 64, fontWeight: 900, color: T.accent, opacity: 0.08, lineHeight: 1,
+                  fontFamily: "Georgia, serif",
+                }}>"</div>
+
                 <blockquote style={{
-                  fontFamily: V.body, fontSize: "clamp(1.1rem, 2vw, 1.4rem)", fontWeight: 500,
-                  color: V.bright, lineHeight: 1.75, margin: 0, marginBottom: 32,
-                  fontStyle: "italic", position: "relative", zIndex: 1,
+                  fontFamily: T.font, fontSize: "clamp(17px, 2vw, 20px)", fontWeight: 400,
+                  color: T.dark, lineHeight: 1.7, margin: "0 0 28px",
+                  fontStyle: "normal", position: "relative", zIndex: 1,
                 }}>
                   Placeholder для отзыва клиента. Здесь должна быть цитата о том, как сотрудничество с Bankai Agency помогло бизнесу выйти на новый уровень — конкретные результаты, качество коммуникации, скорость работы.
                 </blockquote>
-                <div style={{ display: "flex", alignItems: "center", gap: 16, position: "relative", zIndex: 1 }}>
+
+                <Divider />
+
+                <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative", zIndex: 1 }}>
                   <div style={{
-                    width: 52, height: 52, borderRadius: 14, flexShrink: 0,
+                    width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
                     background: `linear-gradient(135deg, ${c.color1}, ${c.color3})`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "1.4rem",
-                  }}>👤</div>
+                    fontSize: 18, color: "#fff",
+                  }}>A</div>
                   <div>
-                    <div style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 800, color: V.bright }}>Имя клиента</div>
-                    <div style={{ fontSize: "0.78rem", color: V.dim, fontWeight: 500 }}>CEO / Founder</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: T.dark }}>Имя клиента</div>
+                    <div style={{ fontSize: 13, color: T.muted }}>CEO / Founder</div>
                   </div>
-                  <div style={{
-                    marginLeft: "auto",
-                    padding: "6px 16px", background: "rgba(160,28,45,0.08)", border: `1px solid rgba(160,28,45,0.12)`,
-                    borderRadius: 100, fontSize: "0.72rem", color: V.accent, fontWeight: 700,
-                  }}>✓ Рекомендует</div>
                 </div>
               </div>
 
@@ -467,45 +529,45 @@ export default function CasePage() {
 
             {/* ═══ CTA ═══ */}
             <div style={{
-              marginTop: 60, padding: "64px 52px", borderRadius: V.radius,
-              background: `linear-gradient(135deg, ${c.color1}, ${c.color2})`,
-              textAlign: "center", position: "relative", overflow: "hidden",
+              marginTop: 32, padding: "52px 44px", borderRadius: T.r,
+              background: T.dark, textAlign: "center",
             }}>
-              <div style={{ position: "absolute", inset: 0, opacity: 0.06, backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`, backgroundSize: "40px 40px" }} />
-              <div style={{ position: "relative", zIndex: 1 }}>
-                <h3 style={{
-                  fontFamily: V.heading, fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 900,
-                  color: "#fff", letterSpacing: "-0.04em", marginBottom: 16, lineHeight: 1.1,
-                }}>{t.caseDetail?.ctaTitle || "Хотите так же?"}</h3>
-                <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.65)", marginBottom: 36, lineHeight: 1.7, maxWidth: 480, margin: "0 auto 36px" }}>
-                  {t.caseDetail?.ctaSub || "Расскажите о вашем бизнесе — обсудим стратегию"}
-                </p>
-                <Link href={`/${locale}/#contact`} className="cta-btn" style={{ fontSize: "0.95rem", padding: "18px 48px" }}>
-                  {t.caseDetail?.ctaButton || "Обсудить проект"}
-                </Link>
-              </div>
+              <h3 style={{
+                fontFamily: T.font, fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800,
+                color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.15, margin: "0 0 12px",
+              }}>{t.caseDetail?.ctaTitle || "Хотите так же?"}</h3>
+              <p style={{
+                fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.6,
+                maxWidth: 420, margin: "0 auto 28px", fontWeight: 400,
+              }}>{t.caseDetail?.ctaSub || "Расскажите о вашем бизнесе — обсудим стратегию"}</p>
+              <Link href={`/${locale}/#contact`} className="cta-btn" style={{
+                background: "#fff", color: T.dark,
+              }}>
+                {t.caseDetail?.ctaButton || "Обсудить проект"}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </Link>
             </div>
 
             {/* ═══ OTHER CASES ═══ */}
-            <div style={{ marginTop: 100 }}>
+            <div style={{ marginTop: 72 }}>
               <div style={{
-                fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800,
-                letterSpacing: "0.18em", textTransform: "uppercase", color: V.muted, marginBottom: 28,
+                fontSize: 12, fontWeight: 600, color: T.muted,
+                letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 20,
               }}>{t.caseDetail?.otherCases || "Другие кейсы"}</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {cases.filter(x => x.slug !== slug).slice(0, 3).map((oc, i) => (
-                  <Link key={i} href={`/${locale}/cases/${oc.slug}`} className="oc-link" style={{
-                    display: "flex", alignItems: "center", gap: 20, padding: "20px 24px",
-                    background: V.card, border: `1px solid ${V.border}`, borderRadius: V.radiusSm,
-                    textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
-                  }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 10, flexShrink: 0, background: `linear-gradient(135deg, ${oc.color1}, ${oc.color3})` }} />
+                  <Link key={i} href={`/${locale}/cases/${oc.slug}`} className="oc-link">
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 8, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${oc.color1}, ${oc.color3})`,
+                    }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 800, color: V.bright, letterSpacing: "-0.02em" }}>{oc.client}</div>
-                      <div style={{ fontSize: "0.72rem", color: V.muted, marginTop: 2 }}>{oc.tag}</div>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: T.dark }}>{oc.client}</div>
+                      <div style={{ fontSize: 13, color: T.muted, marginTop: 1 }}>{oc.tag}</div>
                     </div>
-                    <div style={{ fontFamily: V.heading, fontSize: "1rem", fontWeight: 900, color: V.bright, flexShrink: 0 }}>{oc.result}</div>
-                    <span style={{ color: V.muted, fontSize: "0.85rem" }}>→</span>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: T.dark, flexShrink: 0 }}>{oc.result}</div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.muted} strokeWidth="2" style={{ flexShrink: 0 }}><path d="M9 18l6-6-6-6"/></svg>
                   </Link>
                 ))}
               </div>
