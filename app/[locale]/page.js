@@ -139,16 +139,16 @@ html{scroll-behavior:smooth}
 .form-input:focus{border-color:rgba(160,28,45,0.3);background:#fff;box-shadow:0 0 0 3px rgba(160,28,45,0.06)}
 .form-input::placeholder{color:#999999}
 
-/* case card — image-only, overlay on hover */
-.case-card-new{position:relative;overflow:hidden;border-radius:16px;cursor:pointer;transition:all .5s cubic-bezier(.16,1,.3,1)}
-.case-card-new:hover{transform:translateY(-6px);box-shadow:0 24px 64px rgba(0,0,0,0.12)}
-.case-card-new .case-overlay-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:36px;opacity:0;transition:all .45s cubic-bezier(.16,1,.3,1);background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 50%,rgba(0,0,0,0.05) 100%)}
-.case-card-new:hover .case-overlay-content{opacity:1}
-.case-card-new .case-img-inner{transition:transform .6s cubic-bezier(.16,1,.3,1)}
-.case-card-new:hover .case-img-inner{transform:scale(1.05)}
-.case-card-new .case-arrow-btn{transform:translateY(12px);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1) .1s}
-.case-card-new:hover .case-arrow-btn{transform:translateY(0);opacity:1}
+/* case card — chipsa style */
+.case-card-ch{position:relative;overflow:hidden;border-radius:20px;cursor:pointer;transition:all .6s cubic-bezier(.16,1,.3,1)}
+.case-card-ch:hover{transform:scale(0.985);box-shadow:0 32px 80px rgba(0,0,0,0.15)}
+.case-card-ch .case-bg-ch{transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.case-card-ch:hover .case-bg-ch{transform:scale(1.04)}
+.case-card-ch .case-btn-ch{transform:translateY(8px);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1) .1s}
+.case-card-ch:hover .case-btn-ch{transform:translateY(0);opacity:1}
 .case-card-link{display:block;text-decoration:none!important}
+.case-card-ch .case-tags-ch{transition:all .4s cubic-bezier(.16,1,.3,1)}
+.case-card-ch:hover .case-tags-ch{transform:translateY(-4px)}
 
 /* footer */
 .footer-logo:hover .footer-dot{opacity:1!important;color:#C8354A!important}
@@ -179,7 +179,9 @@ html{scroll-behavior:smooth}
   .footer-bottom{flex-direction:column!important;gap:16px!important;align-items:flex-start!important}
   .cases-masonry{grid-template-columns:1fr!important}
   .cases-masonry>div:last-child{padding-top:0!important}
-  .case-card-new{height:300px!important}
+  .case-card-ch{height:360px!important}
+  .case-hero-ch{height:420px!important}
+  .cases-heading-ch{font-size:3rem!important}
   .stat-grid{grid-template-columns:repeat(3,1fr)!important;gap:16px!important}
   .services-split{grid-template-columns:1fr!important}
   .hero-grid{grid-template-columns:1fr!important;gap:32px!important}
@@ -1294,45 +1296,68 @@ function Process({ t }) {
   );
 }
 
-function CaseCard({ c, locale, delay }) {
+function CaseCardChipsa({ c, locale, delay, isHero }) {
+  const h = isHero ? 560 : 440;
   return (
-    <Reveal delay={delay} type="scale" duration={0.8}>
+    <Reveal delay={delay} type="up" duration={0.8}>
       <Link href={`/${locale}/cases/${c.slug}`} className="case-card-link">
-        <div className="case-card-new" style={{ height: 380, borderRadius: V.radius }}>
-          <div className="case-img-inner" style={{
+        <div className={`case-card-ch ${isHero ? "case-hero-ch" : ""}`} style={{ height: h, borderRadius: 20, position: "relative", overflow: "hidden" }}>
+          {/* gradient bg */}
+          <div className="case-bg-ch" style={{
             position: "absolute", inset: 0,
             background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
-            borderRadius: "inherit",
           }}>
-            <div style={{ position: "absolute", top: "10%", right: "8%", width: "50%", height: "50%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}25, transparent 65%)` }} />
-            <div style={{ position: "absolute", bottom: "12%", left: "5%", width: "35%", height: "35%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}18, transparent 70%)` }} />
-            <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: `linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)`, backgroundSize: "50px 50px" }} />
+            <div style={{ position: "absolute", top: "8%", right: "6%", width: "55%", height: "55%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}30, transparent 60%)` }} />
+            <div style={{ position: "absolute", bottom: "10%", left: "4%", width: "40%", height: "40%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}20, transparent 65%)` }} />
+            {isHero && <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "70%", height: "70%", borderRadius: "50%", background: `radial-gradient(circle, ${c.accent}15, transparent 50%)` }} />}
+            <div style={{ position: "absolute", inset: 0, opacity: 0.03, backgroundImage: `linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
           </div>
-          <div style={{ position: "absolute", top: 24, left: 28, zIndex: 2 }}>
-            <div style={{ fontFamily: V.heading, fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>{c.client}</div>
+
+          {/* top: client name */}
+          <div style={{ position: "absolute", top: isHero ? 36 : 28, left: isHero ? 40 : 28, zIndex: 3 }}>
+            <h3 style={{
+              fontFamily: V.heading,
+              fontSize: isHero ? "clamp(2rem, 4vw, 3.2rem)" : "clamp(1.4rem, 2.5vw, 2rem)",
+              fontWeight: 900, color: "#fff", letterSpacing: "-0.04em", lineHeight: 1.05, margin: 0,
+            }}>{c.client}</h3>
           </div>
-          <div style={{ position: "absolute", top: 20, right: 24, zIndex: 2, background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", borderRadius: 8, padding: "8px 14px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div style={{ fontFamily: V.heading, fontSize: "1.1rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1 }}>{c.result}</div>
-            <div style={{ fontSize: "0.48rem", color: "rgba(255,255,255,0.5)", fontWeight: 600, marginTop: 2 }}>{c.resultLabel}</div>
+
+          {/* top-right: status badge */}
+          <div style={{
+            position: "absolute", top: isHero ? 36 : 28, right: isHero ? 40 : 28, zIndex: 3,
+            background: V.accent, borderRadius: 6, padding: "6px 14px",
+          }}>
+            <span style={{ fontFamily: V.heading, fontSize: "0.7rem", fontWeight: 800, color: "#fff", letterSpacing: "0.06em", textTransform: "uppercase" }}>{c.result}</span>
           </div>
-          <div className="case-overlay-content">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-              {c.tag.split(" · ").map((tg, j) => (
-                <span key={j} style={{ padding: "4px 10px", borderRadius: 4, fontSize: "0.52rem", fontWeight: 700, background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.85)", letterSpacing: "0.08em", backdropFilter: "blur(4px)" }}>{tg}</span>
-              ))}
-            </div>
-            <h3 style={{ fontFamily: V.heading, fontSize: "clamp(1.2rem, 2vw, 1.6rem)", fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.15 }}>{c.client}</h3>
-            <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 20, maxWidth: 400, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{c.desc}</p>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", gap: 24 }}>
-                {c.metrics.map((m, j) => (
-                  <div key={j}>
-                    <div style={{ fontFamily: V.heading, fontSize: "0.82rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 1 }}>{m.v}</div>
-                    <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.4)" }}>{m.l}</div>
-                  </div>
+
+          {/* bottom: tags + metrics */}
+          <div className="case-tags-ch" style={{
+            position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 3,
+            padding: isHero ? "0 40px 36px" : "0 28px 28px",
+            background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)",
+            paddingTop: 80,
+          }}>
+            {isHero && (
+              <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.6, marginBottom: 20, maxWidth: 600 }}>{c.desc}</p>
+            )}
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {c.tag.split(" · ").map((tg, j) => (
+                  <span key={j} style={{
+                    padding: "5px 14px", borderRadius: 6, fontSize: "0.65rem", fontWeight: 700,
+                    background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.9)",
+                    letterSpacing: "0.05em", backdropFilter: "blur(6px)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}>{tg}</span>
                 ))}
               </div>
-              <div className="case-arrow-btn" style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1rem", flexShrink: 0 }}>→</div>
+              <div className="case-btn-ch" style={{
+                width: 44, height: 44, borderRadius: "50%",
+                background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontSize: "1.1rem", flexShrink: 0,
+              }}>↗</div>
             </div>
           </div>
         </div>
@@ -1342,24 +1367,37 @@ function CaseCard({ c, locale, delay }) {
 }
 
 function Cases({ t, locale, cases }) {
-  return (
-    <section id="cases" style={{ padding: "120px 0", position: "relative", zIndex: 1 }}>
-      <div style={cx}>
-        <Reveal type="fade"><Label num="04" text={t.cases.label} /></Reveal>
-        <RevealHeading delay={80} className="section-heading" style={{
-          fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
-          lineHeight: 1.06, letterSpacing: "-0.04em", color: V.bright, maxWidth: 700, marginBottom: 56,
-        }}>{t.cases.heading}</RevealHeading>
+  const heroCase = cases[0];
+  const restCases = cases.slice(1);
 
-        <div className="cases-masonry" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+  return (
+    <section id="cases" style={{ padding: "120px 0 140px", position: "relative", zIndex: 1 }}>
+      <div style={cx}>
+        {/* Giant heading — chipsa style */}
+        <Reveal type="up" duration={0.7}>
+          <h2 className="cases-heading-ch" style={{
+            fontFamily: V.heading,
+            fontSize: "clamp(3.5rem, 8vw, 7rem)",
+            fontWeight: 900, color: V.bright, letterSpacing: "-0.05em",
+            lineHeight: 0.95, margin: 0, marginBottom: 56,
+          }}>{t.cases.label}</h2>
+        </Reveal>
+
+        {/* Hero case — full width */}
+        <div style={{ marginBottom: 20 }}>
+          <CaseCardChipsa c={heroCase} locale={locale} delay={100} isHero={true} />
+        </div>
+
+        {/* 2-col asymmetric grid */}
+        <div className="cases-masonry" style={{ display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: 20, alignItems: "start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {cases.filter((_, i) => i % 2 === 0).map((c, i) => (
-              <CaseCard key={c.slug} c={c} locale={locale} delay={120 + i * 160} />
+            {restCases.filter((_, i) => i % 2 === 0).map((c, i) => (
+              <CaseCardChipsa key={c.slug} c={c} locale={locale} delay={180 + i * 120} />
             ))}
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 20, paddingTop: 80 }}>
-            {cases.filter((_, i) => i % 2 === 1).map((c, i) => (
-              <CaseCard key={c.slug} c={c} locale={locale} delay={200 + i * 160} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, paddingTop: 60 }}>
+            {restCases.filter((_, i) => i % 2 === 1).map((c, i) => (
+              <CaseCardChipsa key={c.slug} c={c} locale={locale} delay={240 + i * 120} />
             ))}
           </div>
         </div>
