@@ -25,12 +25,28 @@ const Placeholder = ({ text, ratio = "16/9" }) => {
   );
 };
 
-/* ── Section label ── */
-const SectionLabel = ({ text }) => (
-  <div style={{
-    fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-    letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 20,
-  }}>{text}</div>
+/* ── Section heading with large number accent ── */
+const SectionHeading = ({ num, title, sub }) => (
+  <div style={{ marginBottom: 48, position: "relative" }}>
+    {/* Giant background number */}
+    <div style={{
+      fontFamily: V.heading, fontSize: "clamp(5rem, 12vw, 8rem)", fontWeight: 900,
+      color: "rgba(0,0,0,0.025)", lineHeight: 0.8, position: "absolute",
+      top: -20, left: -8, pointerEvents: "none", userSelect: "none",
+    }}>{num}</div>
+    <div style={{ position: "relative", zIndex: 1 }}>
+      <div style={{
+        fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
+        letterSpacing: "0.18em", textTransform: "uppercase", color: V.accent, marginBottom: 12,
+      }}>{num} — {title}</div>
+      {sub && (
+        <h2 style={{
+          fontFamily: V.heading, fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900,
+          color: V.bright, letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0,
+        }}>{sub}</h2>
+      )}
+    </div>
+  </div>
 );
 
 /* ── CSS ── */
@@ -47,13 +63,14 @@ const css = `
 .metric-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.06)}
 
 /* sidebar nav */
-.side-nav{position:sticky;top:100px;align-self:start}
+.side-nav{position:relative;align-self:start}
+.side-nav.stuck{position:sticky;top:40px}
 .side-nav-item{display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:all .3s;font-family:${V.body}}
 .side-nav-item:hover .snav-label{color:${V.bright}}
 .snav-dot{width:6px;height:6px;border-radius:50%;background:${V.divider};transition:all .4s cubic-bezier(.16,1,.3,1);flex-shrink:0}
 .snav-dot.active{width:8px;height:8px;background:${V.accent};box-shadow:0 0 12px rgba(160,28,45,0.3)}
-.snav-label{font-size:0.78rem;font-weight:500;color:${V.muted};transition:all .3s;line-height:1.3}
-.snav-label.active{color:${V.bright};font-weight:700}
+.snav-label{font-size:0.8rem;font-weight:600;color:${V.muted};transition:all .3s;line-height:1.3;letter-spacing:0.01em}
+.snav-label.active{color:${V.bright};font-weight:800}
 .snav-line{width:1px;height:100%;background:${V.divider};margin-left:3px}
 
 /* content sections */
@@ -111,7 +128,21 @@ export default function CasePage() {
   ];
 
   const sectionRefs = useRef({});
+  const heroRef = useRef(null);
   const [activeSection, setActiveSection] = useState("overview");
+  const [heroGone, setHeroGone] = useState(false);
+
+  /* Hero observer — detect when hero leaves viewport */
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setHeroGone(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     const observers = [];
@@ -151,7 +182,7 @@ export default function CasePage() {
 
       <div style={{ minHeight: "100vh", fontFamily: V.body, color: V.text }}>
         {/* ═══ HERO ═══ */}
-        <div className="case-hero" style={{
+        <div ref={heroRef} className="case-hero" style={{
           width: "100%", minHeight: 480, position: "relative", overflow: "hidden",
           background: `linear-gradient(135deg, ${c.color1}, ${c.color2}, ${c.color3})`,
         }}>
@@ -219,7 +250,7 @@ export default function CasePage() {
           display: "grid", gridTemplateColumns: "200px 1fr", gap: 64,
         }}>
           {/* ── Left sidebar nav ── */}
-          <nav className="side-nav">
+          <nav className={`side-nav${heroGone ? " stuck" : ""}`}>
             {sections.map((s, i) => (
               <div key={s.id}>
                 <button className="side-nav-item" onClick={() => scrollTo(s.id)}>
@@ -245,9 +276,9 @@ export default function CasePage() {
 
             {/* ═══ SECTION: OVERVIEW ═══ */}
             <section ref={setRef("overview")} className="case-section" id="overview">
-              <SectionLabel text="Обзор проекта" />
+              <SectionHeading num="01" title="ОБЗОР" sub={c.headline} />
 
-              <p style={{ fontSize: "1rem", color: V.text, lineHeight: 1.85, maxWidth: 720, marginBottom: 40 }}>{c.desc}</p>
+              <p style={{ fontSize: "1.05rem", color: V.text, lineHeight: 1.9, maxWidth: 720, marginBottom: 44 }}>{c.desc}</p>
 
               {/* Timeline & Model badges */}
               {(d.timeline || d.model) && (
@@ -261,14 +292,19 @@ export default function CasePage() {
                 </div>
               )}
 
-              {/* Key metrics */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 40 }}>
+              {/* Key metrics — bold cards */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 14, marginBottom: 48 }}>
                 {c.metrics.map((m, i) => (
                   <div key={i} className="metric-card" style={{
-                    padding: "20px 24px", background: V.card, border: `1px solid ${V.divider}`, borderRadius: V.radiusSm,
+                    padding: "28px 28px", background: V.card, border: `1px solid ${V.divider}`, borderRadius: V.radius,
+                    position: "relative", overflow: "hidden",
                   }}>
-                    <div style={{ fontFamily: V.heading, fontSize: "1.4rem", fontWeight: 900, color: V.bright, marginBottom: 6, letterSpacing: "-0.03em" }}>{m.v}</div>
-                    <div style={{ fontSize: "0.72rem", color: V.muted, fontWeight: 500, lineHeight: 1.4 }}>{m.l}</div>
+                    <div style={{
+                      position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                      background: `linear-gradient(90deg, ${V.accent}, transparent)`, opacity: 0.4,
+                    }} />
+                    <div style={{ fontFamily: V.heading, fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)", fontWeight: 900, color: V.bright, marginBottom: 8, letterSpacing: "-0.04em" }}>{m.v}</div>
+                    <div style={{ fontSize: "0.76rem", color: V.dim, fontWeight: 500, lineHeight: 1.5 }}>{m.l}</div>
                   </div>
                 ))}
               </div>
@@ -294,20 +330,21 @@ export default function CasePage() {
             {/* ═══ SECTION: BEFORE / AFTER ═══ */}
             {c.beforeAfter && (
               <section ref={setRef("before-after")} className="case-section" id="before-after">
-                <SectionLabel text="До / После" />
+                <SectionHeading num="02" title="ТРАНСФОРМАЦИЯ" sub="До и после нашей работы" />
 
-                <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
-                  <div style={{ padding: "32px 28px", borderRadius: V.radius, background: "rgba(0,0,0,0.02)", border: `1px solid ${V.divider}` }}>
-                    <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: V.muted, marginBottom: 14 }}>
+                <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 36 }}>
+                  <div style={{ padding: "36px 32px", borderRadius: V.radius, background: "rgba(0,0,0,0.02)", border: `1px solid ${V.divider}` }}>
+                    <div style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 18 }}>
                       {t.caseDetail?.before || "До"}
                     </div>
-                    <p style={{ fontSize: "0.88rem", color: V.dim, lineHeight: 1.8, margin: 0 }}>{c.beforeAfter.before}</p>
+                    <p style={{ fontSize: "0.95rem", color: V.dim, lineHeight: 1.85, margin: 0 }}>{c.beforeAfter.before}</p>
                   </div>
-                  <div style={{ padding: "32px 28px", borderRadius: V.radius, background: V.accentDim, border: `1px solid rgba(160,28,45,0.1)` }}>
-                    <div style={{ fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: V.accent, marginBottom: 14 }}>
+                  <div style={{ padding: "36px 32px", borderRadius: V.radius, background: V.accentDim, border: `1px solid rgba(160,28,45,0.12)`, position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${V.accent}, transparent)`, opacity: 0.4 }} />
+                    <div style={{ fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: V.accent, marginBottom: 18 }}>
                       {t.caseDetail?.after || "После"}
                     </div>
-                    <p style={{ fontSize: "0.88rem", color: V.text, lineHeight: 1.8, margin: 0 }}>{c.beforeAfter.after}</p>
+                    <p style={{ fontSize: "0.95rem", color: V.text, lineHeight: 1.85, margin: 0 }}>{c.beforeAfter.after}</p>
                   </div>
                 </div>
 
@@ -317,8 +354,8 @@ export default function CasePage() {
 
             {/* ═══ SECTION: CHALLENGE ═══ */}
             <section ref={setRef("challenge")} className="case-section" id="challenge">
-              <SectionLabel text={t.caseDetail?.challenge || "Задача"} />
-              <p style={{ fontSize: "0.95rem", color: V.text, lineHeight: 1.85, maxWidth: 720 }}>{d.challenge}</p>
+              <SectionHeading num="03" title="ЗАДАЧА" sub="С чем пришёл клиент" />
+              <p style={{ fontSize: "1.08rem", color: V.text, lineHeight: 1.9, maxWidth: 720 }}>{d.challenge}</p>
 
               <div style={{ marginTop: 32 }}>
                 <Placeholder text="Общая схема маркетинговой воронки: трафик → сайт → заявка → CRM → follow-up → сделка" ratio="21/9" />
@@ -327,7 +364,7 @@ export default function CasePage() {
 
             {/* ═══ SECTION: PROCESS ═══ */}
             <section ref={setRef("process")} className="case-section" id="process">
-              <SectionLabel text={t.caseDetail?.solution || "Что мы сделали"} />
+              <SectionHeading num="04" title="ПРОЦЕСС" sub="Что мы сделали" />
 
               {d.solution.map((step, idx) => (
                 <div key={idx} style={{ marginBottom: 72 }}>
@@ -360,7 +397,7 @@ export default function CasePage() {
 
             {/* ═══ SECTION: RESULTS ═══ */}
             <section ref={setRef("results")} className="case-section" id="results">
-              <SectionLabel text="Результаты" />
+              <SectionHeading num="05" title="РЕЗУЛЬТАТЫ" sub="Цифры говорят сами за себя" />
 
               {/* Big numbers */}
               <div className="results-big" style={{
@@ -368,11 +405,15 @@ export default function CasePage() {
               }}>
                 {d.results.map((r, i) => (
                   <div key={i} className="metric-card" style={{
-                    padding: "28px 24px", background: V.card, border: `1px solid ${V.divider}`,
-                    borderRadius: V.radius, textAlign: "center",
+                    padding: "32px 28px", background: V.card, border: `1px solid ${V.divider}`,
+                    borderRadius: V.radius, textAlign: "center", position: "relative", overflow: "hidden",
                   }}>
-                    <div style={{ fontFamily: V.heading, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", fontWeight: 900, color: V.accent, letterSpacing: "-0.03em", marginBottom: 8 }}>{r.v}</div>
-                    <div style={{ fontSize: "0.76rem", color: V.muted, fontWeight: 500, lineHeight: 1.4 }}>{r.l}</div>
+                    <div style={{
+                      position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                      background: `linear-gradient(90deg, ${V.accent}, transparent)`, opacity: 0.5,
+                    }} />
+                    <div style={{ fontFamily: V.heading, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, color: V.accent, letterSpacing: "-0.04em", marginBottom: 10, lineHeight: 1 }}>{r.v}</div>
+                    <div style={{ fontSize: "0.8rem", color: V.muted, fontWeight: 600, lineHeight: 1.5 }}>{r.l}</div>
                   </div>
                 ))}
               </div>
@@ -384,39 +425,39 @@ export default function CasePage() {
 
             {/* ═══ SECTION: REVIEW ═══ */}
             <section ref={setRef("review")} className="case-section" id="review">
-              <SectionLabel text="Отзыв клиента" />
+              <SectionHeading num="06" title="ОТЗЫВ" sub="Что говорит клиент" />
 
               {/* Quote */}
               <div style={{
-                padding: "48px 40px", background: V.accentDim, border: `1px solid rgba(160,28,45,0.08)`,
+                padding: "56px 48px", background: V.accentDim, border: `1px solid rgba(160,28,45,0.08)`,
                 borderRadius: V.radius, marginBottom: 40, position: "relative",
               }}>
                 <div style={{
-                  position: "absolute", top: 20, left: 32,
-                  fontFamily: V.heading, fontSize: "4rem", fontWeight: 900, color: V.accent, opacity: 0.12, lineHeight: 1,
+                  position: "absolute", top: 16, left: 36,
+                  fontFamily: V.heading, fontSize: "6rem", fontWeight: 900, color: V.accent, opacity: 0.10, lineHeight: 1,
                 }}>❝</div>
                 <blockquote style={{
-                  fontFamily: V.body, fontSize: "clamp(1rem, 1.8vw, 1.2rem)", fontWeight: 500,
-                  color: V.bright, lineHeight: 1.7, margin: 0, marginBottom: 24,
+                  fontFamily: V.body, fontSize: "clamp(1.1rem, 2vw, 1.4rem)", fontWeight: 500,
+                  color: V.bright, lineHeight: 1.75, margin: 0, marginBottom: 32,
                   fontStyle: "italic", position: "relative", zIndex: 1,
                 }}>
                   Placeholder для отзыва клиента. Здесь должна быть цитата о том, как сотрудничество с Bankai Agency помогло бизнесу выйти на новый уровень — конкретные результаты, качество коммуникации, скорость работы.
                 </blockquote>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative", zIndex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, position: "relative", zIndex: 1 }}>
                   <div style={{
-                    width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                    width: 52, height: 52, borderRadius: 14, flexShrink: 0,
                     background: `linear-gradient(135deg, ${c.color1}, ${c.color3})`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "1.2rem",
+                    fontSize: "1.4rem",
                   }}>👤</div>
                   <div>
-                    <div style={{ fontFamily: V.heading, fontSize: "0.85rem", fontWeight: 700, color: V.bright }}>Имя клиента</div>
-                    <div style={{ fontSize: "0.75rem", color: V.dim }}>CEO / Founder</div>
+                    <div style={{ fontFamily: V.heading, fontSize: "0.95rem", fontWeight: 800, color: V.bright }}>Имя клиента</div>
+                    <div style={{ fontSize: "0.78rem", color: V.dim, fontWeight: 500 }}>CEO / Founder</div>
                   </div>
                   <div style={{
                     marginLeft: "auto",
-                    padding: "5px 12px", background: "rgba(160,28,45,0.08)", border: `1px solid rgba(160,28,45,0.12)`,
-                    borderRadius: 100, fontSize: "0.68rem", color: V.accent, fontWeight: 600,
+                    padding: "6px 16px", background: "rgba(160,28,45,0.08)", border: `1px solid rgba(160,28,45,0.12)`,
+                    borderRadius: 100, fontSize: "0.72rem", color: V.accent, fontWeight: 700,
                   }}>✓ Рекомендует</div>
                 </div>
               </div>
@@ -426,27 +467,30 @@ export default function CasePage() {
 
             {/* ═══ CTA ═══ */}
             <div style={{
-              marginTop: 40, padding: "52px 44px", borderRadius: V.radius,
+              marginTop: 60, padding: "64px 52px", borderRadius: V.radius,
               background: `linear-gradient(135deg, ${c.color1}, ${c.color2})`,
-              textAlign: "center",
+              textAlign: "center", position: "relative", overflow: "hidden",
             }}>
-              <h3 style={{
-                fontFamily: V.heading, fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)", fontWeight: 800,
-                color: "#fff", letterSpacing: "-0.03em", marginBottom: 12,
-              }}>{t.caseDetail?.ctaTitle || "Хотите так же?"}</h3>
-              <p style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.6)", marginBottom: 28, lineHeight: 1.6 }}>
-                {t.caseDetail?.ctaSub || "Расскажите о вашем бизнесе — обсудим стратегию"}
-              </p>
-              <Link href={`/${locale}/#contact`} className="cta-btn">
-                {t.caseDetail?.ctaButton || "Обсудить проект"}
-              </Link>
+              <div style={{ position: "absolute", inset: 0, opacity: 0.06, backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`, backgroundSize: "40px 40px" }} />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <h3 style={{
+                  fontFamily: V.heading, fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 900,
+                  color: "#fff", letterSpacing: "-0.04em", marginBottom: 16, lineHeight: 1.1,
+                }}>{t.caseDetail?.ctaTitle || "Хотите так же?"}</h3>
+                <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.65)", marginBottom: 36, lineHeight: 1.7, maxWidth: 480, margin: "0 auto 36px" }}>
+                  {t.caseDetail?.ctaSub || "Расскажите о вашем бизнесе — обсудим стратегию"}
+                </p>
+                <Link href={`/${locale}/#contact`} className="cta-btn" style={{ fontSize: "0.95rem", padding: "18px 48px" }}>
+                  {t.caseDetail?.ctaButton || "Обсудить проект"}
+                </Link>
+              </div>
             </div>
 
             {/* ═══ OTHER CASES ═══ */}
-            <div style={{ marginTop: 80 }}>
+            <div style={{ marginTop: 100 }}>
               <div style={{
-                fontFamily: V.heading, fontSize: "0.6rem", fontWeight: 700,
-                letterSpacing: "0.16em", textTransform: "uppercase", color: V.muted, marginBottom: 24,
+                fontFamily: V.heading, fontSize: "0.65rem", fontWeight: 800,
+                letterSpacing: "0.18em", textTransform: "uppercase", color: V.muted, marginBottom: 28,
               }}>{t.caseDetail?.otherCases || "Другие кейсы"}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {cases.filter(x => x.slug !== slug).slice(0, 3).map((oc, i) => (
