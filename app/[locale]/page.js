@@ -955,16 +955,85 @@ function Hero({ t, locale }) {
             </Reveal>
           </div>
 
-          {/* AI Chat — right side */}
+          {/* AI Chat — right side with floating metric cards behind */}
           <div className="hero-right" style={{
             transform: `translateY(-${cardsY}px)`,
             opacity: cardsOpacity,
             willChange: "transform, opacity",
             position: "relative", zIndex: 2,
+            minHeight: 480,
           }}>
-            <Reveal delay={400} type="scale" duration={1}>
-              <AiChat t={t} locale={locale} />
-            </Reveal>
+            {/* ── Floating metric cards (background layer) ── */}
+            <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+              {/* Card: top-right — project count */}
+              <div className="hero-float-1 hero-visual-card" style={{
+                position: "absolute", top: -16, right: -20,
+                background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)",
+                border: `1px solid ${V.border}`, borderRadius: 14,
+                padding: "14px 18px", minWidth: 120,
+                boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V.muted, letterSpacing: "0.04em", marginBottom: 4 }}>Projects</div>
+                <div style={{ fontFamily: V.heading, fontSize: 28, fontWeight: 800, color: V.bright, letterSpacing: "-0.03em", lineHeight: 1 }}>50+</div>
+              </div>
+
+              {/* Card: top-left — revenue */}
+              <div className="hero-float-2 hero-visual-card" style={{
+                position: "absolute", top: 24, left: -32,
+                background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)",
+                border: `1px solid ${V.border}`, borderRadius: 14,
+                padding: "14px 18px", minWidth: 130,
+                boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V.muted, letterSpacing: "0.04em", marginBottom: 4 }}>{t.hero.card2?.budget || "Revenue"}</div>
+                <div style={{ fontFamily: V.heading, fontSize: 28, fontWeight: 800, color: V.accent, letterSpacing: "-0.03em", lineHeight: 1 }}>$14.6M</div>
+              </div>
+
+              {/* Card: bottom-right — CPA */}
+              <div className="hero-float-3 hero-visual-card" style={{
+                position: "absolute", bottom: 24, right: -28,
+                background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)",
+                border: `1px solid ${V.border}`, borderRadius: 14,
+                padding: "14px 18px", minWidth: 110,
+                boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V.muted, letterSpacing: "0.04em", marginBottom: 4 }}>CPA</div>
+                <div style={{ fontFamily: V.heading, fontSize: 28, fontWeight: 800, color: "#16a34a", letterSpacing: "-0.03em", lineHeight: 1 }}>−40%</div>
+              </div>
+
+              {/* Card: bottom-left — orders */}
+              <div className="hero-float-1 hero-visual-card" style={{
+                position: "absolute", bottom: -8, left: -16,
+                background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)",
+                border: `1px solid ${V.border}`, borderRadius: 14,
+                padding: "14px 18px", minWidth: 115,
+                boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+                animationDelay: "1.5s",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V.muted, letterSpacing: "0.04em", marginBottom: 4 }}>{t.hero.card2?.orders || "Orders"}</div>
+                <div style={{ fontFamily: V.heading, fontSize: 28, fontWeight: 800, color: V.bright, letterSpacing: "-0.03em", lineHeight: 1 }}>10K+</div>
+              </div>
+
+              {/* Card: mid-right — conversion */}
+              <div className="hero-float-2 hero-visual-card" style={{
+                position: "absolute", top: "50%", right: -36, marginTop: -20,
+                background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)",
+                border: `1px solid ${V.border}`, borderRadius: 14,
+                padding: "12px 16px",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+                animationDelay: "0.8s",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: V.muted, letterSpacing: "0.04em", marginBottom: 4 }}>ROAS</div>
+                <div style={{ fontFamily: V.heading, fontSize: 22, fontWeight: 800, color: V.accent, letterSpacing: "-0.03em", lineHeight: 1 }}>5.2×</div>
+              </div>
+            </div>
+
+            {/* AI Chat (foreground) */}
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <Reveal delay={400} type="scale" duration={1}>
+                <AiChat t={t} locale={locale} />
+              </Reveal>
+            </div>
           </div>
         </div>
       </div>
