@@ -203,11 +203,10 @@ export default function CasePage() {
           {c.video && (
             <>
               <video
-                autoPlay muted loop playsInline
+                autoPlay muted loop playsInline preload="auto"
+                src={c.video}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
-              >
-                <source src={c.video} type="video/mp4" />
-              </video>
+              />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, rgba(0,0,0,0.55), rgba(0,0,0,0.3))", zIndex: 1 }} />
             </>
           )}

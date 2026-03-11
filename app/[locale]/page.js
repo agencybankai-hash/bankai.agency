@@ -1306,11 +1306,10 @@ function CaseCardChipsa({ c, locale, delay, isHero }) {
           {c.video ? (
             <div className="case-bg-ch" style={{ position: "absolute", inset: 0 }}>
               <video
-                autoPlay muted loop playsInline
+                autoPlay muted loop playsInline preload="auto"
+                src={c.video}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-              >
-                <source src={c.video} type="video/mp4" />
-              </video>
+              />
               {/* dark overlay for readability */}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25))" }} />
             </div>
