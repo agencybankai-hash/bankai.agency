@@ -693,8 +693,7 @@ function AiChat({ t, locale }) {
 
   return (
     <div style={{
-      background: "rgba(255,255,255,0.75)",
-      backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+      background: "#ffffff",
       border: `1px solid ${V.border}`,
       borderRadius: 20,
       boxShadow: "0 8px 48px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
