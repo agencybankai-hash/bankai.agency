@@ -2,7 +2,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Lenis from "lenis";
 import { getCases, V } from "../data";
+import { getDictionary } from "../../../i18n";
 
 /* ── Lazy video: only loads & plays when visible ── */
 function LazyVideo({ src, style }) {
@@ -26,7 +28,24 @@ function LazyVideo({ src, style }) {
   }, [src]);
   return <video ref={ref} muted loop playsInline preload="auto" style={style} />;
 }
-import { getDictionary } from "../../../i18n";
+
+/* ── Lenis smooth scroll hook ── */
+function useLenis() {
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      smoothWheel: true,
+    });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+    return () => lenis.destroy();
+  }, []);
+}
 
 /* ── Fonts ── */
 const F = {
@@ -101,7 +120,7 @@ const resultIcons = ["star", "time", "team", "pages", "globe", "money"];
 /* ── CSS ── */
 const css = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0}
+*{box-sizing:border-box}html.lenis,html.lenis body{height:auto;overflow:auto}html.lenis.lenis-smooth{scroll-behavior:auto}body{margin:0}
 
 .ch-back{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.55);text-decoration:none;transition:all .25s;letter-spacing:0.04em;font-family:${F.body};text-transform:uppercase}
 .ch-back:hover{color:#fff}
@@ -175,6 +194,7 @@ export default function CasePage() {
   const t = getDictionary(locale);
   const cases = getCases(locale);
   const c = cases.find(x => x.slug === slug);
+  useLenis();
 
   if (!c) return (
     <div style={{ padding: 80, textAlign: "center", fontFamily: F.body, color: T.muted }}>
@@ -214,11 +234,12 @@ export default function CasePage() {
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      <div style={{ minHeight: "100vh", fontFamily: F.body, color: T.body, background: T.bg }}>
+      <div style={{ fontFamily: F.body, color: T.body, background: T.bg }}>
 
-        {/* ═══ HERO ═══ */}
+        {/* ═══ HERO — sticky, stays behind content ═══ */}
         <div style={{
-          width: "100%", minHeight: "100vh", position: "relative", overflow: "hidden",
+          width: "100%", height: "100vh", position: "sticky", top: 0, zIndex: 1,
+          overflow: "hidden",
           background: `linear-gradient(160deg, ${c.color1}, ${c.color2}, ${c.color3})`,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         }}>
@@ -283,8 +304,13 @@ export default function CasePage() {
           </div>
         </div>
 
-        {/* ═══ CONTENT — всё в одном контейнере ═══ */}
-        <div id="about" style={{ scrollMarginTop: 40 }}>
+        {/* ═══ CONTENT — slides over hero ═══ */}
+        <div id="about" style={{
+          position: "relative", zIndex: 2, background: T.bg,
+          borderRadius: "24px 24px 0 0",
+          marginTop: "-24px",
+          boxShadow: "0 -8px 40px rgba(0,0,0,0.08)",
+        }}>
 
           {/* ── О ПРОЕКТЕ ── */}
           <S h={80} />
